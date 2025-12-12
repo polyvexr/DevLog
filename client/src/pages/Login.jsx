@@ -17,7 +17,10 @@ export default function Login() {
 
   return (
     <div className="h-screen flex items-center justify-center bg-gray-100">
-      <form onSubmit={handleSubmit} className="bg-white p-6 shadow rounded w-96">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white p-6 shadow rounded w-96"
+      >
         <h2 className="text-2xl mb-4 font-bold">Login</h2>
 
         <input
@@ -39,7 +42,7 @@ export default function Login() {
         </button>
         <div className="mt-4 text-center">
           <p className="text-sm">
-            Don't have an account?{' '}
+            Don't have an account?{" "}
             <Link to="/register" className="text-blue-500 underline">
               Register
             </Link>
