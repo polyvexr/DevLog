@@ -1,7 +1,7 @@
 import { useState, useContext } from "react";
 import api from "../api/axios";
 import { AuthContext } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 export default function Login() {
   const { login } = useContext(AuthContext);
@@ -37,6 +37,14 @@ export default function Login() {
         <button className="bg-blue-500 text-white w-full p-2 rounded">
           Login
         </button>
+        <div className="mt-4 text-center">
+          <p className="text-sm">
+            Don't have an account?{' '}
+            <Link to="/register" className="text-blue-500 underline">
+              Register
+            </Link>
+          </p>
+        </div>
       </form>
     </div>
   );

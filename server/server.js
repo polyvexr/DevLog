@@ -11,6 +11,7 @@ import "./src/cron/codeforcesCron.js";
 import "./src/cron/githubCron.js";
 
 import cors from "cors";
+import path from "path";
 
 dotenv.config();
 connectDB();
@@ -26,6 +27,16 @@ app.use(cors());
 app.use("/api/auth", authRoutes);
 app.use("/api/platforms", platformRoutes);
 app.use("/api/stats", statsRoutes);
+
+// Serve client build and fallback to index.html for client-side routes
+const __dirname = path.resolve();
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "client", "dist")));
+  app.get("*", (req, res) => {
+    if (req.path.startsWith("/api")) return res.status(404).send("Not Found");
+    res.sendFile(path.join(__dirname, "client", "dist", "index.html"));
+  });
+}
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () =>
