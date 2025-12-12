@@ -21,13 +21,12 @@ app.use(express.json());
 
 // CORS: allow specific client origin via env or fall back to allow all
 const corsOptions = {
-  origin: process.env.CLIENT_ORIGIN || '*',
-  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  origin: process.env.CLIENT_ORIGIN || "*",
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
   optionsSuccessStatus: 200,
 };
 app.use(cors(corsOptions));
-app.options('*', cors(corsOptions));
 
 // app.use("/", (req, res)=>{
 //     res.send("api is running....")
