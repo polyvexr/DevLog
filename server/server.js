@@ -30,15 +30,18 @@ app.use(cors(corsOptions));
 
 // Explicitly set CORS headers for all responses and handle preflight.
 const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN || "*";
-const ALLOW_CREDENTIALS = process.env.CORS_ALLOW_CREDENTIALS === 'true';
+const ALLOW_CREDENTIALS = process.env.CORS_ALLOW_CREDENTIALS === "true";
 app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', CLIENT_ORIGIN);
-  res.setHeader('Access-Control-Allow-Headers', corsOptions.allowedHeaders.join(', '));
-  res.setHeader('Access-Control-Allow-Methods', corsOptions.methods.join(', '));
+  res.setHeader("Access-Control-Allow-Origin", CLIENT_ORIGIN);
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    corsOptions.allowedHeaders.join(", ")
+  );
+  res.setHeader("Access-Control-Allow-Methods", corsOptions.methods.join(", "));
   if (ALLOW_CREDENTIALS) {
-    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader("Access-Control-Allow-Credentials", "true");
   }
-  if (req.method === 'OPTIONS') {
+  if (req.method === "OPTIONS") {
     return res.sendStatus(corsOptions.optionsSuccessStatus);
   }
   next();
