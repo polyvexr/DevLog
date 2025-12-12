@@ -1,17 +1,18 @@
-const axios = require("axios");
+import axios from "axios";
 
-module.exports = async function fetchGithub(username) {
+export const fetchGithub = async (username) => {
   try {
-    if (!username) return { repos: 0 };
-    const url = `https://api.github.com/users/${encodeURIComponent(username)}`;
-    const res = await axios.get(url, { timeout: 5000 });
+    const res = await axios.get(`https://api.github.com/users/${username}`);
+
     return {
-      login: res.data.login,
-      public_repos: res.data.public_repos,
       followers: res.data.followers,
+      following: res.data.following,
+      publicRepos: res.data.public_repos,
+      publicGists: res.data.public_gists,
+      createdAt: res.data.created_at,
     };
   } catch (err) {
-    console.error("fetchGithub error", err.message);
-    return null;
+    console.log("GitHub Fetch Error:", err.message);
+    return {};
   }
 };

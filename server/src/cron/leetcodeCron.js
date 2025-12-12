@@ -1,17 +1,18 @@
-const cron = require("node-cron");
-const fetchLeetCode = require("../utils/fetchLeetCode");
+import cron from "node-cron";
+import PlatformStat from "../models/PlatformStat.js";
+import { fetchLeetCode } from "../utils/fetchLeetCode.js";
 
-function schedule() {
-  // example: every hour
-  cron.schedule("0 * * * *", async () => {
-    try {
-      console.log("[cron] leetcode cron running");
-      const data = await fetchLeetCode();
-      console.log("[cron] leetcode fetched:", Object.keys(data || {}).length);
-    } catch (err) {
-      console.error("[cron] leetcode error", err.message);
-    }
-  });
-}
+cron.schedule("0 */6 * * *", async () => {
+  console.log("🔄 Running LeetCode Cron...");
 
-module.exports = { schedule };
+  const users = await PlatformStat.find({ platform: "leetcode" });
+
+  for (const user of users) {
+    const stats = await fetchLeetCode(user.username);
+    user.stats = stats;
+    user.lastUpdated = new Date();
+    await user.save();
+  }
+
+  console.log("✔ LeetCode stats updated");
+});

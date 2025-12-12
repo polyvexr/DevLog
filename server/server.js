@@ -1,0 +1,28 @@
+import express from "express";
+import dotenv from "dotenv";
+import connectDB from "./src/config/db.js";
+
+import authRoutes from "./src/routes/auth.js";
+import platformRoutes from "./src/routes/platforms.js";
+import statsRoutes from "./src/routes/stats.js";
+
+
+import "./src/cron/leetcodeCron.js";
+import "./src/cron/codeforcesCron.js";
+import "./src/cron/githubCron.js";
+
+dotenv.config();
+connectDB();
+
+const app = express();
+app.use(express.json());
+
+// app.use("/", (req, res)=>{
+//     res.send("api is running....")
+// })
+
+app.use("/api/auth", authRoutes);
+app.use("/api/platforms", platformRoutes);
+app.use("/api/stats", statsRoutes);
+
+app.listen(5000, () => console.log("Server running on 5000 http://localhost:5000"));

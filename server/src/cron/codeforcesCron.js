@@ -1,16 +1,18 @@
-const cron = require("node-cron");
-const fetchCodeforces = require("../utils/fetchCodeforces");
+import cron from "node-cron";
+import PlatformStat from "../models/PlatformStat.js";
+import { fetchCodeforces } from "../utils/fetchCodeforces.js";
 
-function schedule() {
-  cron.schedule("0 * * * *", async () => {
-    try {
-      console.log("[cron] codeforces cron running");
-      const data = await fetchCodeforces();
-      console.log("[cron] codeforces fetched:", Object.keys(data || {}).length);
-    } catch (err) {
-      console.error("[cron] codeforces error", err.message);
-    }
-  });
-}
+cron.schedule("*/30 * * * *", async () => {
+  console.log("🔄 Running Codeforces Cron...");
 
-module.exports = { schedule };
+  const users = await PlatformStat.find({ platform: "codeforces" });
+
+  for (const user of users) {
+    const stats = await fetchCodeforces(user.username);
+    user.stats = stats;
+    user.lastUpdated = new Date();
+    await user.save();
+  }
+
+  console.log("✔ Codeforces stats updated");
+});

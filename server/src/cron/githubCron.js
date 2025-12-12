@@ -1,16 +1,18 @@
-const cron = require("node-cron");
-const fetchGithub = require("../utils/fetchGithub");
+import cron from "node-cron";
+import PlatformStat from "../models/PlatformStat.js";
+import { fetchGithub } from "../utils/fetchGithub.js";
 
-function schedule() {
-  cron.schedule("0 * * * *", async () => {
-    try {
-      console.log("[cron] github cron running");
-      const data = await fetchGithub();
-      console.log("[cron] github fetched:", Object.keys(data || {}).length);
-    } catch (err) {
-      console.error("[cron] github error", err.message);
-    }
-  });
-}
+cron.schedule("0 */12 * * *", async () => {
+  console.log("🔄 Running GitHub Cron...");
 
-module.exports = { schedule };
+  const users = await PlatformStat.find({ platform: "github" });
+
+  for (const user of users) {
+    const stats = await fetchGithub(user.username);
+    user.stats = stats;
+    user.lastUpdated = new Date();
+    await user.save();
+  }
+
+  console.log("✔ GitHub stats updated");
+});

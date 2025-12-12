@@ -1,10 +1,11 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
-const PlatformStatSchema = new mongoose.Schema({
-  user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-  platform: { type: String, required: true },
-  data: { type: mongoose.Schema.Types.Mixed },
-  lastUpdated: { type: Date, default: Date.now },
+const platformStatSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  platform: { type: String, enum: ["leetcode", "codeforces", "github"] },
+  username: String,
+  stats: { type: Object, default: {} },
+  lastUpdated: Date,
 });
 
-module.exports = mongoose.model("PlatformStat", PlatformStatSchema);
+export default mongoose.model("PlatformStat", platformStatSchema);

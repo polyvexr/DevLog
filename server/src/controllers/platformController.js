@@ -1,27 +1,28 @@
-const PlatformStat = require("../models/PlatformStat");
+import PlatformStat from "../models/PlatformStat.js";
 
-exports.getUserPlatforms = async (req, res) => {
-  try {
-    const stats = await PlatformStat.find({ user: req.user.id });
-    res.json(stats);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Server error");
-  }
+export const linkPlatform = async (req, res) => {
+  const { platform, username } = req.body;
+
+  const existing = await PlatformStat.findOne({
+    userId: req.user._id,
+    platform,
+  });
+
+  if (existing)
+    return res.status(400).json({ message: "Platform already linked" });
+
+  const entry = await PlatformStat.create({
+    userId: req.user._id,
+    platform,
+    username,
+    stats: {},
+    lastUpdated: null,
+  });
+
+  res.json({ success: true, entry });
 };
 
-exports.updatePlatform = async (req, res) => {
-  try {
-    const { platform, data } = req.body;
-    if (!platform) return res.status(400).json({ msg: "Platform required" });
-    const stat = await PlatformStat.findOneAndUpdate(
-      { user: req.user.id, platform },
-      { data, lastUpdated: new Date() },
-      { upsert: true, new: true }
-    );
-    res.json(stat);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Server error");
-  }
+export const getPlatforms = async (req, res) => {
+  const data = await PlatformStat.find({ userId: req.user._id });
+  res.json(data);
 };

@@ -1,13 +1,26 @@
-const axios = require("axios");
+import axios from "axios";
 
-module.exports = async function fetchLeetCode(username) {
-  // Placeholder: LeetCode has no official public simple API; real implementation
-  // would scrape or use a third-party API. Here we return a mock object.
+export const fetchLeetCode = async (username) => {
   try {
-    if (!username) return { solved: 0 };
-    return { username, solved: 0, easy: 0, medium: 0, hard: 0 };
+    const res = await axios.post("https://leetcode.com/graphql", {
+      query: `
+        query userProfile($username: String!) {
+          matchedUser(username: $username) {
+            submitStats {
+              acSubmissionNum {
+                difficulty
+                count
+              }
+            }
+          }
+        }
+      `,
+      variables: { username },
+    });
+
+    return res.data.data.matchedUser.submitStats;
   } catch (err) {
-    console.error("fetchLeetCode error", err.message);
-    return null;
+    console.log("LC Fetch Error:", err.message);
+    return {};
   }
 };

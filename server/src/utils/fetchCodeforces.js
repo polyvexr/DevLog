@@ -1,18 +1,24 @@
-const axios = require("axios");
+import axios from "axios";
 
-module.exports = async function fetchCodeforces(handle) {
+export const fetchCodeforces = async (username) => {
   try {
-    if (!handle) return { rating: null };
-    const url = `https://codeforces.com/api/user.info?handles=${encodeURIComponent(
-      handle
-    )}`;
-    const res = await axios.get(url, { timeout: 5000 });
-    if (res.data && res.data.status === "OK") {
-      return res.data.result[0];
-    }
-    return null;
+    const res = await axios.get(
+      `https://codeforces.com/api/user.info?handles=${username}`
+    );
+
+    if (res.data.status !== "OK") return {};
+
+    const user = res.data.result[0];
+
+    return {
+      rating: user.rating || 0,
+      maxRating: user.maxRating || 0,
+      rank: user.rank || "unrated",
+      maxRank: user.maxRank || "unrated",
+      friendOfCount: user.friendOfCount || 0,
+    };
   } catch (err) {
-    console.error("fetchCodeforces error", err.message);
-    return null;
+    console.log("CF Fetch Error:", err.message);
+    return {};
   }
 };
