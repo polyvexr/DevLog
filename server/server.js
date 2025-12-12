@@ -6,14 +6,11 @@ import authRoutes from "./src/routes/auth.js";
 import platformRoutes from "./src/routes/platforms.js";
 import statsRoutes from "./src/routes/stats.js";
 
-
 import "./src/cron/leetcodeCron.js";
 import "./src/cron/codeforcesCron.js";
 import "./src/cron/githubCron.js";
 
 import cors from "cors";
-
-
 
 dotenv.config();
 connectDB();
@@ -30,4 +27,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/platforms", platformRoutes);
 app.use("/api/stats", statsRoutes);
 
-app.listen(5000, () => console.log("Server running on 5000 http://localhost:5000"));
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () =>
+  console.log(`Server running on ${PORT} http://localhost:${PORT}`)
+);
