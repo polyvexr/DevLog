@@ -14,7 +14,6 @@ const app = express();
 
 // Middleware
 app.use(express.json());
-app.use(cookieParser());
 
 // CORS configuration for production
 const allowedOrigins = [
