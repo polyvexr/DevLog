@@ -113,7 +113,7 @@ export default function Dashboard() {
   };
 
   const renderGitHubStats = (item) => {
-    const { followers = 0, following = 0, publicRepos = 0, publicGists = 0 } = item.stats || {};
+    const { followers = 0, following = 0, publicRepos = 0, publicGists = 0, totalStars = 0, name = "" } = item.stats || {};
     const hasStats = Object.keys(item.stats || {}).length > 0;
 
     return (
@@ -130,6 +130,7 @@ export default function Dashboard() {
             <div>
               <h2 className="text-2xl font-bold neon-text capitalize">{item.platform}</h2>
               <div className="text-sm text-gray-400">@{item.username}</div>
+              {name && <div className="text-xs text-gray-500 mt-0.5">{name}</div>}
             </div>
           </div>
           <div className="px-3 py-1 rounded-full bg-purple-500/20 text-purple-400 text-xs font-semibold border border-purple-500/30">
@@ -140,15 +141,16 @@ export default function Dashboard() {
         {hasStats ? (
           <>
             <div className="mb-4">
-              <div className="stat-value-lg mb-2">{followers.toLocaleString()}</div>
-              <div className="stat-label">Followers</div>
+              <div className="stat-value-lg mb-2">{totalStars.toLocaleString()}</div>
+              <div className="stat-label">Total Stars</div>
+              <div className="text-sm text-gray-400 mt-1">{followers.toLocaleString()} followers</div>
             </div>
 
             <div className="grid grid-cols-2 gap-4 mt-6">
               <StatCard label="Repos" value={publicRepos} icon="📦" />
               <StatCard label="Gists" value={publicGists} icon="📝" />
               <StatCard label="Following" value={following} icon="👤" />
-              <StatCard label="Visibility" value="Public" icon="🌐" />
+              <StatCard label="Followers" value={followers.toLocaleString()} icon="👥" />
             </div>
           </>
         ) : (
