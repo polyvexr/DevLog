@@ -13,20 +13,55 @@ export default function Register() {
   };
 
   return (
-    <div className="h-screen flex items-center justify-center bg-gray-100">
-      <form onSubmit={submit} className="bg-white p-6 shadow rounded w-96">
-        <h2 className="text-2xl mb-4 font-bold">Register</h2>
+    <div className="min-h-screen flex items-center justify-center px-4">
+      <form
+        onSubmit={submit}
+        className="glass-card-hover p-8 shadow-2xl rounded-2xl w-full max-w-md fade-in-scale"
+      >
+        <div className="text-center mb-8">
+          <h2 className="text-4xl font-black neon-text mb-2">Join DevLog</h2>
+          <p className="text-gray-400">Start tracking your coding progress</p>
+        </div>
 
-        <input type="text" placeholder="Name" className="w-full mb-3 p-2 border rounded"
-          onChange={(e) => setForm({ ...form, name: e.target.value })} />
+        <div className="mb-5">
+          <label className="block text-sm font-semibold text-gray-300 mb-2">Name</label>
+          <input
+            value={form.name}
+            type="text"
+            placeholder="Your name"
+            className="w-full p-3 border border-blue-500/30 rounded-lg bg-slate-900/50 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
+            required
+          />
+        </div>
 
-        <input type="email" placeholder="Email" className="w-full mb-3 p-2 border rounded"
-          onChange={(e) => setForm({ ...form, email: e.target.value })} />
+        <div className="mb-5">
+          <label className="block text-sm font-semibold text-gray-300 mb-2">Email</label>
+          <input
+            value={form.email}
+            type="email"
+            placeholder="your@email.com"
+            className="w-full p-3 border border-blue-500/30 rounded-lg bg-slate-900/50 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+            onChange={(e) => setForm({ ...form, email: e.target.value })}
+            required
+          />
+        </div>
 
-        <input type="password" placeholder="Password" className="w-full mb-3 p-2 border rounded"
-          onChange={(e) => setForm({ ...form, password: e.target.value })} />
+        <div className="mb-6">
+          <label className="block text-sm font-semibold text-gray-300 mb-2">Password</label>
+          <input
+            value={form.password}
+            type="password"
+            placeholder="••••••••"
+            className="w-full p-3 border border-blue-500/30 rounded-lg bg-slate-900/50 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+            onChange={(e) => setForm({ ...form, password: e.target.value })}
+            required
+          />
+        </div>
 
-        <button className="bg-blue-500 text-white w-full p-2 rounded">Register</button>
+        <button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white p-3 rounded-lg font-bold text-lg hover:shadow-lg hover:shadow-blue-500/50 transition-all duration-200">
+          Create Account
+        </button>
       </form>
     </div>
   );
