@@ -17,10 +17,8 @@ const app = express();
 app.use(express.json());
 app.use(
   cors({
-    origin: process.env.CLIENT_ORIGIN || "*",
-    credentials: process.env.CORS_ALLOW_CREDENTIALS === "true",
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    origin: process.env.CLIENT_URL,
+    credentials: true
   })
 );
 
@@ -38,17 +36,6 @@ app.use("/api/platforms", platformRoutes);
 app.use("/api/stats", statsRoutes);
 app.use("/api/admin", adminRoutes);
 
-// Serve client build in production
-const __dirname = path.resolve();
-if (process.env.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "client", "dist")));
-  app.get("*", (req, res) => {
-    if (req.path.startsWith("/api")) {
-      return res.status(404).json({ message: "API route not found" });
-    }
-    res.sendFile(path.join(__dirname, "client", "dist", "index.html"));
-  });
-}
 
 const PORT = process.env.PORT || 5000;
 
