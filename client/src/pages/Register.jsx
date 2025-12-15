@@ -24,7 +24,9 @@ export default function Register() {
         </div>
 
         <div className="mb-5">
-          <label className="block text-sm font-semibold text-gray-300 mb-2">Name</label>
+          <label className="block text-sm font-semibold text-gray-300 mb-2">
+            Name
+          </label>
           <input
             value={form.name}
             type="text"
@@ -36,7 +38,9 @@ export default function Register() {
         </div>
 
         <div className="mb-5">
-          <label className="block text-sm font-semibold text-gray-300 mb-2">Email</label>
+          <label className="block text-sm font-semibold text-gray-300 mb-2">
+            Email
+          </label>
           <input
             value={form.email}
             type="email"
@@ -48,7 +52,9 @@ export default function Register() {
         </div>
 
         <div className="mb-6">
-          <label className="block text-sm font-semibold text-gray-300 mb-2">Password</label>
+          <label className="block text-sm font-semibold text-gray-300 mb-2">
+            Password
+          </label>
           <input
             value={form.password}
             type="password"

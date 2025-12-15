@@ -5,10 +5,7 @@ import connectDB from "./src/config/db.js";
 import authRoutes from "./src/routes/auth.js";
 import platformRoutes from "./src/routes/platforms.js";
 import statsRoutes from "./src/routes/stats.js";
-
-import "./src/cron/leetcodeCron.js";
-import "./src/cron/codeforcesCron.js";
-import "./src/cron/githubCron.js";
+import adminRoutes from "./src/routes/admin.js";
 
 import cors from "cors";
 import path from "path";
@@ -53,6 +50,7 @@ app.use((req, res, next) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/platforms", platformRoutes);
 app.use("/api/stats", statsRoutes);
+app.use("/api/admin", adminRoutes);
 
 // Serve client build and fallback to index.html for client-side routes
 const __dirname = path.resolve();

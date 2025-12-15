@@ -21,5 +21,8 @@ export const login = async (req, res) => {
 
   const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
 
-  res.json({ success: true, token });
+  // Check if user is admin
+  const isAdmin = email === process.env.ADMIN_EMAIL;
+
+  res.json({ success: true, token, isAdmin });
 };

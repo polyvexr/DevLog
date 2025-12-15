@@ -11,8 +11,14 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const res = await api.post("/auth/login", form);
-    login(res.data.token);
-    navigate("/");
+    login(res.data.token, res.data.isAdmin);
+    
+    // Navigate to admin dashboard if admin, otherwise to home
+    if (res.data.isAdmin) {
+      navigate("/admin");
+    } else {
+      navigate("/");
+    }
   };
 
   return (
@@ -23,11 +29,15 @@ export default function Login() {
       >
         <div className="text-center mb-8">
           <h2 className="text-4xl font-black neon-text mb-2">Welcome Back</h2>
-          <p className="text-gray-400">Sign in to continue your coding journey</p>
+          <p className="text-gray-400">
+            Sign in to continue your coding journey
+          </p>
         </div>
 
         <div className="mb-5">
-          <label className="block text-sm font-semibold text-gray-300 mb-2">Email</label>
+          <label className="block text-sm font-semibold text-gray-300 mb-2">
+            Email
+          </label>
           <input
             value={form.email}
             type="email"
@@ -39,7 +49,9 @@ export default function Login() {
         </div>
 
         <div className="mb-6">
-          <label className="block text-sm font-semibold text-gray-300 mb-2">Password</label>
+          <label className="block text-sm font-semibold text-gray-300 mb-2">
+            Password
+          </label>
           <input
             value={form.password}
             type="password"
@@ -57,7 +69,10 @@ export default function Login() {
         <div className="mt-6 text-center">
           <p className="text-sm text-gray-400">
             Don't have an account?{" "}
-            <Link to="/register" className="text-blue-400 hover:text-blue-300 font-semibold underline">
+            <Link
+              to="/register"
+              className="text-blue-400 hover:text-blue-300 font-semibold underline"
+            >
               Create one
             </Link>
           </p>

@@ -4,6 +4,7 @@ const platformStatSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   platform: { type: String, enum: ["leetcode", "codeforces", "github"] },
   username: String,
+  data: { type: Object, default: {} },
   stats: { type: Object, default: {} },
   lastUpdated: Date,
 });

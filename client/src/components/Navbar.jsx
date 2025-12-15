@@ -3,7 +3,7 @@ import { AuthContext } from "../context/AuthContext";
 import { NavLink, useNavigate } from "react-router-dom";
 
 export default function Navbar() {
-  const { logout } = useContext(AuthContext);
+  const { logout, isAdmin } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -14,16 +14,33 @@ export default function Navbar() {
   return (
     <nav className="w-full bg-gradient-to-r from-slate-900/95 via-slate-800/95 to-slate-900/95 backdrop-blur-lg border-b border-blue-500/20 shadow-lg shadow-blue-500/10">
       <div className="app-container flex items-center justify-between p-4">
-        <NavLink to="/" className="text-2xl font-black neon-text">⚡ DevLog</NavLink>
+        <NavLink to="/" className="text-2xl font-black neon-text">
+          ⚡ DevLog
+        </NavLink>
 
         <div className="flex gap-4 items-center">
+          {isAdmin && (
+            <NavLink
+              to="/admin"
+              className={({ isActive }) =>
+                `font-semibold px-4 py-2 rounded-lg transition-all duration-200 ${
+                  isActive
+                    ? "bg-gradient-to-r from-yellow-600 to-orange-600 text-white shadow-lg shadow-yellow-500/50"
+                    : "text-gray-300 hover:text-white hover:bg-white/5"
+                }`
+              }
+            >
+              🔧 Admin
+            </NavLink>
+          )}
+
           <NavLink
             to="/link"
             className={({ isActive }) =>
               `font-semibold px-4 py-2 rounded-lg transition-all duration-200 ${
-                isActive 
-                  ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg shadow-blue-500/50' 
-                  : 'text-gray-300 hover:text-white hover:bg-white/5'
+                isActive
+                  ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg shadow-blue-500/50"
+                  : "text-gray-300 hover:text-white hover:bg-white/5"
               }`
             }
           >
