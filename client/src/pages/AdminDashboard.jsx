@@ -9,6 +9,7 @@ export default function AdminDashboard() {
   const [stats, setStats] = useState(null);
   const [syncResults, setSyncResults] = useState(null);
   const [activeSync, setActiveSync] = useState("");
+  const [notification, setNotification] = useState(null);
 
   useEffect(() => {
     fetchStats();
@@ -21,7 +22,10 @@ export default function AdminDashboard() {
       setStats(res.data.stats);
     } catch (error) {
       console.error("Error fetching stats:", error);
-      alert(error.response?.data?.message || "Failed to fetch stats");
+      setNotification({
+        type: "error",
+        message: error.response?.data?.message || "Failed to fetch stats",
+      });
     } finally {
       setLoading(false);
     }
@@ -43,13 +47,16 @@ export default function AdminDashboard() {
 
       // Refresh stats after sync
       await fetchStats();
-
-      alert(
-        `${res.data.message} - Success: ${res.data.results.success}, Failed: ${res.data.results.failed}`
-      );
+      setNotification({
+        type: "success",
+        message: `${res.data.message} - Success: ${res.data.results.success}, Failed: ${res.data.results.failed}`,
+      });
     } catch (error) {
       console.error("Error syncing:", error);
-      alert(error.response?.data?.message || "Failed to sync data");
+      setNotification({
+        type: "error",
+        message: error.response?.data?.message || "Failed to sync data",
+      });
     } finally {
       setSyncing(false);
       setActiveSync("");
@@ -70,6 +77,26 @@ export default function AdminDashboard() {
   return (
     <div className="min-h-screen">
       <Navbar />
+      {notification && (
+        <div
+          className={`fixed top-6 right-6 z-50 p-4 rounded-lg shadow-lg ${
+            notification.type === "error"
+              ? "bg-red-900/80 text-red-200"
+              : "bg-green-900/80 text-green-200"
+          }`}
+          role="status"
+        >
+          <div className="flex items-start gap-3">
+            <div className="flex-1 text-sm">{notification.message}</div>
+            <button
+              onClick={() => setNotification(null)}
+              className="text-sm opacity-80 hover:opacity-100"
+            >
+              Dismiss
+            </button>
+          </div>
+        </div>
+      )}
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-12">

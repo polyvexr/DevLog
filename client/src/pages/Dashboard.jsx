@@ -29,7 +29,11 @@ export default function Dashboard() {
       <div 
         key={item._id} 
         onClick={() => navigate("/leetcode")}
-        className="glass-card-hover p-6 rounded-2xl fade-in-up cursor-pointer transform transition-all hover:scale-105"
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigate('/leetcode'); } }}
+        aria-label={`Open ${item.platform} details`}
+        className="glass-card-hover p-6 rounded-2xl fade-in-up cursor-pointer transform transition-all hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500"
       >
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
@@ -75,7 +79,11 @@ export default function Dashboard() {
       <div 
         key={item._id} 
         onClick={() => navigate("/codeforces")}
-        className="glass-card-hover p-6 rounded-2xl fade-in-up delay-200 cursor-pointer transform transition-all hover:scale-105"
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigate('/codeforces'); } }}
+        aria-label={`Open ${item.platform} details`}
+        className="glass-card-hover p-6 rounded-2xl fade-in-up delay-200 cursor-pointer transform transition-all hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500"
       >
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
@@ -120,7 +128,11 @@ export default function Dashboard() {
       <div 
         key={item._id} 
         onClick={() => navigate("/github")}
-        className="glass-card-hover p-6 rounded-2xl fade-in-up delay-400 cursor-pointer transform transition-all hover:scale-105"
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigate('/github'); } }}
+        aria-label={`Open ${item.platform} details`}
+        className="glass-card-hover p-6 rounded-2xl fade-in-up delay-400 cursor-pointer transform transition-all hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500"
       >
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">

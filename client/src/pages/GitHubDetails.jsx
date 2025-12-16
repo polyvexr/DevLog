@@ -129,7 +129,8 @@ export default function GitHubDetails() {
                         href={repo.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className={`glass-card-hover p-5 rounded-xl fade-in-up delay-${idx * 100} hover:scale-105 transition-transform`}
+                        className={`glass-card-hover p-5 rounded-xl fade-in-up hover:scale-105 transition-transform`}
+                        style={{ animationDelay: `${idx * 100}ms` }}
                       >
                         <div className="flex items-start justify-between mb-3">
                           <h3 className="text-lg font-bold text-blue-400 hover:text-blue-300">{repo.name}</h3>
