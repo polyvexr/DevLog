@@ -1,4 +1,7 @@
 import PlatformStat from "../models/PlatformStat.js";
+import { fetchLeetCode } from "../utils/fetchLeetCode.js";
+import { fetchGithub } from "../utils/fetchGithub.js";
+import { fetchCodeforces } from "../utils/fetchCodeforces.js";
 
 export const linkPlatform = async (req, res) => {
   const { platform, username } = req.body;
@@ -18,6 +21,25 @@ export const linkPlatform = async (req, res) => {
     stats: {},
     lastUpdated: null,
   });
+
+  // Fetch platform stats immediately for this user only
+  try {
+    let fetched = {};
+    if (platform === "leetcode") {
+      fetched = await fetchLeetCode(username);
+    } else if (platform === "github") {
+      fetched = await fetchGithub(username);
+    } else if (platform === "codeforces") {
+      fetched = await fetchCodeforces(username);
+    }
+
+    entry.stats = fetched || {};
+    entry.lastUpdated = new Date();
+    await entry.save();
+  } catch (err) {
+    console.error("Platform fetch error:", err?.message || err);
+    // keep entry with empty stats; do not fail the link operation
+  }
 
   res.json({ success: true, entry });
 };
