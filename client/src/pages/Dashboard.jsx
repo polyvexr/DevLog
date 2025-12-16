@@ -4,28 +4,50 @@ import StatCard from "../components/StatCard";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
+import Dialog from "../components/Dialog";
 
 export default function Dashboard() {
   const [stats, setStats] = useState(null);
   const navigate = useNavigate();
-  const handleUnlink = async (platform, e) => {
+  const [confirmDialog, setConfirmDialog] = useState({
+    open: false,
+    platform: null,
+  });
+  const [messageDialog, setMessageDialog] = useState({
+    open: false,
+    title: "",
+    message: "",
+  });
+
+  const handleUnlink = (platform, e) => {
     if (e) e.stopPropagation();
-    const ok = window.confirm(
-      `Are you sure you want to unlink ${platform}? You can re-add it after 15 days (one-time re-add allowed immediately).`
-    );
-    if (!ok) return;
+    setConfirmDialog({ open: true, platform });
+  };
+
+  const doUnlink = async () => {
+    const platform = confirmDialog.platform;
+    setConfirmDialog({ open: false, platform: null });
     try {
       await api.delete(`/platforms/${platform}`);
       const res = await api.get("/stats/all");
       setStats(res.data.stats);
+      setMessageDialog({
+        open: true,
+        title: "Unlinked",
+        message: `${platform} has been unlinked.`,
+      });
     } catch (err) {
       const msg = err?.response?.data?.message || err.message || "Error";
       const retry = err?.response?.data?.retryAfter;
       if (retry) {
         const when = new Date(retry).toLocaleString();
-        alert(`${msg} Try again after ${when}.`);
+        setMessageDialog({
+          open: true,
+          title: "Action blocked",
+          message: `${msg}\n\nTry again after ${when}.`,
+        });
       } else {
-        alert(msg);
+        setMessageDialog({ open: true, title: "Error", message: msg });
       }
     }
   };
@@ -82,7 +104,7 @@ export default function Dashboard() {
             </div>
             <button
               onClick={(e) => handleUnlink(item.platform, e)}
-              className="absolute right-0 top-0 mt-2 mr-2 text-xs bg-red-600/20 text-red-400 px-2 py-1 rounded"
+              className="absolute left-[-70px] top-[-10px] mt-2 mr-2 text-xs bg-red-600/20 text-red-400 px-3 py-2 rounded-full"
             >
               Unlink
             </button>
@@ -166,7 +188,7 @@ export default function Dashboard() {
             ● Active
             <button
               onClick={(e) => handleUnlink(item.platform, e)}
-              className="absolute right-0 top-0 mt-2 mr-2 text-xs bg-red-600/20 text-red-400 px-2 py-1 rounded"
+              className="absolute left-[-70px] top-[-10px] mt-2 mr-2 text-xs bg-red-600/20 text-red-400 px-3 py-2 rounded-full"
             >
               Unlink
             </button>
@@ -248,7 +270,7 @@ export default function Dashboard() {
             {hasStats ? "● Active" : "● Loading"}
             <button
               onClick={(e) => handleUnlink(item.platform, e)}
-              className="absolute right-0 top-0 mt-2 mr-2 text-xs bg-red-600/20 text-red-400 px-2 py-1 rounded"
+              className="absolute left-[-70px] top-[-10px] mt-2 mr-2 text-xs bg-red-600/20 text-red-400 px-3 py-2 rounded-full"
             >
               Unlink
             </button>
@@ -330,6 +352,33 @@ export default function Dashboard() {
           )}
         </div>
       </main>
+      <Dialog
+        open={confirmDialog.open}
+        title="Confirm Unlink"
+        message={
+          confirmDialog.platform
+            ? `Are you sure you want to unlink ${confirmDialog.platform}? You can re-add it after 15 days (one-time re-add allowed once).`
+            : ""
+        }
+        confirmText="Unlink"
+        cancelText="Cancel"
+        onConfirm={doUnlink}
+        onCancel={() => setConfirmDialog({ open: false, platform: null })}
+      />
+
+      <Dialog
+        open={messageDialog.open}
+        title={messageDialog.title}
+        message={messageDialog.message}
+        confirmText="OK"
+        cancelText=""
+        onConfirm={() =>
+          setMessageDialog({ open: false, title: "", message: "" })
+        }
+        onCancel={() =>
+          setMessageDialog({ open: false, title: "", message: "" })
+        }
+      />
     </div>
   );
 }
