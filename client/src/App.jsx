@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
+import Landing from "./pages/Landing";
 import LinkPlatform from "./pages/LinkPlatform";
 import LeetCodeDetails from "./pages/LeetCodeDetails";
 import CodeforcesDetails from "./pages/CodeforcesDetails";
@@ -22,18 +23,23 @@ const AdminRoute = ({ children }) => {
   return children;
 };
 
+// PublicRoute: Redirect authenticated users away from public pages
+const PublicRoute = ({ children }) => {
+  const { token } = useContext(AuthContext);
+  return token ? <Navigate to="/" replace /> : children;
+};
+
+// Context-aware home route: Landing for guests, Dashboard for authenticated users
+const HomeRoute = () => {
+  const { token } = useContext(AuthContext);
+  return token ? <Dashboard /> : <Landing />;
+};
+
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route
-          path="/"
-          element={
-            <PrivateRoute>
-              <Dashboard />
-            </PrivateRoute>
-          }
-        />
+        <Route path="/" element={<HomeRoute />} />
         <Route
           path="/admin"
           element={
@@ -74,8 +80,8 @@ function App() {
             </PrivateRoute>
           }
         />
-        <Route path="/register" element={<Register />} />
-        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
+        <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
       </Routes>
     </BrowserRouter>
   );
