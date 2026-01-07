@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import api from "../api/axios";
-import Navbar from "../components/Navbar";
 import Loader from "../components/Loader";
 
 export default function AdminDashboard() {
@@ -65,18 +64,14 @@ export default function AdminDashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen">
-        <Navbar />
-        <div className="flex items-center justify-center min-h-[80vh]">
-          <Loader />
-        </div>
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Loader />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen">
-      <Navbar />
+    <>
       {notification && (
         <div
           className={`fixed top-6 right-6 z-50 p-4 rounded-lg shadow-lg ${
@@ -97,7 +92,7 @@ export default function AdminDashboard() {
           </div>
         </div>
       )}
-      <div className="container mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-5xl font-black neon-text mb-4">
@@ -335,6 +330,6 @@ export default function AdminDashboard() {
           </div>
         )}
       </div>
-    </div>
+    </>
   );
 }
