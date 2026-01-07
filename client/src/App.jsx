@@ -8,19 +8,31 @@ import LeetCodeDetails from "./pages/LeetCodeDetails";
 import CodeforcesDetails from "./pages/CodeforcesDetails";
 import GitHubDetails from "./pages/GitHubDetails";
 import AdminDashboard from "./pages/AdminDashboard";
+import AuthenticatedLayout from "./components/AuthenticatedLayout";
 import { AuthContext } from "./context/AuthContext";
+import { SidebarProvider } from "./context/SidebarContext";
 import { useContext } from "react";
 
 const PrivateRoute = ({ children }) => {
   const { token } = useContext(AuthContext);
-  return token ? children : <Navigate to="/login" />;
+  return token ? (
+    <SidebarProvider>
+      <AuthenticatedLayout>{children}</AuthenticatedLayout>
+    </SidebarProvider>
+  ) : (
+    <Navigate to="/login" />
+  );
 };
 
 const AdminRoute = ({ children }) => {
   const { token, isAdmin } = useContext(AuthContext);
   if (!token) return <Navigate to="/login" />;
   if (!isAdmin) return <Navigate to="/" />;
-  return children;
+  return (
+    <SidebarProvider>
+      <AuthenticatedLayout>{children}</AuthenticatedLayout>
+    </SidebarProvider>
+  );
 };
 
 // PublicRoute: Redirect authenticated users away from public pages
@@ -32,7 +44,15 @@ const PublicRoute = ({ children }) => {
 // Context-aware home route: Landing for guests, Dashboard for authenticated users
 const HomeRoute = () => {
   const { token } = useContext(AuthContext);
-  return token ? <Dashboard /> : <Landing />;
+  return token ? (
+    <SidebarProvider>
+      <AuthenticatedLayout>
+        <Dashboard />
+      </AuthenticatedLayout>
+    </SidebarProvider>
+  ) : (
+    <Landing />
+  );
 };
 
 function App() {
@@ -80,8 +100,22 @@ function App() {
             </PrivateRoute>
           }
         />
-        <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
-        <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
+        <Route
+          path="/register"
+          element={
+            <PublicRoute>
+              <Register />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/login"
+          element={
+            <PublicRoute>
+              <Login />
+            </PublicRoute>
+          }
+        />
       </Routes>
     </BrowserRouter>
   );

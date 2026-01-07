@@ -1,4 +1,3 @@
-import Navbar from "../components/Navbar";
 import Loader from "../components/Loader";
 import StatCard from "../components/StatCard";
 import { useEffect, useState } from "react";
@@ -315,43 +314,38 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen">
-      <Navbar />
-      <main className="p-8">
-        <div className="app-container">
-          <div className="mb-8 fade-in-scale">
-            <h1 className="text-5xl font-black mb-3 neon-text">Dashboard</h1>
-            <p className="text-gray-400 text-lg">
-              Track your coding journey across platforms
-            </p>
-          </div>
+    <>
+      <div className="mb-8 fade-in-scale">
+        <h1 className="text-5xl font-black mb-3 neon-text">Dashboard</h1>
+        <p className="text-gray-400 text-lg">
+          Track your coding journey across platforms
+        </p>
+      </div>
 
-          {!stats ? (
-            <Loader />
-          ) : stats.length === 0 ? (
-            <div className="glass-card p-12 rounded-2xl text-center">
-              <div className="text-6xl mb-4 opacity-30">📊</div>
-              <h3 className="text-2xl font-bold mb-2 text-gray-300">
-                No Stats Yet
-              </h3>
-              <p className="text-gray-500">
-                Link your coding platforms to start tracking
-              </p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-              {stats.map((item) => {
-                if (item.platform === "leetcode")
-                  return renderLeetCodeStats(item);
-                if (item.platform === "codeforces")
-                  return renderCodeforcesStats(item);
-                if (item.platform === "github") return renderGitHubStats(item);
-                return null;
-              })}
-            </div>
-          )}
+      {!stats ? (
+        <Loader />
+      ) : stats.length === 0 ? (
+        <div className="glass-card p-12 rounded-2xl text-center">
+          <div className="text-6xl mb-4 opacity-30">📊</div>
+          <h3 className="text-2xl font-bold mb-2 text-gray-300">
+            No Stats Yet
+          </h3>
+          <p className="text-gray-500">
+            Link your coding platforms to start tracking
+          </p>
         </div>
-      </main>
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+          {stats.map((item) => {
+            if (item.platform === "leetcode") return renderLeetCodeStats(item);
+            if (item.platform === "codeforces")
+              return renderCodeforcesStats(item);
+            if (item.platform === "github") return renderGitHubStats(item);
+            return null;
+          })}
+        </div>
+      )}
+
       <Dialog
         open={confirmDialog.open}
         title="Confirm Unlink"
@@ -379,6 +373,6 @@ export default function Dashboard() {
           setMessageDialog({ open: false, title: "", message: "" })
         }
       />
-    </div>
+    </>
   );
 }
