@@ -6,6 +6,26 @@ const userSchema = new mongoose.Schema({
   email: { type: String, unique: true },
   password: String,
   oneTimeReaddUsed: { type: Map, of: Boolean, default: {} },
+  profile: {
+    bio: { type: String, default: "" },
+    avatar: { type: String, default: "" },
+    location: { type: String, default: "" },
+    website: { type: String, default: "" },
+  },
+  settings: {
+    theme: {
+      type: String,
+      enum: ["light", "dark", "system"],
+      default: "system",
+    },
+    emailNotifications: { type: Boolean, default: true },
+    progressMilestones: {
+      leetcode: { type: Number, default: 500 },
+      codeforces: { type: Number, default: 1500 },
+      github: { type: Number, default: 100 },
+    },
+    timezone: { type: String, default: "UTC" },
+  },
 });
 
 // Hash password

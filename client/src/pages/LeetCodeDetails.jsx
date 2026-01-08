@@ -29,7 +29,7 @@ export default function LeetCodeDetails() {
     <>
       <button
         onClick={() => navigate("/")}
-        className="mb-6 text-blue-400 hover:text-blue-300 flex items-center gap-2 fade-in-scale"
+        className="mb-6 text-[var(--accent-blue)] hover:opacity-80 flex items-center gap-2 fade-in-scale"
       >
         ← Back to Dashboard
       </button>
@@ -40,35 +40,47 @@ export default function LeetCodeDetails() {
             LC
           </div>
           <div>
-            <h1 className="text-5xl font-black neon-text">LeetCode Profile</h1>
-            <p className="text-gray-400 text-lg">@{data.username}</p>
+            <h1 className="text-5xl font-black text-[var(--text-primary)]">
+              LeetCode Profile
+            </h1>
+            <p className="text-[var(--text-secondary)] text-lg">
+              @{data.username}
+            </p>
           </div>
         </div>
       </div>
 
       {/* Profile Summary */}
-      <div className="glass-card-hover p-6 rounded-2xl mb-6 fade-in-up">
+      <div className="platform-card p-6 rounded-2xl mb-6 fade-in-up">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
           <div>
-            <div className="text-gray-400 text-sm mb-1">Real Name</div>
-            <div className="text-xl font-bold text-white">
+            <div className="text-[var(--text-secondary)] text-sm mb-1">
+              Real Name
+            </div>
+            <div className="text-xl font-bold text-[var(--text-primary)]">
               {stats.realName || "N/A"}
             </div>
           </div>
           <div>
-            <div className="text-gray-400 text-sm mb-1">Ranking</div>
-            <div className="stat-value text-2xl">
+            <div className="text-[var(--text-secondary)] text-sm mb-1">
+              Ranking
+            </div>
+            <div className="text-2xl font-bold text-[var(--accent-blue)]">
               #{stats.ranking?.toLocaleString()}
             </div>
           </div>
           <div>
-            <div className="text-gray-400 text-sm mb-1">Reputation</div>
+            <div className="text-[var(--text-secondary)] text-sm mb-1">
+              Reputation
+            </div>
             <div className="text-xl font-bold text-purple-400">
               {stats.reputation?.toLocaleString()}
             </div>
           </div>
           <div>
-            <div className="text-gray-400 text-sm mb-1">Star Rating</div>
+            <div className="text-[var(--text-secondary)] text-sm mb-1">
+              Star Rating
+            </div>
             <div className="text-xl font-bold text-yellow-400 flex gap-0.5">
               {Array.from({
                 length: Math.max(
@@ -85,43 +97,51 @@ export default function LeetCodeDetails() {
 
       {/* Submissions by Difficulty */}
       <div className="mb-8">
-        <h2 className="text-2xl font-bold mb-4 neon-text">
+        <h2 className="text-2xl font-bold mb-4 text-[var(--text-primary)]">
           Problem Solving Stats
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="glass-card-hover p-6 rounded-xl fade-in-up">
-            <div className="stat-label mb-2">Total Solved</div>
-            <div className="stat-value-lg">
+          <div className="platform-card p-6 rounded-xl fade-in-up">
+            <div className="text-[var(--text-secondary)] text-sm mb-2">
+              Total Solved
+            </div>
+            <div className="text-3xl font-bold text-[var(--accent-blue)]">
               {all?.solved?.toLocaleString() || 0}
             </div>
-            <div className="text-sm text-gray-400 mt-2">
+            <div className="text-sm text-[var(--text-secondary)] mt-2">
               out of {all?.total?.toLocaleString() || 0}
             </div>
           </div>
-          <div className="glass-card-hover p-6 rounded-xl fade-in-up delay-100 border-l-4 border-green-500">
-            <div className="stat-label mb-2">Easy</div>
+          <div className="platform-card p-6 rounded-xl fade-in-up delay-100 border-l-4 border-green-500">
+            <div className="text-[var(--text-secondary)] text-sm mb-2">
+              Easy
+            </div>
             <div className="text-3xl font-bold text-green-400">
               {easy?.solved?.toLocaleString() || 0}
             </div>
-            <div className="text-sm text-gray-400 mt-2">
+            <div className="text-sm text-[var(--text-secondary)] mt-2">
               {easy?.submissions?.toLocaleString() || 0} submissions
             </div>
           </div>
-          <div className="glass-card-hover p-6 rounded-xl fade-in-up delay-200 border-l-4 border-yellow-500">
-            <div className="stat-label mb-2">Medium</div>
+          <div className="platform-card p-6 rounded-xl fade-in-up delay-200 border-l-4 border-yellow-500">
+            <div className="text-[var(--text-secondary)] text-sm mb-2">
+              Medium
+            </div>
             <div className="text-3xl font-bold text-yellow-400">
               {medium?.solved?.toLocaleString() || 0}
             </div>
-            <div className="text-sm text-gray-400 mt-2">
+            <div className="text-sm text-[var(--text-secondary)] mt-2">
               {medium?.submissions?.toLocaleString() || 0} submissions
             </div>
           </div>
-          <div className="glass-card-hover p-6 rounded-xl fade-in-up delay-300 border-l-4 border-red-500">
-            <div className="stat-label mb-2">Hard</div>
+          <div className="platform-card p-6 rounded-xl fade-in-up delay-300 border-l-4 border-red-500">
+            <div className="text-[var(--text-secondary)] text-sm mb-2">
+              Hard
+            </div>
             <div className="text-3xl font-bold text-red-400">
               {hard?.solved?.toLocaleString() || 0}
             </div>
-            <div className="text-sm text-gray-400 mt-2">
+            <div className="text-sm text-[var(--text-secondary)] mt-2">
               {hard?.submissions?.toLocaleString() || 0} submissions
             </div>
           </div>
@@ -131,7 +151,7 @@ export default function LeetCodeDetails() {
       {/* Streak Data */}
       {stats.streakData && (
         <div className="mb-8">
-          <h2 className="text-2xl font-bold mb-4 neon-text">
+          <h2 className="text-2xl font-bold mb-4 text-[var(--text-primary)]">
             Streak & Activity
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -157,31 +177,39 @@ export default function LeetCodeDetails() {
       {/* Contest Stats */}
       {stats.contestRanking && (
         <div className="mb-8">
-          <h2 className="text-2xl font-bold mb-4 neon-text">
+          <h2 className="text-2xl font-bold mb-4 text-[var(--text-primary)]">
             Contest Performance
           </h2>
-          <div className="glass-card-hover p-6 rounded-2xl">
+          <div className="platform-card p-6 rounded-2xl">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
               <div>
-                <div className="stat-label mb-2">Rating</div>
+                <div className="text-[var(--text-secondary)] text-sm mb-2">
+                  Rating
+                </div>
                 <div className="text-3xl font-bold text-purple-400">
                   {stats.contestRanking.rating}
                 </div>
               </div>
               <div>
-                <div className="stat-label mb-2">Global Rank</div>
+                <div className="text-[var(--text-secondary)] text-sm mb-2">
+                  Global Rank
+                </div>
                 <div className="text-3xl font-bold text-cyan-400">
                   #{stats.contestRanking.globalRanking?.toLocaleString()}
                 </div>
               </div>
               <div>
-                <div className="stat-label mb-2">Top Percentage</div>
+                <div className="text-[var(--text-secondary)] text-sm mb-2">
+                  Top Percentage
+                </div>
                 <div className="text-3xl font-bold text-green-400">
                   {stats.contestRanking.topPercentage}%
                 </div>
               </div>
               <div>
-                <div className="stat-label mb-2">Badge</div>
+                <div className="text-[var(--text-secondary)] text-sm mb-2">
+                  Badge
+                </div>
                 <div className="text-2xl font-bold text-yellow-400">
                   {stats.contestRanking.badge}
                 </div>
@@ -194,7 +222,9 @@ export default function LeetCodeDetails() {
       {/* Skill Tags */}
       {stats.tagStats && (
         <div className="mb-8">
-          <h2 className="text-2xl font-bold mb-4 neon-text">Skills & Topics</h2>
+          <h2 className="text-2xl font-bold mb-4 text-[var(--text-primary)]">
+            Skills & Topics
+          </h2>
 
           <div className="mb-6">
             <h3 className="text-lg font-semibold mb-3 text-purple-400">
@@ -202,8 +232,10 @@ export default function LeetCodeDetails() {
             </h3>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
               {stats.tagStats.advanced?.slice(0, 12).map((tag) => (
-                <div key={tag.tagSlug} className="glass-card p-3 rounded-lg">
-                  <div className="text-sm text-gray-400">{tag.tagName}</div>
+                <div key={tag.tagSlug} className="platform-card p-3 rounded-lg">
+                  <div className="text-sm text-[var(--text-secondary)]">
+                    {tag.tagName}
+                  </div>
                   <div className="text-xl font-bold text-purple-400">
                     {tag.problemsSolved}
                   </div>
@@ -213,14 +245,16 @@ export default function LeetCodeDetails() {
           </div>
 
           <div className="mb-6">
-            <h3 className="text-lg font-semibold mb-3 text-blue-400">
+            <h3 className="text-lg font-semibold mb-3 text-[var(--accent-blue)]">
               Intermediate Topics
             </h3>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
               {stats.tagStats.intermediate?.slice(0, 12).map((tag) => (
-                <div key={tag.tagSlug} className="glass-card p-3 rounded-lg">
-                  <div className="text-sm text-gray-400">{tag.tagName}</div>
-                  <div className="text-xl font-bold text-blue-400">
+                <div key={tag.tagSlug} className="platform-card p-3 rounded-lg">
+                  <div className="text-sm text-[var(--text-secondary)]">
+                    {tag.tagName}
+                  </div>
+                  <div className="text-xl font-bold text-[var(--accent-blue)]">
                     {tag.problemsSolved}
                   </div>
                 </div>
@@ -234,8 +268,10 @@ export default function LeetCodeDetails() {
             </h3>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
               {stats.tagStats.fundamental?.map((tag) => (
-                <div key={tag.tagSlug} className="glass-card p-3 rounded-lg">
-                  <div className="text-sm text-gray-400">{tag.tagName}</div>
+                <div key={tag.tagSlug} className="platform-card p-3 rounded-lg">
+                  <div className="text-sm text-[var(--text-secondary)]">
+                    {tag.tagName}
+                  </div>
                   <div className="text-xl font-bold text-green-400">
                     {tag.problemsSolved}
                   </div>
@@ -249,16 +285,16 @@ export default function LeetCodeDetails() {
       {/* Language Stats */}
       {stats.languageStats && (
         <div className="mb-8">
-          <h2 className="text-2xl font-bold mb-4 neon-text">
+          <h2 className="text-2xl font-bold mb-4 text-[var(--text-primary)]">
             Programming Languages
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
             {stats.languageStats.slice(0, 12).map((lang) => (
               <div
                 key={lang.languageName}
-                className="glass-card-hover p-4 rounded-xl text-center"
+                className="platform-card p-4 rounded-xl text-center"
               >
-                <div className="text-sm text-gray-400 mb-1">
+                <div className="text-sm text-[var(--text-secondary)] mb-1">
                   {lang.languageName}
                 </div>
                 <div className="text-2xl font-bold text-cyan-400">
@@ -273,18 +309,18 @@ export default function LeetCodeDetails() {
       {/* Recent Submissions */}
       {stats.recentSubmissions && (
         <div className="mb-8">
-          <h2 className="text-2xl font-bold mb-4 neon-text">
+          <h2 className="text-2xl font-bold mb-4 text-[var(--text-primary)]">
             Recent Submissions
           </h2>
-          <div className="glass-card p-6 rounded-2xl">
+          <div className="platform-card p-6 rounded-2xl">
             <div className="space-y-3">
               {stats.recentSubmissions.slice(0, 10).map((sub, idx) => (
                 <div
                   key={idx}
-                  className="flex items-center justify-between p-3 bg-slate-900/30 rounded-lg"
+                  className="flex items-center justify-between p-3 bg-[var(--bg-card-inner)] rounded-lg"
                 >
-                  <div className="text-gray-300">{sub.title}</div>
-                  <div className="text-sm text-gray-500">
+                  <div className="text-[var(--text-primary)]">{sub.title}</div>
+                  <div className="text-sm text-[var(--text-secondary)]">
                     {new Date(
                       parseInt(sub.timestamp) * 1000
                     ).toLocaleDateString()}
@@ -299,22 +335,22 @@ export default function LeetCodeDetails() {
       {/* Badges */}
       {stats.badges && (
         <div>
-          <h2 className="text-2xl font-bold mb-4 neon-text">
+          <h2 className="text-2xl font-bold mb-4 text-[var(--text-primary)]">
             Badges ({stats.badges.length})
           </h2>
-          <div className="glass-card p-6 rounded-2xl">
+          <div className="platform-card p-6 rounded-2xl">
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
               {stats.badges.slice(0, 24).map((badge) => (
                 <div
                   key={badge.id}
-                  className="flex flex-col items-center p-3 bg-slate-900/30 rounded-lg hover:bg-slate-800/40 transition-all"
+                  className="flex flex-col items-center p-3 bg-[var(--bg-card-inner)] rounded-lg hover:bg-[var(--border-color)] transition-all"
                 >
                   <img
                     src={badge.icon}
                     alt={badge.displayName}
                     className="w-12 h-12 mb-2"
                   />
-                  <div className="text-xs text-center text-gray-400">
+                  <div className="text-xs text-center text-[var(--text-secondary)]">
                     {badge.displayName}
                   </div>
                 </div>

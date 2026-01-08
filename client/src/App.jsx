@@ -8,6 +8,7 @@ import LeetCodeDetails from "./pages/LeetCodeDetails";
 import CodeforcesDetails from "./pages/CodeforcesDetails";
 import GitHubDetails from "./pages/GitHubDetails";
 import AdminDashboard from "./pages/AdminDashboard";
+import Settings from "./pages/Settings";
 import AuthenticatedLayout from "./components/AuthenticatedLayout";
 import { AuthContext } from "./context/AuthContext";
 import { SidebarProvider } from "./context/SidebarContext";
@@ -97,6 +98,14 @@ function App() {
           element={
             <PrivateRoute>
               <GitHubDetails />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/settings"
+          element={
+            <PrivateRoute>
+              <Settings />
             </PrivateRoute>
           }
         />

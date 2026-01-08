@@ -1,6 +1,7 @@
 import { useState } from "react";
 import api from "../api/axios";
 import { useNavigate, Link } from "react-router-dom";
+import { FiEye, FiEyeOff } from "react-icons/fi";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -30,19 +31,23 @@ export default function Register() {
       <div className="w-full max-w-md">
         <Link
           to="/"
-          className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-6 fade-in-up"
+          className="inline-flex items-center gap-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors mb-6 fade-in-up"
         >
           <span>←</span>
           <span>Back to Home</span>
         </Link>
         <form
           onSubmit={submit}
-          className="glass-card-hover p-8 shadow-2xl rounded-2xl w-full fade-in-scale"
+          className="platform-card p-8 shadow-2xl rounded-2xl w-full fade-in-scale"
           aria-live="polite"
         >
           <div className="text-center mb-8">
-            <h2 className="text-4xl font-black neon-text mb-2">Join DevLog</h2>
-            <p className="text-gray-400">Start tracking your coding progress</p>
+            <h2 className="text-4xl font-black text-[var(--text-primary)] mb-2">
+              Join DevLog
+            </h2>
+            <p className="text-[var(--text-secondary)]">
+              Start tracking your coding progress
+            </p>
           </div>
 
           {error && (
@@ -54,7 +59,7 @@ export default function Register() {
           <div className="mb-5">
             <label
               htmlFor="name"
-              className="block text-sm font-semibold text-gray-300 mb-2"
+              className="block text-sm font-semibold text-[var(--text-secondary)] mb-2"
             >
               Name
             </label>
@@ -63,7 +68,7 @@ export default function Register() {
               value={form.name}
               type="text"
               placeholder="Your name"
-              className="w-full p-3 border border-blue-500/30 rounded-lg bg-slate-900/50 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              className="w-full p-3 border border-[var(--border-color)] rounded-lg bg-[var(--bg-card-inner)] text-[var(--text-primary)] placeholder-[var(--text-secondary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-blue)] focus:border-transparent transition-all"
               onChange={(e) => setForm({ ...form, name: e.target.value })}
               required
             />
@@ -72,7 +77,7 @@ export default function Register() {
           <div className="mb-5">
             <label
               htmlFor="email"
-              className="block text-sm font-semibold text-gray-300 mb-2"
+              className="block text-sm font-semibold text-[var(--text-secondary)] mb-2"
             >
               Email
             </label>
@@ -81,7 +86,7 @@ export default function Register() {
               value={form.email}
               type="email"
               placeholder="your@email.com"
-              className="w-full p-3 border border-blue-500/30 rounded-lg bg-slate-900/50 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              className="w-full p-3 border border-[var(--border-color)] rounded-lg bg-[var(--bg-card-inner)] text-[var(--text-primary)] placeholder-[var(--text-secondary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-blue)] focus:border-transparent transition-all"
               onChange={(e) => setForm({ ...form, email: e.target.value })}
               required
             />
@@ -90,7 +95,7 @@ export default function Register() {
           <div className="mb-6">
             <label
               htmlFor="password"
-              className="block text-sm font-semibold text-gray-300 mb-2"
+              className="block text-sm font-semibold text-[var(--text-secondary)] mb-2"
             >
               Password
             </label>
@@ -100,17 +105,17 @@ export default function Register() {
                 value={form.password}
                 type={showPassword ? "text" : "password"}
                 placeholder="••••••••"
-                className="w-full p-3 pr-12 border border-blue-500/30 rounded-lg bg-slate-900/50 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                className="w-full p-3 pr-12 border border-[var(--border-color)] rounded-lg bg-[var(--bg-card-inner)] text-[var(--text-primary)] placeholder-[var(--text-secondary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-blue)] focus:border-transparent transition-all"
                 onChange={(e) => setForm({ ...form, password: e.target.value })}
                 required
               />
               <button
                 type="button"
                 onClick={() => setShowPassword((s) => !s)}
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-sm text-gray-400 hover:text-gray-200"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors p-1"
                 aria-label={showPassword ? "Hide password" : "Show password"}
               >
-                {showPassword ? "Hide" : "Show"}
+                {showPassword ? <FiEyeOff className="text-lg" /> : <FiEye className="text-lg" />}
               </button>
             </div>
           </div>
@@ -118,16 +123,16 @@ export default function Register() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white p-3 rounded-lg font-bold text-lg hover:shadow-lg hover:shadow-blue-500/50 transition-all duration-200 disabled:opacity-60"
+            className="btn-primary w-full"
           >
             {loading ? "Creating..." : "Create Account"}
           </button>
           <div className="mt-6 text-center">
-            <p className="text-sm text-gray-400">
+            <p className="text-sm text-[var(--text-secondary)]">
               Already have an account?{" "}
               <Link
                 to="/login"
-                className="text-blue-400 hover:text-blue-300 font-semibold underline"
+                className="text-[var(--accent-blue)] hover:opacity-80 font-semibold underline"
               >
                 Sign in
               </Link>

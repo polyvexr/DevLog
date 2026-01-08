@@ -10,4 +10,16 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// Auth API
+export const getMe = () => api.get("/auth/me");
+export const updateProfile = (data) => api.put("/auth/profile", data);
+export const updatePassword = (data) => api.put("/auth/password", data);
+export const updateSettings = (data) => api.put("/auth/settings", data);
+
+// Stats API
+export const getAllStats = () => api.get("/stats/all");
+export const getStatsSummary = () => api.get("/stats/summary");
+export const refreshPlatformStats = (platform) =>
+  api.post(`/stats/refresh/${platform}`);
+
 export default api;

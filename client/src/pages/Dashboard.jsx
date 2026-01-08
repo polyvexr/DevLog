@@ -1,26 +1,23 @@
 import Loader from "../components/Loader";
-import StatCard from "../components/StatCard";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "../api/axios";
+import api, { getStatsSummary, refreshPlatformStats } from "../api/axios";
 import Dialog from "../components/Dialog";
-import {
-  FiCheck,
-  FiStar,
-  FiAward,
-  FiUsers,
-  FiTarget,
-  FiTrendingUp,
-  FiPackage,
-  FiFileText,
-  FiUser,
-  FiBarChart2,
-  FiRefreshCw,
-  FiHexagon,
-} from "react-icons/fi";
+import FilterButtons from "../components/FilterButtons";
+import PlatformCard from "../components/PlatformCard";
+import SummarySection from "../components/SummarySection";
+import { FiBarChart2 } from "react-icons/fi";
+
+// Filter persistence key
+const FILTER_STORAGE_KEY = "dashboardFilter";
 
 export default function Dashboard() {
   const [stats, setStats] = useState(null);
+  const [summary, setSummary] = useState(null);
+  const [summaryLoading, setSummaryLoading] = useState(true);
+  const [activeFilter, setActiveFilter] = useState(() => {
+    return localStorage.getItem(FILTER_STORAGE_KEY) || "all";
+  });
   const navigate = useNavigate();
   const [confirmDialog, setConfirmDialog] = useState({
     open: false,
@@ -31,6 +28,59 @@ export default function Dashboard() {
     title: "",
     message: "",
   });
+
+  // Filter change handler with localStorage persistence
+  const handleFilterChange = (filter) => {
+    setActiveFilter(filter);
+    localStorage.setItem(FILTER_STORAGE_KEY, filter);
+  };
+
+  // Filter stats based on progress
+  const getFilteredStats = () => {
+    if (!stats) return [];
+    if (activeFilter === "all") return stats;
+
+    return stats.filter((item) => {
+      const progress = item.progress || 0;
+      switch (activeFilter) {
+        case "high":
+          return progress > 66;
+        case "medium":
+          return progress >= 33 && progress <= 66;
+        case "low":
+          return progress < 33;
+        default:
+          return true;
+      }
+    });
+  };
+
+  // Refresh handler
+  const handleRefresh = async (platform) => {
+    try {
+      const res = await refreshPlatformStats(platform);
+      // Update the stats with the refreshed data
+      setStats((prevStats) =>
+        prevStats.map((s) => (s.platform === platform ? res.data.stat : s))
+      );
+      // Refresh summary too
+      fetchSummary();
+      setMessageDialog({
+        open: true,
+        title: "Stats Updated",
+        message: `${platform} stats have been refreshed successfully.`,
+      });
+    } catch (err) {
+      const msg =
+        err?.response?.data?.message || err.message || "Error refreshing stats";
+      setMessageDialog({ open: true, title: "Refresh Failed", message: msg });
+    }
+  };
+
+  // Navigate to platform detail
+  const handlePlatformClick = (platform) => {
+    navigate(`/${platform}`);
+  };
 
   const handleUnlink = (platform, e) => {
     if (e) e.stopPropagation();
@@ -44,6 +94,7 @@ export default function Dashboard() {
       await api.delete(`/platforms/${platform}`);
       const res = await api.get("/stats/all");
       setStats(res.data.stats);
+      fetchSummary();
       setMessageDialog({
         open: true,
         title: "Unlinked",
@@ -65,282 +116,41 @@ export default function Dashboard() {
     }
   };
 
+  const fetchSummary = async () => {
+    try {
+      const res = await getStatsSummary();
+      setSummary(res.data.summary);
+    } catch (err) {
+      console.error("Failed to fetch summary:", err);
+    } finally {
+      setSummaryLoading(false);
+    }
+  };
+
   useEffect(() => {
     api
       .get("/stats/all")
       .then((res) => setStats(res.data.stats))
       .catch(() => setStats([]));
+
+    fetchSummary();
   }, []);
 
-  const renderLeetCodeStats = (item) => {
-    const submissions = item.stats?.submissionsByDifficulty || {};
-    const all = submissions.all?.solved || 0;
-    const easy = submissions.easy?.solved || 0;
-    const medium = submissions.medium?.solved || 0;
-    const hard = submissions.hard?.solved || 0;
-    const ranking = item.stats?.ranking || 0;
-    const starRating = item.stats?.starRating || 0;
-
-    return (
-      <div
-        key={item._id}
-        onClick={() => navigate("/leetcode")}
-        role="button"
-        tabIndex={0}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            navigate("/leetcode");
-          }
-        }}
-        aria-label={`Open ${item.platform} details`}
-        className="glass-card-hover p-6 rounded-2xl fade-in-up cursor-pointer transform transition-all hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500"
-      >
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl leetcode-gradient flex items-center justify-center text-2xl font-bold text-white shadow-lg">
-              LC
-            </div>
-            <div>
-              <h2 className="text-2xl font-bold neon-text capitalize">
-                {item.platform}
-              </h2>
-              <div className="text-sm text-gray-400">@{item.username}</div>
-            </div>
-          </div>
-          <div className="text-right relative">
-            <div className="px-3 py-1 rounded-full bg-green-500/20 text-green-400 text-xs font-semibold border border-green-500/30 mb-1">
-              ● Active
-            </div>
-            <div className="text-yellow-400 text-sm flex gap-0.5">
-              {Array.from({ length: Math.max(0, Math.min(5, Math.floor(Number(starRating) || 0))) }).map((_, i) => (
-                <FiStar key={i} className="fill-current" />
-              ))}
-            </div>
-            <button
-              onClick={(e) => handleUnlink(item.platform, e)}
-              className="absolute left-[-70px] top-[-10px] mt-2 mr-2 text-xs bg-red-600/20 text-red-400 px-3 py-2 rounded-full"
-            >
-              Unlink
-            </button>
-          </div>
-        </div>
-
-        <div className="mb-4">
-          <div className="stat-value-lg mb-2">{all.toLocaleString()}</div>
-          <div className="stat-label">Total Problems Solved</div>
-          <div className="text-sm text-gray-400 mt-1">
-            Rank: #{ranking.toLocaleString()}
-          </div>
-        </div>
-
-        <div className="grid grid-cols-3 gap-4 mt-6">
-          <StatCard
-            label="Easy"
-            value={easy}
-            icon={FiCheck}
-            gradient="from-green-400 to-emerald-500"
-          />
-          <StatCard
-            label="Medium"
-            value={medium}
-            icon={FiHexagon}
-            gradient="from-yellow-400 to-orange-500"
-          />
-          <StatCard
-            label="Hard"
-            value={hard}
-            icon={FiStar}
-            gradient="from-red-400 to-pink-500"
-          />
-        </div>
-
-        <div className="mt-4 text-center text-sm text-blue-400 hover:text-blue-300 font-semibold">
-          Click to view details →
-        </div>
-      </div>
-    );
-  };
-
-  const renderCodeforcesStats = (item) => {
-    const {
-      rating = 0,
-      maxRating = 0,
-      rank = "N/A",
-      friendOfCount = 0,
-      problemsSolved = 0,
-      totalContests = 0,
-    } = item.stats || {};
-
-    return (
-      <div
-        key={item._id}
-        onClick={() => navigate("/codeforces")}
-        role="button"
-        tabIndex={0}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            navigate("/codeforces");
-          }
-        }}
-        aria-label={`Open ${item.platform} details`}
-        className="glass-card-hover p-6 rounded-2xl fade-in-up delay-200 cursor-pointer transform transition-all hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500"
-      >
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl codeforces-gradient flex items-center justify-center text-2xl font-bold text-white shadow-lg">
-              CF
-            </div>
-            <div>
-              <h2 className="text-2xl font-bold neon-text capitalize">
-                {item.platform}
-              </h2>
-              <div className="text-sm text-gray-400">@{item.username}</div>
-            </div>
-          </div>
-          <div className="px-3 py-1 rounded-full bg-blue-500/20 text-blue-400 text-xs font-semibold border border-blue-500/30 relative">
-            ● Active
-            <button
-              onClick={(e) => handleUnlink(item.platform, e)}
-              className="absolute left-[-70px] top-[-10px] mt-2 mr-2 text-xs bg-red-600/20 text-red-400 px-3 py-2 rounded-full"
-            >
-              Unlink
-            </button>
-          </div>
-        </div>
-
-        <div className="mb-4">
-          <div className="stat-value-lg mb-2">{rating.toLocaleString()}</div>
-          <div className="stat-label">Current Rating</div>
-          <div className="mt-2 text-purple-400 text-sm font-semibold capitalize">
-            {rank}
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4 mt-6">
-          <StatCard label="Max Rating" value={maxRating} icon={FiAward} />
-          <StatCard
-            label="Followers"
-            value={friendOfCount.toLocaleString()}
-            icon={FiUsers}
-          />
-          <StatCard
-            label="Problems"
-            value={problemsSolved.toLocaleString()}
-            icon={FiTarget}
-          />
-          <StatCard
-            label="Contests"
-            value={totalContests}
-            icon={FiTrendingUp}
-          />
-        </div>
-
-        <div className="mt-4 text-center text-sm text-blue-400 hover:text-blue-300 font-semibold">
-          Click to view details →
-        </div>
-      </div>
-    );
-  };
-
-  const renderGitHubStats = (item) => {
-    const {
-      followers = 0,
-      following = 0,
-      publicRepos = 0,
-      publicGists = 0,
-      totalStars = 0,
-      name = "",
-    } = item.stats || {};
-    const hasStats = Object.keys(item.stats || {}).length > 0;
-
-    return (
-      <div
-        key={item._id}
-        onClick={() => navigate("/github")}
-        role="button"
-        tabIndex={0}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            navigate("/github");
-          }
-        }}
-        aria-label={`Open ${item.platform} details`}
-        className="glass-card-hover p-6 rounded-2xl fade-in-up delay-400 cursor-pointer transform transition-all hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500"
-      >
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl github-gradient flex items-center justify-center text-2xl font-bold text-white shadow-lg">
-              GH
-            </div>
-            <div>
-              <h2 className="text-2xl font-bold neon-text capitalize">
-                {item.platform}
-              </h2>
-              <div className="text-sm text-gray-400">@{item.username}</div>
-              {name && (
-                <div className="text-xs text-gray-500 mt-0.5">{name}</div>
-              )}
-            </div>
-          </div>
-          <div className="px-3 py-1 rounded-full bg-purple-500/20 text-purple-400 text-xs font-semibold border border-purple-500/30 relative">
-            {hasStats ? "● Active" : "● Loading"}
-            <button
-              onClick={(e) => handleUnlink(item.platform, e)}
-              className="absolute left-[-70px] top-[-10px] mt-2 mr-2 text-xs bg-red-600/20 text-red-400 px-3 py-2 rounded-full"
-            >
-              Unlink
-            </button>
-          </div>
-        </div>
-
-        {hasStats ? (
-          <>
-            <div className="mb-4">
-              <div className="stat-value-lg mb-2">
-                {totalStars.toLocaleString()}
-              </div>
-              <div className="stat-label">Total Stars</div>
-              <div className="text-sm text-gray-400 mt-1">
-                {followers.toLocaleString()} followers
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4 mt-6">
-              <StatCard label="Repos" value={publicRepos} icon={FiPackage} />
-              <StatCard label="Gists" value={publicGists} icon={FiFileText} />
-              <StatCard label="Following" value={following} icon={FiUser} />
-              <StatCard
-                label="Followers"
-                value={followers.toLocaleString()}
-                icon={FiUsers}
-              />
-            </div>
-          </>
-        ) : (
-          <div className="text-center py-8">
-            <FiRefreshCw className="text-4xl mb-3 opacity-30 mx-auto animate-spin" />
-            <div className="text-gray-400 text-sm">Stats loading...</div>
-          </div>
-        )}
-
-        <div className="mt-4 text-center text-sm text-blue-400 hover:text-blue-300 font-semibold">
-          Click to view details →
-        </div>
-      </div>
-    );
-  };
+  const filteredStats = getFilteredStats();
 
   return (
     <>
       <div className="mb-8 fade-in-scale">
-        <h1 className="text-5xl font-black mb-3 neon-text">Dashboard</h1>
-        <p className="text-gray-400 text-lg">
+        <h1 className="text-4xl font-black mb-3 text-[var(--text-primary)]">
+          Dashboard
+        </h1>
+        <p className="text-[var(--text-secondary)] text-lg">
           Track your coding journey across platforms
         </p>
       </div>
+
+      {/* Summary Section */}
+      <SummarySection summary={summary} loading={summaryLoading} />
 
       {!stats ? (
         <Loader />
@@ -355,15 +165,40 @@ export default function Dashboard() {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-          {stats.map((item) => {
-            if (item.platform === "leetcode") return renderLeetCodeStats(item);
-            if (item.platform === "codeforces")
-              return renderCodeforcesStats(item);
-            if (item.platform === "github") return renderGitHubStats(item);
-            return null;
-          })}
-        </div>
+        <>
+          {/* Filter Buttons */}
+          <div className="mb-6">
+            <FilterButtons
+              activeFilter={activeFilter}
+              onFilterChange={handleFilterChange}
+            />
+          </div>
+
+          {/* Platform Cards Grid */}
+          {filteredStats.length === 0 ? (
+            <div className="glass-card p-8 rounded-2xl text-center">
+              <p className="text-[var(--text-secondary)]">
+                No platforms match the selected filter. Try a different filter.
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+              {filteredStats.map((item) => (
+                <PlatformCard
+                  key={item._id}
+                  platform={item.platform}
+                  stats={item.stats}
+                  username={item.username}
+                  progress={item.progress || 0}
+                  canRefresh={item.canRefresh}
+                  nextRefreshAvailable={item.nextRefreshAvailable}
+                  onRefresh={handleRefresh}
+                  onClick={() => handlePlatformClick(item.platform)}
+                />
+              ))}
+            </div>
+          )}
+        </>
       )}
 
       <Dialog

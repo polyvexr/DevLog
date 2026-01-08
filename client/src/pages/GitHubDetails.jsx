@@ -43,7 +43,7 @@ export default function GitHubDetails() {
     <>
       <button
         onClick={() => navigate("/")}
-        className="mb-6 text-blue-400 hover:text-blue-300 flex items-center gap-2 fade-in-scale"
+        className="mb-6 text-[var(--accent-blue)] hover:opacity-80 flex items-center gap-2 fade-in-scale"
       >
         ← Back to Dashboard
       </button>
@@ -54,19 +54,23 @@ export default function GitHubDetails() {
             GH
           </div>
           <div>
-            <h1 className="text-5xl font-black neon-text">GitHub Profile</h1>
-            <p className="text-gray-400 text-lg">@{data.username}</p>
+            <h1 className="text-5xl font-black text-[var(--text-primary)]">
+              GitHub Profile
+            </h1>
+            <p className="text-[var(--text-secondary)] text-lg">
+              @{data.username}
+            </p>
           </div>
         </div>
       </div>
 
       {!hasStats ? (
-        <div className="glass-card p-12 rounded-2xl text-center">
+        <div className="platform-card p-12 rounded-2xl text-center">
           <FiRefreshCw className="text-6xl mb-4 opacity-30 mx-auto animate-spin" />
-          <h3 className="text-2xl font-bold mb-2 text-gray-300">
+          <h3 className="text-2xl font-bold mb-2 text-[var(--text-secondary)]">
             Stats Loading
           </h3>
-          <p className="text-gray-500">
+          <p className="text-[var(--text-secondary)]">
             GitHub stats are being fetched. Check back soon!
           </p>
         </div>
@@ -74,7 +78,7 @@ export default function GitHubDetails() {
         <>
           {/* Profile Header */}
           {stats.name && (
-            <div className="glass-card-hover p-6 rounded-2xl mb-6 fade-in-up">
+            <div className="platform-card p-6 rounded-2xl mb-6 fade-in-up">
               <div className="flex items-center gap-6">
                 {stats.avatar && (
                   <img
@@ -84,19 +88,21 @@ export default function GitHubDetails() {
                   />
                 )}
                 <div className="flex-1">
-                  <h2 className="text-3xl font-bold text-white mb-2">
+                  <h2 className="text-3xl font-bold text-[var(--text-primary)] mb-2">
                     {stats.name}
                   </h2>
                   {stats.bio && (
-                    <p className="text-gray-400 mb-2">{stats.bio}</p>
+                    <p className="text-[var(--text-secondary)] mb-2">
+                      {stats.bio}
+                    </p>
                   )}
                   {stats.company && (
-                    <p className="text-sm text-gray-500 flex items-center gap-1">
+                    <p className="text-sm text-[var(--text-secondary)] flex items-center gap-1">
                       <FiBriefcase /> {stats.company}
                     </p>
                   )}
                   {stats.location && (
-                    <p className="text-sm text-gray-500 flex items-center gap-1">
+                    <p className="text-sm text-[var(--text-secondary)] flex items-center gap-1">
                       <FiMapPin /> {stats.location}
                     </p>
                   )}
@@ -107,30 +113,38 @@ export default function GitHubDetails() {
 
           {/* Main Stats */}
           <div className="mb-8">
-            <h2 className="text-2xl font-bold mb-4 neon-text">
+            <h2 className="text-2xl font-bold mb-4 text-[var(--text-primary)]">
               Profile Overview
             </h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="glass-card-hover p-6 rounded-xl fade-in-up">
-                <div className="stat-label mb-2">Followers</div>
-                <div className="stat-value-lg">
+              <div className="platform-card p-6 rounded-xl fade-in-up">
+                <div className="text-[var(--text-secondary)] text-sm mb-2">
+                  Followers
+                </div>
+                <div className="text-3xl font-bold text-[var(--accent-blue)]">
                   {stats.followers?.toLocaleString() || 0}
                 </div>
               </div>
-              <div className="glass-card-hover p-6 rounded-xl fade-in-up delay-100">
-                <div className="stat-label mb-2">Following</div>
+              <div className="platform-card p-6 rounded-xl fade-in-up delay-100">
+                <div className="text-[var(--text-secondary)] text-sm mb-2">
+                  Following
+                </div>
                 <div className="text-3xl font-bold text-purple-400">
                   {stats.following?.toLocaleString() || 0}
                 </div>
               </div>
-              <div className="glass-card-hover p-6 rounded-xl fade-in-up delay-200">
-                <div className="stat-label mb-2">Public Repos</div>
+              <div className="platform-card p-6 rounded-xl fade-in-up delay-200">
+                <div className="text-[var(--text-secondary)] text-sm mb-2">
+                  Public Repos
+                </div>
                 <div className="text-3xl font-bold text-cyan-400">
                   {stats.publicRepos?.toLocaleString() || 0}
                 </div>
               </div>
-              <div className="glass-card-hover p-6 rounded-xl fade-in-up delay-300">
-                <div className="stat-label mb-2">Public Gists</div>
+              <div className="platform-card p-6 rounded-xl fade-in-up delay-300">
+                <div className="text-[var(--text-secondary)] text-sm mb-2">
+                  Public Gists
+                </div>
                 <div className="text-3xl font-bold text-green-400">
                   {stats.publicGists?.toLocaleString() || 0}
                 </div>
@@ -141,7 +155,7 @@ export default function GitHubDetails() {
           {/* Repository Stats */}
           {stats.totalStars !== undefined && (
             <div className="mb-8">
-              <h2 className="text-2xl font-bold mb-4 neon-text">
+              <h2 className="text-2xl font-bold mb-4 text-[var(--text-primary)]">
                 Repository Stats
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -167,7 +181,7 @@ export default function GitHubDetails() {
           {/* Top Repositories */}
           {stats.topRepositories && stats.topRepositories.length > 0 && (
             <div className="mb-8">
-              <h2 className="text-2xl font-bold mb-4 neon-text">
+              <h2 className="text-2xl font-bold mb-4 text-[var(--text-primary)]">
                 Top Repositories
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -177,11 +191,11 @@ export default function GitHubDetails() {
                     href={repo.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`glass-card-hover p-5 rounded-xl fade-in-up hover:scale-105 transition-transform`}
+                    className={`platform-card p-5 rounded-xl fade-in-up hover:scale-105 transition-transform`}
                     style={{ animationDelay: `${idx * 100}ms` }}
                   >
                     <div className="flex items-start justify-between mb-3">
-                      <h3 className="text-lg font-bold text-blue-400 hover:text-blue-300">
+                      <h3 className="text-lg font-bold text-[var(--accent-blue)] hover:opacity-80">
                         {repo.name}
                       </h3>
                       <span className="px-2 py-1 bg-purple-500/20 rounded text-xs text-purple-300">
@@ -189,11 +203,11 @@ export default function GitHubDetails() {
                       </span>
                     </div>
                     {repo.description && (
-                      <p className="text-sm text-gray-400 mb-3 line-clamp-2">
+                      <p className="text-sm text-[var(--text-secondary)] mb-3 line-clamp-2">
                         {repo.description}
                       </p>
                     )}
-                    <div className="flex gap-4 text-sm text-gray-500">
+                    <div className="flex gap-4 text-sm text-[var(--text-secondary)]">
                       <span className="flex items-center gap-1">
                         <FiStar /> {repo.stars?.toLocaleString()}
                       </span>
@@ -211,10 +225,10 @@ export default function GitHubDetails() {
           {stats.languagesUsed &&
             Object.keys(stats.languagesUsed).length > 0 && (
               <div className="mb-8">
-                <h2 className="text-2xl font-bold mb-4 neon-text">
+                <h2 className="text-2xl font-bold mb-4 text-[var(--text-primary)]">
                   Languages Used
                 </h2>
-                <div className="glass-card-hover p-6 rounded-2xl">
+                <div className="platform-card p-6 rounded-2xl">
                   <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
                     {Object.entries(stats.languagesUsed)
                       .sort((a, b) => b[1] - a[1])
@@ -222,12 +236,12 @@ export default function GitHubDetails() {
                       .map(([lang, count]) => (
                         <div
                           key={lang}
-                          className="text-center p-3 rounded-lg bg-slate-800/50"
+                          className="text-center p-3 rounded-lg bg-[var(--bg-card-inner)]"
                         >
                           <div className="text-2xl font-bold text-cyan-400">
                             {count}
                           </div>
-                          <div className="text-xs text-gray-400 mt-1">
+                          <div className="text-xs text-[var(--text-secondary)] mt-1">
                             {lang}
                           </div>
                         </div>
@@ -240,15 +254,15 @@ export default function GitHubDetails() {
           {/* Recent Activity */}
           {stats.recentActivity && stats.recentActivity.length > 0 && (
             <div className="mb-8">
-              <h2 className="text-2xl font-bold mb-4 neon-text">
+              <h2 className="text-2xl font-bold mb-4 text-[var(--text-primary)]">
                 Recent Activity
               </h2>
-              <div className="glass-card-hover p-6 rounded-2xl">
+              <div className="platform-card p-6 rounded-2xl">
                 <div className="space-y-3">
                   {stats.recentActivity.slice(0, 10).map((activity, idx) => (
                     <div
                       key={idx}
-                      className="flex items-center justify-between py-2 border-b border-gray-700/50 last:border-0"
+                      className="flex items-center justify-between py-2 border-b border-[var(--border-color)] last:border-0"
                     >
                       <div className="flex items-center gap-3">
                         <span className="text-xl">
@@ -271,15 +285,15 @@ export default function GitHubDetails() {
                           )}
                         </span>
                         <div>
-                          <div className="text-sm font-semibold text-white">
+                          <div className="text-sm font-semibold text-[var(--text-primary)]">
                             {activity.type.replace("Event", "")}
                           </div>
-                          <div className="text-xs text-gray-400">
+                          <div className="text-xs text-[var(--text-secondary)]">
                             {activity.repo}
                           </div>
                         </div>
                       </div>
-                      <div className="text-xs text-gray-500">
+                      <div className="text-xs text-[var(--text-secondary)]">
                         {new Date(activity.createdAt).toLocaleDateString()}
                       </div>
                     </div>
@@ -292,7 +306,7 @@ export default function GitHubDetails() {
           {/* Event Types Distribution */}
           {stats.eventTypes && Object.keys(stats.eventTypes).length > 0 && (
             <div className="mb-8">
-              <h2 className="text-2xl font-bold mb-4 neon-text">
+              <h2 className="text-2xl font-bold mb-4 text-[var(--text-primary)]">
                 Activity Breakdown
               </h2>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
@@ -313,16 +327,16 @@ export default function GitHubDetails() {
           {/* Account Info */}
           {stats.createdAt && (
             <div>
-              <h2 className="text-2xl font-bold mb-4 neon-text">
+              <h2 className="text-2xl font-bold mb-4 text-[var(--text-primary)]">
                 Account Information
               </h2>
-              <div className="glass-card-hover p-6 rounded-2xl">
+              <div className="platform-card p-6 rounded-2xl">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div>
-                    <div className="text-gray-400 text-sm mb-1">
+                    <div className="text-[var(--text-secondary)] text-sm mb-1">
                       Account Created
                     </div>
-                    <div className="text-lg font-bold text-white">
+                    <div className="text-lg font-bold text-[var(--text-primary)]">
                       {new Date(stats.createdAt).toLocaleDateString("en-US", {
                         year: "numeric",
                         month: "long",
@@ -331,10 +345,10 @@ export default function GitHubDetails() {
                     </div>
                   </div>
                   <div>
-                    <div className="text-gray-400 text-sm mb-1">
+                    <div className="text-[var(--text-secondary)] text-sm mb-1">
                       Last Updated
                     </div>
-                    <div className="text-lg font-bold text-white">
+                    <div className="text-lg font-bold text-[var(--text-primary)]">
                       {new Date(stats.updatedAt).toLocaleDateString("en-US", {
                         year: "numeric",
                         month: "long",
@@ -343,14 +357,14 @@ export default function GitHubDetails() {
                     </div>
                   </div>
                   <div>
-                    <div className="text-gray-400 text-sm mb-1">
+                    <div className="text-[var(--text-secondary)] text-sm mb-1">
                       Profile URL
                     </div>
                     <a
                       href={stats.profileUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-lg font-bold text-blue-400 hover:text-blue-300"
+                      className="text-lg font-bold text-[var(--accent-blue)] hover:opacity-80"
                     >
                       View on GitHub →
                     </a>
