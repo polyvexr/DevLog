@@ -2,6 +2,17 @@ import { useContext } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { useSidebar } from "../context/SidebarContext";
+import {
+  FiZap,
+  FiBarChart2,
+  FiLink,
+  FiTarget,
+  FiSettings,
+  FiLogOut,
+  FiChevronRight,
+  FiX,
+} from "react-icons/fi";
+import { SiLeetcode, SiCodeforces, SiGithub } from "react-icons/si";
 
 export default function Sidebar() {
   const { logout, isAdmin } = useContext(AuthContext);
@@ -32,26 +43,26 @@ export default function Sidebar() {
   );
 
   const navItems = [
-    { path: "/", icon: "📊", label: "Dashboard", exact: true },
-    { path: "/link", icon: "🔗", label: "Link Platform" },
+    { path: "/", icon: FiBarChart2, label: "Dashboard", exact: true },
+    { path: "/link", icon: FiLink, label: "Link Platform" },
   ];
 
   const platformItems = [
     {
       path: "/leetcode",
-      icon: "🧩",
+      icon: SiLeetcode,
       label: "LeetCode",
       gradient: "from-orange-500 to-yellow-500",
     },
     {
       path: "/codeforces",
-      icon: "🏆",
+      icon: SiCodeforces,
       label: "Codeforces",
       gradient: "from-blue-500 to-cyan-500",
     },
     {
       path: "/github",
-      icon: "💻",
+      icon: SiGithub,
       label: "GitHub",
       gradient: "from-purple-500 to-pink-500",
     },
@@ -81,33 +92,38 @@ export default function Sidebar() {
       >
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-blue-500/10">
+          {/* Mobile: Link to home, Desktop: Toggle collapse */}
           <NavLink
             to="/"
-            onClick={handleNavClick}
-            className={`font-black neon-text transition-all duration-300 ${
-              isCollapsed ? "lg:text-xl" : "text-2xl"
+            onClick={(e) => {
+              // On mobile, navigate to home
+              // On desktop, prevent navigation and toggle collapse
+              if (window.innerWidth >= 1024) {
+                e.preventDefault();
+                toggleCollapse();
+              } else {
+                handleNavClick();
+              }
+            }}
+            className={`font-black neon-text transition-all duration-300 flex items-center gap-2 ${
+              isCollapsed
+                ? "lg:text-xl lg:justify-center lg:w-full"
+                : "text-2xl"
             }`}
-          >
-            <span className="lg:hidden">⚡ DevLog</span>
-            <span className="hidden lg:inline">
-              {isCollapsed ? "⚡" : "⚡ DevLog"}
-            </span>
-          </NavLink>
-
-          {/* Collapse Toggle - Desktop only */}
-          <button
-            onClick={toggleCollapse}
-            className="hidden lg:flex items-center justify-center w-8 h-8 rounded-lg bg-slate-800/50 hover:bg-slate-700/50 text-gray-400 hover:text-white transition-all"
             aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
-            <span
-              className={`transition-transform duration-300 ${
-                isCollapsed ? "rotate-180" : ""
-              }`}
-            >
-              ◀
+            <span className="lg:hidden flex items-center gap-2">
+              <FiZap className="text-blue-400" /> DevLog
             </span>
-          </button>
+            <span className="hidden lg:inline-flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
+              <FiZap
+                className={`text-blue-400 transition-transform duration-300 ${
+                  isCollapsed ? "text-2xl" : ""
+                }`}
+              />
+              {!isCollapsed && "DevLog"}
+            </span>
+          </NavLink>
 
           {/* Close button - Mobile only */}
           <button
@@ -115,12 +131,16 @@ export default function Sidebar() {
             className="lg:hidden flex items-center justify-center w-8 h-8 rounded-lg bg-slate-800/50 hover:bg-slate-700/50 text-gray-400 hover:text-white transition-all"
             aria-label="Close sidebar"
           >
-            ✕
+            <FiX />
           </button>
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 overflow-y-auto py-4 px-3">
+        <nav
+          className={`flex-1 py-4 px-3 ${
+            isCollapsed ? "lg:overflow-hidden" : "overflow-y-auto"
+          }`}
+        >
           {/* Main Nav Items */}
           <div className="space-y-1">
             {navItems.map((item) => (
@@ -138,7 +158,7 @@ export default function Sidebar() {
                   }
                 `}
               >
-                <span className="text-xl flex-shrink-0">{item.icon}</span>
+                <item.icon className="text-xl flex-shrink-0" />
                 <span
                   className={`font-medium whitespace-nowrap transition-all duration-300 ${
                     isCollapsed
@@ -168,7 +188,7 @@ export default function Sidebar() {
                 ${isPlatformRoute ? "text-white" : ""}
               `}
             >
-              <span className="text-xl flex-shrink-0">🎯</span>
+              <FiTarget className="text-xl flex-shrink-0" />
               <span
                 className={`font-medium whitespace-nowrap flex-1 text-left transition-all duration-300 ${
                   isCollapsed
@@ -183,7 +203,7 @@ export default function Sidebar() {
                   isCollapsed ? "lg:hidden" : ""
                 } ${isPlatformsExpanded ? "rotate-90" : ""}`}
               >
-                ▶
+                <FiChevronRight />
               </span>
               {/* Tooltip for collapsed state */}
               {isCollapsed && (
@@ -221,7 +241,7 @@ export default function Sidebar() {
                       }
                     `}
                   >
-                    <span className="text-lg flex-shrink-0">{item.icon}</span>
+                    <item.icon className="text-lg flex-shrink-0" />
                     <span
                       className={`font-medium whitespace-nowrap transition-all duration-300 ${
                         isCollapsed
@@ -258,7 +278,7 @@ export default function Sidebar() {
                   }
                 `}
               >
-                <span className="text-xl flex-shrink-0">🔧</span>
+                <FiSettings className="text-xl flex-shrink-0" />
                 <span
                   className={`font-medium whitespace-nowrap transition-all duration-300 ${
                     isCollapsed
@@ -289,7 +309,7 @@ export default function Sidebar() {
               hover:border hover:border-red-500/30
             `}
           >
-            <span className="text-xl flex-shrink-0">🚪</span>
+            <FiLogOut className="text-xl flex-shrink-0" />
             <span
               className={`font-medium whitespace-nowrap transition-all duration-300 ${
                 isCollapsed

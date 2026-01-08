@@ -3,6 +3,14 @@ import { useNavigate } from "react-router-dom";
 import Loader from "../components/Loader";
 import StatCard from "../components/StatCard";
 import api from "../api/axios";
+import {
+  FiSend,
+  FiCheckCircle,
+  FiTarget,
+  FiAward,
+  FiTrendingUp,
+  FiBarChart2,
+} from "react-icons/fi";
 
 export default function CodeforcesDetails() {
   const [data, setData] = useState(null);
@@ -20,7 +28,7 @@ export default function CodeforcesDetails() {
 
   if (!data) return <Loader />;
 
-  const stats = data.stats;
+  const stats = data.stats || {};
 
   return (
     <>
@@ -115,22 +123,22 @@ export default function CodeforcesDetails() {
           <StatCard
             label="Total Submissions"
             value={stats.totalSubmissions?.toLocaleString()}
-            icon="📤"
+            icon={FiSend}
           />
           <StatCard
             label="Accepted"
             value={stats.acceptedSubmissions?.toLocaleString()}
-            icon="✅"
+            icon={FiCheckCircle}
           />
           <StatCard
             label="Problems Solved"
             value={stats.problemsSolved?.toLocaleString()}
-            icon="🎯"
+            icon={FiTarget}
           />
           <StatCard
             label="Total Contests"
             value={stats.totalContests}
-            icon="🏆"
+            icon={FiAward}
           />
         </div>
       </div>
@@ -144,17 +152,17 @@ export default function CodeforcesDetails() {
           <StatCard
             label="Best Contest Rank"
             value={`#${stats.bestContestRank}`}
-            icon="🥇"
+            icon={FiAward}
           />
           <StatCard
             label="Worst Contest Rank"
             value={`#${stats.worstContestRank}`}
-            icon="📊"
+            icon={FiBarChart2}
           />
           <StatCard
             label="Average Rank"
             value={`#${stats.averageRank}`}
-            icon="📈"
+            icon={FiTrendingUp}
           />
         </div>
       </div>

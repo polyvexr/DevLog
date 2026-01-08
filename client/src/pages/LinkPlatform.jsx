@@ -1,6 +1,7 @@
 import { useState } from "react";
 import api from "../api/axios";
 import { useNavigate } from "react-router-dom";
+import { FiLink } from "react-icons/fi";
 
 export default function LinkPlatform() {
   const navigate = useNavigate();
@@ -59,9 +60,9 @@ export default function LinkPlatform() {
             value={platform}
             onChange={(e) => setPlatform(e.target.value)}
           >
-            <option value="leetcode">🟠 LeetCode</option>
-            <option value="codeforces">🔵 CodeForces</option>
-            <option value="github">🟣 GitHub</option>
+            <option value="leetcode">LeetCode</option>
+            <option value="codeforces">CodeForces</option>
+            <option value="github">GitHub</option>
           </select>
         </div>
 
@@ -86,9 +87,15 @@ export default function LinkPlatform() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white p-3 rounded-lg font-bold text-lg hover:shadow-lg hover:shadow-blue-500/50 transition-all duration-200 disabled:opacity-60"
+          className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white p-3 rounded-lg font-bold text-lg hover:shadow-lg hover:shadow-blue-500/50 transition-all duration-200 disabled:opacity-60 flex items-center justify-center gap-2"
         >
-          {loading ? "Linking..." : "🔗 Link Platform"}
+          {loading ? (
+            "Linking..."
+          ) : (
+            <>
+              <FiLink /> Link Platform
+            </>
+          )}
         </button>
       </form>
     </>

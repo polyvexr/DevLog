@@ -1,5 +1,6 @@
 import { useSidebar } from "../context/SidebarContext";
 import Sidebar from "./Sidebar";
+import { FiZap } from "react-icons/fi";
 
 export default function AuthenticatedLayout({ children }) {
   const { isCollapsed, toggleMobile } = useSidebar();
@@ -41,7 +42,9 @@ export default function AuthenticatedLayout({ children }) {
             </button>
 
             {/* Logo */}
-            <span className="text-xl font-black neon-text">⚡ DevLog</span>
+            <span className="text-xl font-black neon-text flex items-center gap-2">
+              <FiZap className="text-blue-400" /> DevLog
+            </span>
 
             {/* Spacer for alignment */}
             <div className="w-10" />

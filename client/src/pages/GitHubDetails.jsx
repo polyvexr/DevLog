@@ -3,6 +3,22 @@ import { useNavigate } from "react-router-dom";
 import Loader from "../components/Loader";
 import StatCard from "../components/StatCard";
 import api from "../api/axios";
+import {
+  FiStar,
+  FiGitBranch,
+  FiEye,
+  FiBarChart2,
+  FiRefreshCw,
+  FiUpload,
+  FiGitPullRequest,
+  FiAlertCircle,
+  FiMessageSquare,
+  FiPlus,
+  FiTrash2,
+  FiCopy,
+  FiBriefcase,
+  FiMapPin,
+} from "react-icons/fi";
 
 export default function GitHubDetails() {
   const [data, setData] = useState(null);
@@ -46,7 +62,7 @@ export default function GitHubDetails() {
 
       {!hasStats ? (
         <div className="glass-card p-12 rounded-2xl text-center">
-          <div className="text-6xl mb-4 opacity-30">🔄</div>
+          <FiRefreshCw className="text-6xl mb-4 opacity-30 mx-auto animate-spin" />
           <h3 className="text-2xl font-bold mb-2 text-gray-300">
             Stats Loading
           </h3>
@@ -75,10 +91,14 @@ export default function GitHubDetails() {
                     <p className="text-gray-400 mb-2">{stats.bio}</p>
                   )}
                   {stats.company && (
-                    <p className="text-sm text-gray-500">🏢 {stats.company}</p>
+                    <p className="text-sm text-gray-500 flex items-center gap-1">
+                      <FiBriefcase /> {stats.company}
+                    </p>
                   )}
                   {stats.location && (
-                    <p className="text-sm text-gray-500">📍 {stats.location}</p>
+                    <p className="text-sm text-gray-500 flex items-center gap-1">
+                      <FiMapPin /> {stats.location}
+                    </p>
                   )}
                 </div>
               </div>
@@ -128,17 +148,17 @@ export default function GitHubDetails() {
                 <StatCard
                   label="Total Stars"
                   value={stats.totalStars?.toLocaleString()}
-                  icon="⭐"
+                  icon={FiStar}
                 />
                 <StatCard
                   label="Total Forks"
                   value={stats.totalForks?.toLocaleString()}
-                  icon="🔱"
+                  icon={FiGitBranch}
                 />
                 <StatCard
                   label="Total Watchers"
                   value={stats.totalWatchers?.toLocaleString()}
-                  icon="👁️"
+                  icon={FiEye}
                 />
               </div>
             </div>
@@ -175,10 +195,10 @@ export default function GitHubDetails() {
                     )}
                     <div className="flex gap-4 text-sm text-gray-500">
                       <span className="flex items-center gap-1">
-                        ⭐ {repo.stars?.toLocaleString()}
+                        <FiStar /> {repo.stars?.toLocaleString()}
                       </span>
                       <span className="flex items-center gap-1">
-                        🔱 {repo.forks?.toLocaleString()}
+                        <FiGitBranch /> {repo.forks?.toLocaleString()}
                       </span>
                     </div>
                   </a>
@@ -232,21 +252,23 @@ export default function GitHubDetails() {
                     >
                       <div className="flex items-center gap-3">
                         <span className="text-xl">
-                          {activity.type === "PushEvent"
-                            ? "📤"
-                            : activity.type === "PullRequestEvent"
-                            ? "🔀"
-                            : activity.type === "IssuesEvent"
-                            ? "📋"
-                            : activity.type === "IssueCommentEvent"
-                            ? "💬"
-                            : activity.type === "CreateEvent"
-                            ? "✨"
-                            : activity.type === "DeleteEvent"
-                            ? "🗑️"
-                            : activity.type === "ForkEvent"
-                            ? "🍴"
-                            : "📊"}
+                          {activity.type === "PushEvent" ? (
+                            <FiUpload />
+                          ) : activity.type === "PullRequestEvent" ? (
+                            <FiGitPullRequest />
+                          ) : activity.type === "IssuesEvent" ? (
+                            <FiAlertCircle />
+                          ) : activity.type === "IssueCommentEvent" ? (
+                            <FiMessageSquare />
+                          ) : activity.type === "CreateEvent" ? (
+                            <FiPlus />
+                          ) : activity.type === "DeleteEvent" ? (
+                            <FiTrash2 />
+                          ) : activity.type === "ForkEvent" ? (
+                            <FiCopy />
+                          ) : (
+                            <FiBarChart2 />
+                          )}
                         </span>
                         <div>
                           <div className="text-sm font-semibold text-white">
@@ -281,7 +303,7 @@ export default function GitHubDetails() {
                       key={event}
                       label={event.replace("Event", "")}
                       value={count}
-                      icon="📊"
+                      icon={FiBarChart2}
                     />
                   ))}
               </div>

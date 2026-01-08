@@ -1,4 +1,11 @@
-export default function StatCard({ label, value, icon = "⚡", gradient = "from-blue-500 to-purple-500" }) {
+import { FiZap } from "react-icons/fi";
+
+export default function StatCard({
+  label,
+  value,
+  icon: Icon = FiZap,
+  gradient = "from-blue-500 to-purple-500",
+}) {
   const formatValue = (val) => {
     if (typeof val === "number") {
       return val.toLocaleString();
@@ -8,11 +15,19 @@ export default function StatCard({ label, value, icon = "⚡", gradient = "from-
 
   return (
     <div className="glass-card-hover p-5 rounded-xl neon-border fade-in-scale relative overflow-hidden group">
-      <div className={`absolute inset-0 bg-gradient-to-br ${gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-300`} />
+      <div
+        className={`absolute inset-0 bg-gradient-to-br ${gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}
+      />
       <div className="relative z-10">
         <div className="flex items-center justify-between mb-2">
           <span className="stat-label">{label}</span>
-          <span className="text-2xl opacity-40 group-hover:opacity-70 transition-opacity">{icon}</span>
+          {typeof Icon === "function" ? (
+            <Icon className="text-2xl opacity-40 group-hover:opacity-70 transition-opacity" />
+          ) : (
+            <span className="text-2xl opacity-40 group-hover:opacity-70 transition-opacity">
+              {Icon}
+            </span>
+          )}
         </div>
         <div className="stat-value text-3xl mt-1">{formatValue(value)}</div>
       </div>

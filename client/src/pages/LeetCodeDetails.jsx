@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import Loader from "../components/Loader";
 import StatCard from "../components/StatCard";
 import api from "../api/axios";
+import { FiStar, FiCalendar, FiBarChart2, FiActivity } from "react-icons/fi";
+import { RiFireLine } from "react-icons/ri";
 
 export default function LeetCodeDetails() {
   const [data, setData] = useState(null);
@@ -67,8 +69,15 @@ export default function LeetCodeDetails() {
           </div>
           <div>
             <div className="text-gray-400 text-sm mb-1">Star Rating</div>
-            <div className="text-xl font-bold text-yellow-400">
-              {"⭐".repeat(stats.starRating || 0)}
+            <div className="text-xl font-bold text-yellow-400 flex gap-0.5">
+              {Array.from({
+                length: Math.max(
+                  0,
+                  Math.min(5, Math.floor(Number(stats.starRating) || 0))
+                ),
+              }).map((_, i) => (
+                <FiStar key={i} className="fill-current" />
+              ))}
             </div>
           </div>
         </div>
@@ -129,17 +138,17 @@ export default function LeetCodeDetails() {
             <StatCard
               label="Current Streak"
               value={`${stats.streakData.currentStreak} days`}
-              icon="🔥"
+              icon={RiFireLine}
             />
             <StatCard
               label="Total Active Days"
               value={stats.streakData.totalActiveDays}
-              icon="📅"
+              icon={FiCalendar}
             />
             <StatCard
               label="Active Years"
               value={stats.streakData.activeYears?.length || 0}
-              icon="📊"
+              icon={FiBarChart2}
             />
           </div>
         </div>
