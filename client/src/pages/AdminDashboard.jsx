@@ -95,10 +95,10 @@ export default function AdminDashboard() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-5xl font-black neon-text mb-4">
+          <h1 className="text-5xl font-black text-[var(--text-primary)] mb-4">
             Admin Dashboard
           </h1>
-          <p className="text-gray-400 text-lg">
+          <p className="text-[var(--text-secondary)] text-lg">
             Manage and sync platform data for all users
           </p>
         </div>
@@ -106,45 +106,49 @@ export default function AdminDashboard() {
         {/* Stats Cards */}
         {stats && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-            <div className="glass-card-hover p-6 rounded-2xl text-center">
-              <div className="text-4xl font-bold text-blue-400 mb-2">
+            <div className="platform-card p-6 rounded-2xl text-center">
+              <div className="text-4xl font-bold text-[var(--accent-blue)] mb-2">
                 {stats.totalUsers}
               </div>
-              <div className="text-gray-400">Total Users</div>
+              <div className="text-[var(--text-secondary)]">Total Users</div>
             </div>
-            <div className="glass-card-hover p-6 rounded-2xl text-center">
+            <div className="platform-card p-6 rounded-2xl text-center">
               <div className="text-4xl font-bold text-yellow-400 mb-2">
                 {stats.platformCounts.leetcode}
               </div>
-              <div className="text-gray-400">LeetCode Users</div>
+              <div className="text-[var(--text-secondary)]">LeetCode Users</div>
             </div>
-            <div className="glass-card-hover p-6 rounded-2xl text-center">
+            <div className="platform-card p-6 rounded-2xl text-center">
               <div className="text-4xl font-bold text-green-400 mb-2">
                 {stats.platformCounts.codeforces}
               </div>
-              <div className="text-gray-400">Codeforces Users</div>
+              <div className="text-[var(--text-secondary)]">
+                Codeforces Users
+              </div>
             </div>
-            <div className="glass-card-hover p-6 rounded-2xl text-center">
+            <div className="platform-card p-6 rounded-2xl text-center">
               <div className="text-4xl font-bold text-purple-400 mb-2">
                 {stats.platformCounts.github}
               </div>
-              <div className="text-gray-400">GitHub Users</div>
+              <div className="text-[var(--text-secondary)]">GitHub Users</div>
             </div>
           </div>
         )}
 
         {/* Sync Controls */}
-        <div className="glass-card-hover p-8 rounded-2xl mb-8">
-          <h2 className="text-3xl font-bold text-white mb-6">Sync Controls</h2>
+        <div className="platform-card p-8 rounded-2xl mb-8">
+          <h2 className="text-3xl font-bold text-[var(--text-primary)] mb-6">
+            Sync Controls
+          </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <button
               onClick={() => handleSync("all")}
               disabled={syncing}
               className={`p-6 rounded-xl font-bold text-lg transition-all duration-200 ${
                 syncing && activeSync === "all"
-                  ? "bg-blue-600/50 cursor-wait"
-                  : "bg-gradient-to-r from-blue-600 to-purple-600 hover:shadow-lg hover:shadow-blue-500/50"
-              } text-white disabled:opacity-50`}
+                  ? "bg-[var(--accent-blue)]/50 cursor-wait"
+                  : "btn-primary"
+              } disabled:opacity-50`}
             >
               {syncing && activeSync === "all" ? (
                 <div className="flex items-center justify-center gap-2">
@@ -217,55 +221,65 @@ export default function AdminDashboard() {
 
         {/* Sync Results */}
         {syncResults && (
-          <div className="glass-card-hover p-8 rounded-2xl mb-8">
-            <h2 className="text-3xl font-bold text-white mb-6">
+          <div className="platform-card p-8 rounded-2xl mb-8">
+            <h2 className="text-3xl font-bold text-[var(--text-primary)] mb-6">
               Last Sync Results
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-              <div className="p-4 bg-slate-800/50 rounded-xl text-center">
-                <div className="text-3xl font-bold text-white mb-1">
+              <div className="p-4 bg-[var(--bg-card-inner)] rounded-xl text-center">
+                <div className="text-3xl font-bold text-[var(--text-primary)] mb-1">
                   {syncResults.total}
                 </div>
-                <div className="text-gray-400">Total</div>
+                <div className="text-[var(--text-secondary)]">Total</div>
               </div>
               <div className="p-4 bg-green-900/30 rounded-xl text-center">
                 <div className="text-3xl font-bold text-green-400 mb-1">
                   {syncResults.success}
                 </div>
-                <div className="text-gray-400">Success</div>
+                <div className="text-[var(--text-secondary)]">Success</div>
               </div>
               <div className="p-4 bg-red-900/30 rounded-xl text-center">
                 <div className="text-3xl font-bold text-red-400 mb-1">
                   {syncResults.failed}
                 </div>
-                <div className="text-gray-400">Failed</div>
+                <div className="text-[var(--text-secondary)]">Failed</div>
               </div>
             </div>
 
             {/* Detailed Results */}
             {syncResults.details && syncResults.details.length > 0 && (
               <div className="mt-6">
-                <h3 className="text-xl font-bold text-white mb-4">
+                <h3 className="text-xl font-bold text-[var(--text-primary)] mb-4">
                   Detailed Results
                 </h3>
                 <div className="max-h-96 overflow-y-auto">
                   <table className="w-full text-left">
-                    <thead className="sticky top-0 bg-slate-800">
-                      <tr className="border-b border-gray-700">
-                        <th className="p-3 text-gray-300">User</th>
-                        <th className="p-3 text-gray-300">Platform/Username</th>
-                        <th className="p-3 text-gray-300">Status</th>
-                        <th className="p-3 text-gray-300">Error</th>
+                    <thead className="sticky top-0 bg-[var(--bg-card-inner)]">
+                      <tr className="border-b border-[var(--border-color)]">
+                        <th className="p-3 text-[var(--text-secondary)]">
+                          User
+                        </th>
+                        <th className="p-3 text-[var(--text-secondary)]">
+                          Platform/Username
+                        </th>
+                        <th className="p-3 text-[var(--text-secondary)]">
+                          Status
+                        </th>
+                        <th className="p-3 text-[var(--text-secondary)]">
+                          Error
+                        </th>
                       </tr>
                     </thead>
                     <tbody>
                       {syncResults.details.map((detail, index) => (
                         <tr
                           key={index}
-                          className="border-b border-gray-800 hover:bg-slate-800/30"
+                          className="border-b border-[var(--border-color)] hover:bg-[var(--bg-card-inner)]"
                         >
-                          <td className="p-3 text-gray-300">{detail.user}</td>
-                          <td className="p-3 text-gray-300">
+                          <td className="p-3 text-[var(--text-primary)]">
+                            {detail.user}
+                          </td>
+                          <td className="p-3 text-[var(--text-primary)]">
                             {detail.platform || detail.username || "-"}
                           </td>
                           <td className="p-3">
@@ -294,32 +308,38 @@ export default function AdminDashboard() {
 
         {/* Recent Syncs */}
         {stats?.recentSyncs && stats.recentSyncs.length > 0 && (
-          <div className="glass-card-hover p-8 rounded-2xl">
-            <h2 className="text-3xl font-bold text-white mb-6">Recent Syncs</h2>
+          <div className="platform-card p-8 rounded-2xl">
+            <h2 className="text-3xl font-bold text-[var(--text-primary)] mb-6">
+              Recent Syncs
+            </h2>
             <div className="overflow-x-auto">
               <table className="w-full text-left">
                 <thead>
-                  <tr className="border-b border-gray-700">
-                    <th className="p-3 text-gray-300">User</th>
-                    <th className="p-3 text-gray-300">Platform</th>
-                    <th className="p-3 text-gray-300">Last Updated</th>
+                  <tr className="border-b border-[var(--border-color)]">
+                    <th className="p-3 text-[var(--text-secondary)]">User</th>
+                    <th className="p-3 text-[var(--text-secondary)]">
+                      Platform
+                    </th>
+                    <th className="p-3 text-[var(--text-secondary)]">
+                      Last Updated
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {stats.recentSyncs.map((sync, index) => (
                     <tr
                       key={index}
-                      className="border-b border-gray-800 hover:bg-slate-800/30"
+                      className="border-b border-[var(--border-color)] hover:bg-[var(--bg-card-inner)]"
                     >
-                      <td className="p-3 text-gray-300">
+                      <td className="p-3 text-[var(--text-primary)]">
                         {sync.userId?.email || "Unknown"}
                       </td>
                       <td className="p-3">
-                        <span className="px-3 py-1 rounded-full text-sm font-semibold bg-blue-900/50 text-blue-400">
+                        <span className="px-3 py-1 rounded-full text-sm font-semibold bg-[var(--accent-blue)]/20 text-[var(--accent-blue)]">
                           {sync.platform}
                         </span>
                       </td>
-                      <td className="p-3 text-gray-400">
+                      <td className="p-3 text-[var(--text-secondary)]">
                         {new Date(sync.lastUpdated).toLocaleString()}
                       </td>
                     </tr>

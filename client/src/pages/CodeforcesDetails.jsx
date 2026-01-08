@@ -34,7 +34,7 @@ export default function CodeforcesDetails() {
     <>
       <button
         onClick={() => navigate("/")}
-        className="mb-6 text-blue-400 hover:text-blue-300 flex items-center gap-2 fade-in-scale"
+        className="mb-6 text-[var(--accent-blue)] hover:opacity-80 flex items-center gap-2 fade-in-scale"
       >
         ← Back to Dashboard
       </button>
@@ -45,37 +45,47 @@ export default function CodeforcesDetails() {
             CF
           </div>
           <div>
-            <h1 className="text-5xl font-black neon-text">
+            <h1 className="text-5xl font-black text-[var(--text-primary)]">
               Codeforces Profile
             </h1>
-            <p className="text-gray-400 text-lg">@{data.username}</p>
+            <p className="text-[var(--text-secondary)] text-lg">
+              @{data.username}
+            </p>
           </div>
         </div>
       </div>
 
       {/* Profile Info */}
-      <div className="glass-card-hover p-6 rounded-2xl mb-6 fade-in-up">
+      <div className="platform-card p-6 rounded-2xl mb-6 fade-in-up">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
           <div>
-            <div className="text-gray-400 text-sm mb-1">Organization</div>
-            <div className="text-lg font-bold text-white">
+            <div className="text-[var(--text-secondary)] text-sm mb-1">
+              Organization
+            </div>
+            <div className="text-lg font-bold text-[var(--text-primary)]">
               {stats.organization || "N/A"}
             </div>
           </div>
           <div>
-            <div className="text-gray-400 text-sm mb-1">Country</div>
-            <div className="text-lg font-bold text-white">
+            <div className="text-[var(--text-secondary)] text-sm mb-1">
+              Country
+            </div>
+            <div className="text-lg font-bold text-[var(--text-primary)]">
               {stats.country || "N/A"}
             </div>
           </div>
           <div>
-            <div className="text-gray-400 text-sm mb-1">City</div>
-            <div className="text-lg font-bold text-white">
+            <div className="text-[var(--text-secondary)] text-sm mb-1">
+              City
+            </div>
+            <div className="text-lg font-bold text-[var(--text-primary)]">
               {stats.city || "N/A"}
             </div>
           </div>
           <div>
-            <div className="text-gray-400 text-sm mb-1">Contribution</div>
+            <div className="text-[var(--text-secondary)] text-sm mb-1">
+              Contribution
+            </div>
             <div className="text-lg font-bold text-green-400">
               +{stats.contribution || 0}
             </div>
@@ -85,28 +95,38 @@ export default function CodeforcesDetails() {
 
       {/* Rating Stats */}
       <div className="mb-8">
-        <h2 className="text-2xl font-bold mb-4 neon-text">Rating & Rank</h2>
+        <h2 className="text-2xl font-bold mb-4 text-[var(--text-primary)]">
+          Rating & Rank
+        </h2>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="glass-card-hover p-6 rounded-xl fade-in-up">
-            <div className="stat-label mb-2">Current Rating</div>
-            <div className="stat-value-lg">
+          <div className="platform-card p-6 rounded-xl fade-in-up">
+            <div className="text-[var(--text-secondary)] text-sm mb-2">
+              Current Rating
+            </div>
+            <div className="text-3xl font-bold text-[var(--accent-blue)]">
               {stats.rating?.toLocaleString()}
             </div>
           </div>
-          <div className="glass-card-hover p-6 rounded-xl fade-in-up delay-100">
-            <div className="stat-label mb-2">Max Rating</div>
+          <div className="platform-card p-6 rounded-xl fade-in-up delay-100">
+            <div className="text-[var(--text-secondary)] text-sm mb-2">
+              Max Rating
+            </div>
             <div className="text-3xl font-bold text-purple-400">
               {stats.maxRating?.toLocaleString()}
             </div>
           </div>
-          <div className="glass-card-hover p-6 rounded-xl fade-in-up delay-200">
-            <div className="stat-label mb-2">Current Rank</div>
+          <div className="platform-card p-6 rounded-xl fade-in-up delay-200">
+            <div className="text-[var(--text-secondary)] text-sm mb-2">
+              Current Rank
+            </div>
             <div className="text-2xl font-bold text-yellow-400 capitalize">
               {stats.rank}
             </div>
           </div>
-          <div className="glass-card-hover p-6 rounded-xl fade-in-up delay-300">
-            <div className="stat-label mb-2">Followers</div>
+          <div className="platform-card p-6 rounded-xl fade-in-up delay-300">
+            <div className="text-[var(--text-secondary)] text-sm mb-2">
+              Followers
+            </div>
             <div className="text-3xl font-bold text-cyan-400">
               {stats.friendOfCount?.toLocaleString()}
             </div>
@@ -116,7 +136,7 @@ export default function CodeforcesDetails() {
 
       {/* Submission Stats */}
       <div className="mb-8">
-        <h2 className="text-2xl font-bold mb-4 neon-text">
+        <h2 className="text-2xl font-bold mb-4 text-[var(--text-primary)]">
           Submission Statistics
         </h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -145,7 +165,7 @@ export default function CodeforcesDetails() {
 
       {/* Contest Performance */}
       <div className="mb-8">
-        <h2 className="text-2xl font-bold mb-4 neon-text">
+        <h2 className="text-2xl font-bold mb-4 text-[var(--text-primary)]">
           Contest Performance
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -170,10 +190,10 @@ export default function CodeforcesDetails() {
       {/* Problems by Rating */}
       {stats.problemsByRating && (
         <div className="mb-8">
-          <h2 className="text-2xl font-bold mb-4 neon-text">
+          <h2 className="text-2xl font-bold mb-4 text-[var(--text-primary)]">
             Problems by Rating
           </h2>
-          <div className="glass-card p-6 rounded-2xl">
+          <div className="platform-card p-6 rounded-2xl">
             <div className="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-9 gap-3">
               {Object.entries(stats.problemsByRating)
                 .sort((a, b) => {
@@ -184,10 +204,12 @@ export default function CodeforcesDetails() {
                 .map(([rating, count]) => (
                   <div
                     key={rating}
-                    className="bg-slate-900/30 p-3 rounded-lg text-center"
+                    className="bg-[var(--bg-card-inner)] p-3 rounded-lg text-center"
                   >
-                    <div className="text-sm text-gray-400">{rating}</div>
-                    <div className="text-xl font-bold text-blue-400">
+                    <div className="text-sm text-[var(--text-secondary)]">
+                      {rating}
+                    </div>
+                    <div className="text-xl font-bold text-[var(--accent-blue)]">
                       {count}
                     </div>
                   </div>
@@ -200,10 +222,10 @@ export default function CodeforcesDetails() {
       {/* Languages Used */}
       {stats.languagesUsed && (
         <div className="mb-8">
-          <h2 className="text-2xl font-bold mb-4 neon-text">
+          <h2 className="text-2xl font-bold mb-4 text-[var(--text-primary)]">
             Programming Languages
           </h2>
-          <div className="glass-card p-6 rounded-2xl">
+          <div className="platform-card p-6 rounded-2xl">
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
               {Object.entries(stats.languagesUsed)
                 .sort((a, b) => b[1] - a[1])
@@ -211,9 +233,11 @@ export default function CodeforcesDetails() {
                 .map(([lang, count]) => (
                   <div
                     key={lang}
-                    className="bg-slate-900/30 p-4 rounded-lg text-center hover:bg-slate-800/40 transition-all"
+                    className="bg-[var(--bg-card-inner)] p-4 rounded-lg text-center hover:bg-[var(--border-color)] transition-all"
                   >
-                    <div className="text-sm text-gray-400 mb-1">{lang}</div>
+                    <div className="text-sm text-[var(--text-secondary)] mb-1">
+                      {lang}
+                    </div>
                     <div className="text-2xl font-bold text-purple-400">
                       {count}
                     </div>
@@ -227,7 +251,7 @@ export default function CodeforcesDetails() {
       {/* Verdict Distribution */}
       {stats.verdictDistribution && (
         <div className="mb-8">
-          <h2 className="text-2xl font-bold mb-4 neon-text">
+          <h2 className="text-2xl font-bold mb-4 text-[var(--text-primary)]">
             Verdict Distribution
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -240,10 +264,10 @@ export default function CodeforcesDetails() {
                     ? "text-red-400"
                     : verdict === "TIME_LIMIT_EXCEEDED"
                     ? "text-yellow-400"
-                    : "text-gray-400";
+                    : "text-[var(--text-secondary)]";
                 return (
-                  <div key={verdict} className="glass-card p-4 rounded-xl">
-                    <div className="text-xs text-gray-400 mb-1">
+                  <div key={verdict} className="platform-card p-4 rounded-xl">
+                    <div className="text-xs text-[var(--text-secondary)] mb-1">
                       {verdict.replace(/_/g, " ")}
                     </div>
                     <div className={`text-2xl font-bold ${color}`}>{count}</div>
@@ -258,10 +282,10 @@ export default function CodeforcesDetails() {
       {/* Rating Changes History */}
       {stats.ratingChanges && (
         <div>
-          <h2 className="text-2xl font-bold mb-4 neon-text">
+          <h2 className="text-2xl font-bold mb-4 text-[var(--text-primary)]">
             Recent Rating Changes
           </h2>
-          <div className="glass-card p-6 rounded-2xl">
+          <div className="platform-card p-6 rounded-2xl">
             <div className="space-y-2">
               {stats.ratingChanges
                 .slice(-15)
@@ -269,13 +293,13 @@ export default function CodeforcesDetails() {
                 .map((change, idx) => (
                   <div
                     key={idx}
-                    className="flex items-center justify-between p-3 bg-slate-900/30 rounded-lg"
+                    className="flex items-center justify-between p-3 bg-[var(--bg-card-inner)] rounded-lg"
                   >
                     <div className="flex-1">
-                      <div className="text-gray-300 font-medium">
+                      <div className="text-[var(--text-primary)] font-medium">
                         {change.contestName}
                       </div>
-                      <div className="text-sm text-gray-500">
+                      <div className="text-sm text-[var(--text-secondary)]">
                         Rank: #{change.rank}
                       </div>
                     </div>
