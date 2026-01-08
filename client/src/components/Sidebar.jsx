@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { useSidebar } from "../context/SidebarContext";
@@ -11,8 +11,11 @@ import {
   FiLogOut,
   FiChevronRight,
   FiX,
+  FiCalendar,
 } from "react-icons/fi";
 import { SiLeetcode, SiCodeforces, SiGithub } from "react-icons/si";
+import UserAvatar from "./UserAvatar";
+import { getMe } from "../api/axios";
 
 export default function Sidebar() {
   const { logout, isAdmin } = useContext(AuthContext);
@@ -26,6 +29,20 @@ export default function Sidebar() {
   } = useSidebar();
   const location = useLocation();
   const navigate = useNavigate();
+
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await getMe();
+        setUser(res.data.user);
+      } catch (err) {
+        console.error("Failed to fetch user:", err);
+      }
+    };
+    fetchUser();
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -45,6 +62,7 @@ export default function Sidebar() {
   const navItems = [
     { path: "/", icon: FiBarChart2, label: "Dashboard", exact: true },
     { path: "/link", icon: FiLink, label: "Link Platform" },
+    { path: "/settings", icon: FiSettings, label: "Settings" },
   ];
 
   const platformItems = [
@@ -134,6 +152,19 @@ export default function Sidebar() {
             <FiX />
           </button>
         </div>
+
+        {/* User Profile Card */}
+        {user && (
+          <div className={`p-3 border-b border-blue-500/10 ${isCollapsed ? "lg:py-3 lg:px-2" : ""}`}>
+            <div className={`flex items-center gap-3 ${isCollapsed ? "lg:justify-center" : ""}`}>
+              <UserAvatar name={user.name} size={isCollapsed ? "small" : "default"} />
+              <div className={`flex-1 min-w-0 transition-all duration-300 ${isCollapsed ? "lg:hidden" : ""}`}>
+                <p className="text-sm font-medium text-white truncate">{user.name}</p>
+                <p className="text-xs text-gray-400 truncate">{user.email}</p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Navigation */}
         <nav
@@ -297,6 +328,22 @@ export default function Sidebar() {
               </NavLink>
             </div>
           )}
+
+          {/* Upcoming Contests - Placeholder */}
+          <div className={`mt-6 pt-6 border-t border-blue-500/10 ${isCollapsed ? "lg:hidden" : ""}`}>
+            <div className="flex items-center justify-between px-3 mb-2">
+              <div className="flex items-center gap-2 text-gray-400">
+                <FiCalendar className="text-lg" />
+                <span className="font-medium text-sm">Upcoming Contests</span>
+              </div>
+              <span className="coming-soon-badge">Soon</span>
+            </div>
+            <div className="px-3 py-4 mx-1 rounded-lg bg-slate-800/30 border border-dashed border-blue-500/20">
+              <p className="text-xs text-gray-500 text-center">
+                Contest schedules from LeetCode & Codeforces coming soon
+              </p>
+            </div>
+          </div>
         </nav>
 
         {/* Footer - Logout */}
