@@ -4,6 +4,20 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
 import Dialog from "../components/Dialog";
+import {
+  FiCheck,
+  FiStar,
+  FiAward,
+  FiUsers,
+  FiTarget,
+  FiTrendingUp,
+  FiPackage,
+  FiFileText,
+  FiUser,
+  FiBarChart2,
+  FiRefreshCw,
+  FiHexagon,
+} from "react-icons/fi";
 
 export default function Dashboard() {
   const [stats, setStats] = useState(null);
@@ -98,8 +112,10 @@ export default function Dashboard() {
             <div className="px-3 py-1 rounded-full bg-green-500/20 text-green-400 text-xs font-semibold border border-green-500/30 mb-1">
               ● Active
             </div>
-            <div className="text-yellow-400 text-sm">
-              {"⭐".repeat(starRating)}
+            <div className="text-yellow-400 text-sm flex gap-0.5">
+              {Array.from({ length: Math.max(0, Math.min(5, Math.floor(Number(starRating) || 0))) }).map((_, i) => (
+                <FiStar key={i} className="fill-current" />
+              ))}
             </div>
             <button
               onClick={(e) => handleUnlink(item.platform, e)}
@@ -122,19 +138,19 @@ export default function Dashboard() {
           <StatCard
             label="Easy"
             value={easy}
-            icon="✓"
+            icon={FiCheck}
             gradient="from-green-400 to-emerald-500"
           />
           <StatCard
             label="Medium"
             value={medium}
-            icon="◆"
+            icon={FiHexagon}
             gradient="from-yellow-400 to-orange-500"
           />
           <StatCard
             label="Hard"
             value={hard}
-            icon="★"
+            icon={FiStar}
             gradient="from-red-400 to-pink-500"
           />
         </div>
@@ -203,18 +219,22 @@ export default function Dashboard() {
         </div>
 
         <div className="grid grid-cols-2 gap-4 mt-6">
-          <StatCard label="Max Rating" value={maxRating} icon="🏆" />
+          <StatCard label="Max Rating" value={maxRating} icon={FiAward} />
           <StatCard
             label="Followers"
             value={friendOfCount.toLocaleString()}
-            icon="👥"
+            icon={FiUsers}
           />
           <StatCard
             label="Problems"
             value={problemsSolved.toLocaleString()}
-            icon="🎯"
+            icon={FiTarget}
           />
-          <StatCard label="Contests" value={totalContests} icon="🏅" />
+          <StatCard
+            label="Contests"
+            value={totalContests}
+            icon={FiTrendingUp}
+          />
         </div>
 
         <div className="mt-4 text-center text-sm text-blue-400 hover:text-blue-300 font-semibold">
@@ -289,19 +309,19 @@ export default function Dashboard() {
             </div>
 
             <div className="grid grid-cols-2 gap-4 mt-6">
-              <StatCard label="Repos" value={publicRepos} icon="📦" />
-              <StatCard label="Gists" value={publicGists} icon="📝" />
-              <StatCard label="Following" value={following} icon="👤" />
+              <StatCard label="Repos" value={publicRepos} icon={FiPackage} />
+              <StatCard label="Gists" value={publicGists} icon={FiFileText} />
+              <StatCard label="Following" value={following} icon={FiUser} />
               <StatCard
                 label="Followers"
                 value={followers.toLocaleString()}
-                icon="👥"
+                icon={FiUsers}
               />
             </div>
           </>
         ) : (
           <div className="text-center py-8">
-            <div className="text-4xl mb-3 opacity-30">🔄</div>
+            <FiRefreshCw className="text-4xl mb-3 opacity-30 mx-auto animate-spin" />
             <div className="text-gray-400 text-sm">Stats loading...</div>
           </div>
         )}
@@ -326,7 +346,7 @@ export default function Dashboard() {
         <Loader />
       ) : stats.length === 0 ? (
         <div className="glass-card p-12 rounded-2xl text-center">
-          <div className="text-6xl mb-4 opacity-30">📊</div>
+          <FiBarChart2 className="text-6xl mb-4 opacity-30 mx-auto" />
           <h3 className="text-2xl font-bold mb-2 text-gray-300">
             No Stats Yet
           </h3>

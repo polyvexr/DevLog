@@ -1,6 +1,7 @@
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { NavLink, useNavigate } from "react-router-dom";
+import { FiZap, FiSettings } from "react-icons/fi";
 
 export default function Navbar() {
   const { logout, isAdmin } = useContext(AuthContext);
@@ -14,8 +15,11 @@ export default function Navbar() {
   return (
     <nav className="w-full bg-gradient-to-r from-slate-900/95 via-slate-800/95 to-slate-900/95 backdrop-blur-lg border-b border-blue-500/20 shadow-lg shadow-blue-500/10">
       <div className="app-container flex items-center justify-between p-4">
-        <NavLink to="/" className="text-2xl font-black neon-text">
-          ⚡ DevLog
+        <NavLink
+          to="/"
+          className="text-2xl font-black neon-text flex items-center gap-2"
+        >
+          <FiZap className="text-blue-400" /> DevLog
         </NavLink>
 
         <div className="flex gap-4 items-center">
@@ -23,14 +27,14 @@ export default function Navbar() {
             <NavLink
               to="/admin"
               className={({ isActive }) =>
-                `font-semibold px-4 py-2 rounded-lg transition-all duration-200 ${
+                `font-semibold px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 ${
                   isActive
                     ? "bg-gradient-to-r from-yellow-600 to-orange-600 text-white shadow-lg shadow-yellow-500/50"
                     : "text-gray-300 hover:text-white hover:bg-white/5"
                 }`
               }
             >
-              🔧 Admin
+              <FiSettings /> Admin
             </NavLink>
           )}
 

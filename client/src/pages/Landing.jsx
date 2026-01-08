@@ -1,4 +1,12 @@
 import { Link } from "react-router-dom";
+import {
+  FiZap,
+  FiBarChart2,
+  FiTrendingUp,
+  FiAward,
+  FiLink,
+} from "react-icons/fi";
+import { SiLeetcode, SiCodeforces, SiGithub } from "react-icons/si";
 
 export default function Landing() {
   return (
@@ -8,8 +16,8 @@ export default function Landing() {
         <div className="app-container">
           {/* Navigation */}
           <nav className="flex justify-between items-center mb-12 md:mb-20 fade-in-up">
-            <div className="text-2xl md:text-3xl font-black neon-text">
-              ⚡ DevLog
+            <div className="text-2xl md:text-3xl font-black neon-text flex items-center gap-2">
+              <FiZap className="text-blue-400" /> DevLog
             </div>
             <div className="flex gap-3 md:gap-4">
               <Link
@@ -101,7 +109,7 @@ export default function Landing() {
               <div className="p-6 md:p-8">
                 <div className="flex items-center gap-3 mb-6">
                   <div className="w-12 h-12 rounded-xl leetcode-gradient flex items-center justify-center text-2xl">
-                    🧩
+                    <SiLeetcode className="text-white" />
                   </div>
                   <div>
                     <h3 className="text-xl font-bold text-white">LeetCode</h3>
@@ -151,7 +159,7 @@ export default function Landing() {
               <div className="p-6 md:p-8">
                 <div className="flex items-center gap-3 mb-6">
                   <div className="w-12 h-12 rounded-xl codeforces-gradient flex items-center justify-center text-2xl">
-                    🏆
+                    <SiCodeforces className="text-white" />
                   </div>
                   <div>
                     <h3 className="text-xl font-bold text-white">Codeforces</h3>
@@ -195,7 +203,7 @@ export default function Landing() {
               <div className="p-6 md:p-8">
                 <div className="flex items-center gap-3 mb-6">
                   <div className="w-12 h-12 rounded-xl github-gradient flex items-center justify-center text-2xl">
-                    💻
+                    <SiGithub className="text-white" />
                   </div>
                   <div>
                     <h3 className="text-xl font-bold text-white">GitHub</h3>
@@ -261,7 +269,7 @@ export default function Landing() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 max-w-4xl mx-auto">
             <div className="glass-card p-6 md:p-8 rounded-2xl fade-in-up delay-100">
               <div className="w-14 h-14 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center text-2xl mb-4">
-                📊
+                <FiBarChart2 className="text-white" />
               </div>
               <h3 className="text-xl font-bold text-white mb-2">
                 Unified Dashboard
@@ -274,7 +282,7 @@ export default function Landing() {
 
             <div className="glass-card p-6 md:p-8 rounded-2xl fade-in-up delay-200">
               <div className="w-14 h-14 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center text-2xl mb-4">
-                📈
+                <FiTrendingUp className="text-white" />
               </div>
               <h3 className="text-xl font-bold text-white mb-2">
                 Progress Tracking
@@ -287,7 +295,7 @@ export default function Landing() {
 
             <div className="glass-card p-6 md:p-8 rounded-2xl fade-in-up delay-300">
               <div className="w-14 h-14 rounded-xl bg-gradient-to-r from-orange-500 to-yellow-500 flex items-center justify-center text-2xl mb-4">
-                🏅
+                <FiAward className="text-white" />
               </div>
               <h3 className="text-xl font-bold text-white mb-2">
                 Rating & Rankings
@@ -300,7 +308,7 @@ export default function Landing() {
 
             <div className="glass-card p-6 md:p-8 rounded-2xl fade-in-up delay-400">
               <div className="w-14 h-14 rounded-xl bg-gradient-to-r from-green-500 to-emerald-500 flex items-center justify-center text-2xl mb-4">
-                🔗
+                <FiLink className="text-white" />
               </div>
               <h3 className="text-xl font-bold text-white mb-2">
                 Easy Integration
@@ -398,7 +406,9 @@ export default function Landing() {
       {/* Footer */}
       <footer className="py-8 px-4 md:px-8 border-t border-gray-800">
         <div className="app-container flex flex-col md:flex-row justify-between items-center gap-4">
-          <div className="text-xl font-black neon-text">⚡ DevLog</div>
+          <div className="text-xl font-black neon-text flex items-center gap-2">
+            <FiZap className="text-blue-400" /> DevLog
+          </div>
           <p className="text-gray-500 text-sm">
             © 2026 DevLog. Track your coding journey.
           </p>
