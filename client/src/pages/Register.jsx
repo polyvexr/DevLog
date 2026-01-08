@@ -1,6 +1,7 @@
 import { useState } from "react";
 import api from "../api/axios";
 import { useNavigate, Link } from "react-router-dom";
+import { FiEye, FiEyeOff } from "react-icons/fi";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -111,10 +112,10 @@ export default function Register() {
               <button
                 type="button"
                 onClick={() => setShowPassword((s) => !s)}
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors p-1"
                 aria-label={showPassword ? "Hide password" : "Show password"}
               >
-                {showPassword ? "Hide" : "Show"}
+                {showPassword ? <FiEyeOff className="text-lg" /> : <FiEye className="text-lg" />}
               </button>
             </div>
           </div>
