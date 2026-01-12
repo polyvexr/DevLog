@@ -107,6 +107,11 @@ export const updateProfile = async (req, res) => {
     const user = await User.findById(req.user._id);
     if (!user) return res.status(404).json({ message: "User not found" });
 
+    // Initialize profile if not exists
+    if (!user.profile) {
+      user.profile = {};
+    }
+
     if (name) user.name = name;
     if (bio !== undefined) user.profile.bio = bio;
     if (location !== undefined) user.profile.location = location;
@@ -163,14 +168,24 @@ export const updateSettings = async (req, res) => {
     const user = await User.findById(req.user._id);
     if (!user) return res.status(404).json({ message: "User not found" });
 
+    // Initialize settings if not exists
+    if (!user.settings) {
+      user.settings = {};
+    }
+
     if (theme !== undefined) user.settings.theme = theme;
     if (emailNotifications !== undefined)
       user.settings.emailNotifications = emailNotifications;
     if (progressMilestones !== undefined) {
+      // Properly merge nested objects for MongoDB
+      const currentMilestones = user.settings.progressMilestones?.toObject?.() 
+        || user.settings.progressMilestones 
+        || {};
       user.settings.progressMilestones = {
-        ...user.settings.progressMilestones,
+        ...currentMilestones,
         ...progressMilestones,
       };
+      user.markModified('settings.progressMilestones');
     }
     if (timezone !== undefined) user.settings.timezone = timezone;
 
@@ -184,3 +199,4 @@ export const updateSettings = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+

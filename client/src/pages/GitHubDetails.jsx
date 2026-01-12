@@ -15,6 +15,8 @@ import { SiGithub } from "react-icons/si";
 
 export default function GitHubDetails() {
   const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -22,12 +24,32 @@ export default function GitHubDetails() {
       .get("/stats/all")
       .then((res) => {
         const github = res.data.stats.find((s) => s.platform === "github");
-        setData(github);
+        if (github) {
+          setData(github);
+        } else {
+          setError(true);
+        }
       })
-      .catch(() => setData(null));
+      .catch(() => setError(true))
+      .finally(() => setLoading(false));
   }, []);
 
-  if (!data) return <Loader />;
+  if (loading) return <Loader />;
+
+  if (error || !data) {
+    return (
+      <div className="text-center py-20">
+        <h2 className="text-2xl font-bold text-white mb-4">GitHub Not Linked</h2>
+        <p className="text-gray-400 mb-8">Please link your GitHub account first.</p>
+        <button
+          onClick={() => navigate("/link")}
+          className="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition-all"
+        >
+          Link GitHub
+        </button>
+      </div>
+    );
+  }
 
   const stats = data.stats || {};
   const hasStats = Object.keys(stats).length > 0;
