@@ -10,4 +10,5 @@ router.use(authLimiter);
 router.post("/register", validateRegister, register);
 router.post("/login", validateLogin, login);
 
+
 export default router;

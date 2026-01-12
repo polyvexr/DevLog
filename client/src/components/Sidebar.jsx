@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { useSidebar } from "../context/SidebarContext";
@@ -12,8 +12,11 @@ import {
   FiUser,
   FiChevronRight,
   FiX,
+  FiCalendar,
 } from "react-icons/fi";
 import { SiLeetcode, SiCodeforces, SiGithub } from "react-icons/si";
+import UserAvatar from "./UserAvatar";
+import { getMe } from "../api/axios";
 
 export default function Sidebar() {
   const { logout, isAdmin } = useContext(AuthContext);
@@ -27,6 +30,20 @@ export default function Sidebar() {
   } = useSidebar();
   const location = useLocation();
   const navigate = useNavigate();
+
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await getMe();
+        setUser(res.data.user);
+      } catch (err) {
+        console.error("Failed to fetch user:", err);
+      }
+    };
+    fetchUser();
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -47,7 +64,6 @@ export default function Sidebar() {
     { path: "/", icon: FiBarChart2, label: "Dashboard", exact: true },
     { path: "/link", icon: FiLink, label: "Link Platform" },
     { path: "/profile", icon: FiUser, label: "Profile" }, // Added Profile link
-  ];
 
   const platformItems = [
     {
@@ -84,8 +100,7 @@ export default function Sidebar() {
       <aside
         className={`
           fixed top-0 left-0 h-full z-50 flex flex-col
-          bg-gradient-to-b from-slate-900/98 via-slate-800/98 to-slate-900/98
-          backdrop-blur-xl border-r border-blue-500/20
+          bg-[var(--bg-card)] backdrop-blur-xl border-r border-[var(--border-color)]
           transition-all duration-300 ease-in-out
           ${isCollapsed ? "lg:w-20" : "lg:w-64"} w-64
           ${isMobileOpen ? "translate-x-0" : "-translate-x-full"}
@@ -93,7 +108,7 @@ export default function Sidebar() {
         `}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-blue-500/10">
+        <div className="flex items-center justify-between p-4 border-b border-[var(--border-color)]">
           {/* Mobile: Link to home, Desktop: Toggle collapse */}
           <NavLink
             to="/"
@@ -107,7 +122,7 @@ export default function Sidebar() {
                 handleNavClick();
               }
             }}
-            className={`font-black neon-text transition-all duration-300 flex items-center gap-2 ${
+            className={`font-black text-[var(--text-primary)] transition-all duration-300 flex items-center gap-2 ${
               isCollapsed
                 ? "lg:text-xl lg:justify-center lg:w-full"
                 : "text-2xl"
@@ -115,11 +130,11 @@ export default function Sidebar() {
             aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
             <span className="lg:hidden flex items-center gap-2">
-              <FiZap className="text-blue-400" /> DevLog
+              <FiZap className="text-[var(--accent-blue)]" /> DevLog
             </span>
             <span className="hidden lg:inline-flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
               <FiZap
-                className={`text-blue-400 transition-transform duration-300 ${
+                className={`text-[var(--accent-blue)] transition-transform duration-300 ${
                   isCollapsed ? "text-2xl" : ""
                 }`}
               />
@@ -130,12 +145,44 @@ export default function Sidebar() {
           {/* Close button - Mobile only */}
           <button
             onClick={closeMobile}
-            className="lg:hidden flex items-center justify-center w-8 h-8 rounded-lg bg-slate-800/50 hover:bg-slate-700/50 text-gray-400 hover:text-white transition-all"
+            className="lg:hidden flex items-center justify-center w-8 h-8 rounded-lg bg-[var(--bg-card-inner)] hover:bg-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all"
             aria-label="Close sidebar"
           >
             <FiX />
           </button>
         </div>
+
+        {/* User Profile Card */}
+        {user && (
+          <div
+            className={`p-3 border-b border-[var(--border-color)] ${
+              isCollapsed ? "lg:py-3 lg:px-2" : ""
+            }`}
+          >
+            <div
+              className={`flex items-center gap-3 ${
+                isCollapsed ? "lg:justify-center" : ""
+              }`}
+            >
+              <UserAvatar
+                name={user.name}
+                size={isCollapsed ? "small" : "default"}
+              />
+              <div
+                className={`flex-1 min-w-0 transition-all duration-300 ${
+                  isCollapsed ? "lg:hidden" : ""
+                }`}
+              >
+                <p className="text-sm font-medium text-[var(--text-primary)] truncate">
+                  {user.name}
+                </p>
+                <p className="text-xs text-[var(--text-secondary)] truncate">
+                  {user.email}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Navigation */}
         <nav
@@ -155,8 +202,8 @@ export default function Sidebar() {
                   sidebar-item group flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 relative
                   ${
                     isActive
-                      ? "bg-gradient-to-r from-blue-600/20 to-purple-600/20 text-white shadow-lg shadow-blue-500/10 border border-blue-500/30"
-                      : "text-gray-400 hover:text-white hover:bg-white/5"
+                      ? "bg-[var(--accent-blue)]/10 text-[var(--text-primary)] border border-[var(--accent-blue)]/30"
+                      : "text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card-inner)]"
                   }
                 `}
               >
@@ -186,8 +233,8 @@ export default function Sidebar() {
               onClick={togglePlatforms}
               className={`
                 sidebar-item w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 relative
-                text-gray-400 hover:text-white hover:bg-white/5
-                ${isPlatformRoute ? "text-white" : ""}
+                text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card-inner)]
+                ${isPlatformRoute ? "text-[var(--text-primary)]" : ""}
               `}
             >
               <FiTarget className="text-xl flex-shrink-0" />
@@ -238,8 +285,8 @@ export default function Sidebar() {
                       sidebar-item group flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 relative
                       ${
                         isActive
-                          ? `bg-gradient-to-r ${item.gradient} bg-opacity-20 text-white shadow-lg border border-white/10`
-                          : "text-gray-500 hover:text-white hover:bg-white/5"
+                          ? `bg-gradient-to-r ${item.gradient} bg-opacity-20 text-[var(--text-primary)] border border-white/10`
+                          : "text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card-inner)]"
                       }
                     `}
                   >
@@ -267,7 +314,7 @@ export default function Sidebar() {
 
           {/* Admin Section */}
           {isAdmin && (
-            <div className="mt-6 pt-6 border-t border-blue-500/10">
+            <div className="mt-6 pt-6 border-t border-[var(--border-color)]">
               <NavLink
                 to="/admin"
                 onClick={handleNavClick}
@@ -275,8 +322,8 @@ export default function Sidebar() {
                   sidebar-item group flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 relative
                   ${
                     isActive
-                      ? "bg-gradient-to-r from-yellow-600/20 to-orange-600/20 text-white shadow-lg shadow-yellow-500/10 border border-yellow-500/30"
-                      : "text-gray-400 hover:text-white hover:bg-white/5"
+                      ? "bg-gradient-to-r from-yellow-600/20 to-orange-600/20 text-[var(--text-primary)] border border-yellow-500/30"
+                      : "text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card-inner)]"
                   }
                 `}
               >
@@ -299,15 +346,35 @@ export default function Sidebar() {
               </NavLink>
             </div>
           )}
+
+          {/* Upcoming Contests - Placeholder */}
+          <div
+            className={`mt-6 pt-6 border-t border-[var(--border-color)] ${
+              isCollapsed ? "lg:hidden" : ""
+            }`}
+          >
+            <div className="flex items-center justify-between px-3 mb-2">
+              <div className="flex items-center gap-2 text-[var(--text-secondary)]">
+                <FiCalendar className="text-lg" />
+                <span className="font-medium text-sm">Upcoming Contests</span>
+              </div>
+              <span className="coming-soon-badge">Soon</span>
+            </div>
+            <div className="px-3 py-4 mx-1 rounded-lg bg-[var(--bg-card-inner)] border border-dashed border-[var(--border-color)]">
+              <p className="text-xs text-[var(--text-secondary)] text-center">
+                Contest schedules from LeetCode & Codeforces coming soon
+              </p>
+            </div>
+          </div>
         </nav>
 
         {/* Footer - Logout */}
-        <div className="p-3 border-t border-blue-500/10">
+        <div className="p-3 border-t border-[var(--border-color)]">
           <button
             onClick={handleLogout}
             className={`
               sidebar-item w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 relative
-              text-gray-400 hover:text-white hover:bg-gradient-to-r hover:from-red-500/10 hover:to-pink-500/10
+              text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-gradient-to-r hover:from-red-500/10 hover:to-pink-500/10
               hover:border hover:border-red-500/30
             `}
           >

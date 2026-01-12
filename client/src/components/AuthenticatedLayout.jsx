@@ -18,12 +18,12 @@ export default function AuthenticatedLayout({ children }) {
         `}
       >
         {/* Top Bar - Mobile Header */}
-        <header className="sticky top-0 z-30 lg:hidden bg-gradient-to-r from-slate-900/95 via-slate-800/95 to-slate-900/95 backdrop-blur-lg border-b border-blue-500/20">
+        <header className="sticky top-0 z-30 lg:hidden bg-[var(--bg-card)] backdrop-blur-lg border-b border-[var(--border-color)]">
           <div className="flex items-center justify-between p-4">
             {/* Hamburger Menu */}
             <button
               onClick={toggleMobile}
-              className="flex items-center justify-center w-10 h-10 rounded-xl bg-slate-800/50 hover:bg-slate-700/50 text-gray-300 hover:text-white transition-all"
+              className="flex items-center justify-center w-10 h-10 rounded-xl bg-[var(--bg-card-inner)] hover:bg-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all"
               aria-label="Open menu"
             >
               <svg
@@ -42,8 +42,8 @@ export default function AuthenticatedLayout({ children }) {
             </button>
 
             {/* Logo */}
-            <span className="text-xl font-black neon-text flex items-center gap-2">
-              <FiZap className="text-blue-400" /> DevLog
+            <span className="text-xl font-black text-[var(--text-primary)] flex items-center gap-2">
+              <FiZap className="text-[var(--accent-blue)]" /> DevLog
             </span>
 
             {/* Spacer for alignment */}

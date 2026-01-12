@@ -7,6 +7,7 @@ const platformStatSchema = new mongoose.Schema({
   data: { type: Object, default: {} },
   stats: { type: Object, default: {} },
   lastUpdated: Date,
+  lastManualRefresh: { type: Date, default: null },
 });
 
 export default mongoose.model("PlatformStat", platformStatSchema);
