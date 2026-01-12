@@ -243,20 +243,91 @@ export const contestService = {
 
   /**
    * Fetch AtCoder contests
+   * Uses AtCoder's contest schedule page data
    */
   async fetchAtCoderContests() {
     try {
-      // AtCoder doesn't have a public API, use a community API
+      // Try to fetch from AtCoder's homepage API (contests are embedded in the page)
+      // If that fails, fall back to clist.by API or return cached data
+      
+      // Method 1: Try clist.by API (a popular contest aggregator)
+      try {
+        const response = await axios.get(
+          "https://clist.by/api/v4/contest/",
+          {
+            params: {
+              upcoming: true,
+              resource: "atcoder.jp",
+              order_by: "start",
+              limit: 20
+            },
+            headers: {
+              "Authorization": `ApiKey ${process.env.CLIST_API_KEY || ""}`
+            },
+            timeout: 10000
+          }
+        );
+
+        if (response.data?.objects?.length > 0) {
+          let fetched = 0;
+          for (const contest of response.data.objects) {
+            const startTime = new Date(contest.start);
+            const endTime = new Date(contest.end);
+            const durationMs = endTime - startTime;
+
+            await Contest.findOneAndUpdate(
+              { platform: "atcoder", contestId: contest.id.toString() },
+              {
+                $set: {
+                  name: contest.event,
+                  startTime,
+                  endTime,
+                  duration: Math.round(durationMs / 60000),
+                  url: contest.href,
+                  rated: true,
+                  fetchedAt: new Date()
+                }
+              },
+              { upsert: true }
+            );
+            fetched++;
+          }
+          if (fetched > 0) {
+            return { fetched, error: null };
+          }
+        }
+      } catch (clistError) {
+        console.log("clist.by API failed, trying kenkoooo API...");
+      }
+
+      // Method 2: Fallback to kenkoooo API (may have limited upcoming contest data)
       const response = await axios.get(
         "https://kenkoooo.com/atcoder/resources/contests.json",
         { timeout: 10000 }
       );
 
       const now = Date.now() / 1000;
+      // Filter for contests that start in the future
       const upcomingContests = response.data
         .filter(c => c.start_epoch_second > now)
         .sort((a, b) => a.start_epoch_second - b.start_epoch_second)
         .slice(0, 20);
+
+      // If no upcoming contests found in kenkoooo, try to get recent contests that might still be valid
+      if (upcomingContests.length === 0) {
+        // Get the most recent contests (some might be ongoing or just finished)
+        const recentContests = response.data
+          .sort((a, b) => b.start_epoch_second - a.start_epoch_second)
+          .slice(0, 5)
+          .filter(c => {
+            const startTime = c.start_epoch_second;
+            const endTime = startTime + c.duration_second;
+            // Include if ongoing or ended within last hour
+            return endTime > now - 3600;
+          });
+        
+        upcomingContests.push(...recentContests);
+      }
 
       let fetched = 0;
       for (const contest of upcomingContests) {
@@ -281,7 +352,7 @@ export const contestService = {
         fetched++;
       }
 
-      return { fetched, error: null };
+      return { fetched, error: upcomingContests.length === 0 ? "No upcoming contests found" : null };
     } catch (error) {
       return { fetched: 0, error: error.message };
     }
