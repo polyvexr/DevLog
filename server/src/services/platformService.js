@@ -2,9 +2,9 @@ import PlatformStat from "../models/PlatformStat.js";
 import SyncJob from "../models/SyncJob.js";
 import User from "../models/User.js";
 import PlatformStatHistory from "../models/PlatformStatHistory.js";
-import { fetchLeetCodeStats } from "../utils/fetchLeetCode.js";
-import { fetchCodeforcesStats } from "../utils/fetchCodeforces.js";
-import { fetchGitHubStats } from "../utils/fetchGithub.js";
+import { fetchLeetCode } from "../utils/fetchLeetCode.js";
+import { fetchCodeforces } from "../utils/fetchCodeforces.js";
+import { fetchGithub } from "../utils/fetchGithub.js";
 
 // Cooldown duration in milliseconds (6 hours)
 const COOLDOWN_MS = 6 * 60 * 60 * 1000;
@@ -116,13 +116,13 @@ export const platformService = {
       let freshData;
       switch (job.platform) {
         case "leetcode":
-          freshData = await fetchLeetCodeStats(platformStat.username);
+          freshData = await fetchLeetCode(platformStat.username);
           break;
         case "codeforces":
-          freshData = await fetchCodeforcesStats(platformStat.username);
+          freshData = await fetchCodeforces(platformStat.username);
           break;
         case "github":
-          freshData = await fetchGitHubStats(platformStat.username);
+          freshData = await fetchGithub(platformStat.username);
           break;
         default:
           throw new Error(`Unknown platform: ${job.platform}`);
