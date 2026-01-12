@@ -19,10 +19,6 @@ export default function Dashboard() {
     return localStorage.getItem(FILTER_STORAGE_KEY) || "all";
   });
   const navigate = useNavigate();
-  const [confirmDialog, setConfirmDialog] = useState({
-    open: false,
-    platform: null,
-  });
   const [messageDialog, setMessageDialog] = useState({
     open: false,
     title: "",
@@ -82,39 +78,7 @@ export default function Dashboard() {
     navigate(`/${platform}`);
   };
 
-  const handleUnlink = (platform, e) => {
-    if (e) e.stopPropagation();
-    setConfirmDialog({ open: true, platform });
-  };
 
-  const doUnlink = async () => {
-    const platform = confirmDialog.platform;
-    setConfirmDialog({ open: false, platform: null });
-    try {
-      await api.delete(`/platforms/${platform}`);
-      const res = await api.get("/stats/all");
-      setStats(res.data.stats);
-      fetchSummary();
-      setMessageDialog({
-        open: true,
-        title: "Unlinked",
-        message: `${platform} has been unlinked.`,
-      });
-    } catch (err) {
-      const msg = err?.response?.data?.message || err.message || "Error";
-      const retry = err?.response?.data?.retryAfter;
-      if (retry) {
-        const when = new Date(retry).toLocaleString();
-        setMessageDialog({
-          open: true,
-          title: "Action blocked",
-          message: `${msg}\n\nTry again after ${when}.`,
-        });
-      } else {
-        setMessageDialog({ open: true, title: "Error", message: msg });
-      }
-    }
-  };
 
   const fetchSummary = async () => {
     try {
@@ -140,12 +104,14 @@ export default function Dashboard() {
 
   return (
     <>
-      <div className="mb-8 fade-in-scale">
-        <h1 className="text-4xl font-black mb-3 text-[var(--text-primary)]">
-          Dashboard
+      <div className="mb-12 fade-in-scale">
+        <h1 className="text-5xl md:text-8xl font-black mb-4 tracking-tight">
+          <span className="text-white opacity-90">Developer</span>
+          <br />
+          <span className="animate-text-shine inline-block">Command Center</span>
         </h1>
-        <p className="text-[var(--text-secondary)] text-lg">
-          Track your coding journey across platforms
+        <p className="text-gray-400 text-xl md:text-2xl font-medium max-w-2xl leading-relaxed">
+          Quantify your secondary consciousness. Track your neural coding progress across the global ecosystem.
         </p>
       </div>
 
@@ -155,14 +121,22 @@ export default function Dashboard() {
       {!stats ? (
         <Loader />
       ) : stats.length === 0 ? (
-        <div className="glass-card p-12 rounded-2xl text-center">
-          <FiBarChart2 className="text-6xl mb-4 opacity-30 mx-auto" />
-          <h3 className="text-2xl font-bold mb-2 text-gray-300">
-            No Stats Yet
+        <div className="glass-card-premium p-16 md:p-24 text-center fade-in-up">
+          <div className="w-24 h-24 bg-blue-600/10 border border-blue-500/20 rounded-3xl flex items-center justify-center mx-auto mb-10 shadow-2xl pulse-ring">
+            <FiBarChart2 className="text-5xl text-blue-500" />
+          </div>
+          <h3 className="text-4xl font-black mb-4 text-white italic">
+            System <span className="text-gray-600">Offline</span>
           </h3>
-          <p className="text-gray-500">
-            Link your coding platforms to start tracking
+          <p className="text-gray-500 text-xl max-w-md mx-auto mb-12 font-medium leading-relaxed">
+            No neural nodes are currently synchronized. Initialize your ecosystems to begin data aggregation.
           </p>
+          <button 
+            onClick={() => navigate('/link')}
+            className="px-10 py-5 bg-blue-600 hover:bg-blue-500 text-white font-black text-lg rounded-2xl transition-all shadow-2xl shadow-blue-500/30 active:scale-95 group"
+          >
+            Connect Hub <span className="inline-block group-hover:translate-x-2 transition-transform ml-2">→</span>
+          </button>
         </div>
       ) : (
         <>
@@ -200,20 +174,6 @@ export default function Dashboard() {
           )}
         </>
       )}
-
-      <Dialog
-        open={confirmDialog.open}
-        title="Confirm Unlink"
-        message={
-          confirmDialog.platform
-            ? `Are you sure you want to unlink ${confirmDialog.platform}? You can re-add it after 15 days (one-time re-add allowed once).`
-            : ""
-        }
-        confirmText="Unlink"
-        cancelText="Cancel"
-        onConfirm={doUnlink}
-        onCancel={() => setConfirmDialog({ open: false, platform: null })}
-      />
 
       <Dialog
         open={messageDialog.open}
