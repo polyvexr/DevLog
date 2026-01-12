@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
-import { useSidebar } from "../context/SidebarContext";
+import { useSidebar } from "../hooks/useSidebar";
 import {
   FiZap,
   FiBarChart2,
@@ -12,6 +12,7 @@ import {
   FiUser,
   FiChevronRight,
   FiX,
+  FiLayers,
 } from "react-icons/fi";
 import { SiLeetcode, SiCodeforces, SiGithub } from "react-icons/si";
 
@@ -38,15 +39,14 @@ export default function Sidebar() {
     closeMobile();
   };
 
-  // Check if current route is a platform detail page
   const isPlatformRoute = ["/leetcode", "/codeforces", "/github"].includes(
     location.pathname
   );
 
   const navItems = [
     { path: "/", icon: FiBarChart2, label: "Dashboard", exact: true },
-    { path: "/link", icon: FiLink, label: "Link Platform" },
-    { path: "/profile", icon: FiUser, label: "Profile" }, // Added Profile link
+    { path: "/link", icon: FiLink, label: "Connect Hub" },
+    { path: "/profile", icon: FiUser, label: "User Pulse" },
   ];
 
   const platformItems = [
@@ -54,19 +54,25 @@ export default function Sidebar() {
       path: "/leetcode",
       icon: SiLeetcode,
       label: "LeetCode",
-      gradient: "from-orange-500 to-yellow-500",
+      color: "text-orange-400",
+      bg: "bg-orange-500/10",
+      border: "border-orange-500/20",
     },
     {
       path: "/codeforces",
       icon: SiCodeforces,
       label: "Codeforces",
-      gradient: "from-blue-500 to-cyan-500",
+      color: "text-blue-400",
+      bg: "bg-blue-500/10",
+      border: "border-blue-500/20",
     },
     {
       path: "/github",
       icon: SiGithub,
       label: "GitHub",
-      gradient: "from-purple-500 to-pink-500",
+      color: "text-purple-400",
+      bg: "bg-purple-500/10",
+      border: "border-purple-500/20",
     },
   ];
 
@@ -75,7 +81,7 @@ export default function Sidebar() {
       {/* Mobile Overlay */}
       {isMobileOpen && (
         <div
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
+          className="fixed inset-0 bg-black/60 backdrop-blur-md z-[60] lg:hidden animate-fade-in"
           onClick={closeMobile}
         />
       )}
@@ -83,23 +89,19 @@ export default function Sidebar() {
       {/* Sidebar */}
       <aside
         className={`
-          fixed top-0 left-0 h-full z-50 flex flex-col
-          bg-gradient-to-b from-slate-900/98 via-slate-800/98 to-slate-900/98
-          backdrop-blur-xl border-r border-blue-500/20
-          transition-all duration-300 ease-in-out
-          ${isCollapsed ? "lg:w-20" : "lg:w-64"} w-64
+          fixed top-0 left-0 h-full z-[70] flex flex-col
+          bg-[#0a0f18]/60 backdrop-blur-2xl border-r border-white/5
+          transition-all duration-500 cubic-bezier(0.23, 1, 0.32, 1)
+          ${isCollapsed ? "lg:w-24" : "lg:w-72"} w-72
           ${isMobileOpen ? "translate-x-0" : "-translate-x-full"}
           lg:translate-x-0
         `}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-blue-500/10">
-          {/* Mobile: Link to home, Desktop: Toggle collapse */}
+        <div className="flex items-center justify-between p-6 mb-4">
           <NavLink
             to="/"
             onClick={(e) => {
-              // On mobile, navigate to home
-              // On desktop, prevent navigation and toggle collapse
               if (window.innerWidth >= 1024) {
                 e.preventDefault();
                 toggleCollapse();
@@ -107,44 +109,37 @@ export default function Sidebar() {
                 handleNavClick();
               }
             }}
-            className={`font-black neon-text transition-all duration-300 flex items-center gap-2 ${
-              isCollapsed
-                ? "lg:text-xl lg:justify-center lg:w-full"
-                : "text-2xl"
-            }`}
-            aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+            className="flex items-center gap-3 group"
           >
-            <span className="lg:hidden flex items-center gap-2">
-              <FiZap className="text-blue-400" /> DevLog
-            </span>
-            <span className="hidden lg:inline-flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
-              <FiZap
-                className={`text-blue-400 transition-transform duration-300 ${
-                  isCollapsed ? "text-2xl" : ""
-                }`}
-              />
-              {!isCollapsed && "DevLog"}
-            </span>
+            <div className={`w-12 h-12 rounded-2xl bg-blue-600/10 border border-blue-500/20 flex items-center justify-center transition-all duration-300 ${isCollapsed ? "mx-auto" : ""}`}>
+              <FiZap className="text-2xl text-blue-500 animate-pulse" />
+            </div>
+            {!isCollapsed && (
+              <span className="text-2xl font-black text-white italic tracking-tight animate-fade-in">
+                DevLog
+              </span>
+            )}
           </NavLink>
 
-          {/* Close button - Mobile only */}
-          <button
-            onClick={closeMobile}
-            className="lg:hidden flex items-center justify-center w-8 h-8 rounded-lg bg-slate-800/50 hover:bg-slate-700/50 text-gray-400 hover:text-white transition-all"
-            aria-label="Close sidebar"
-          >
-            <FiX />
-          </button>
+          {isMobileOpen && (
+             <button
+                onClick={closeMobile}
+                className="lg:hidden w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-gray-400 hover:text-white"
+             >
+                <FiX />
+             </button>
+          )}
         </div>
 
         {/* Navigation */}
-        <nav
-          className={`flex-1 py-4 px-3 ${
-            isCollapsed ? "lg:overflow-hidden" : "overflow-y-auto"
-          }`}
-        >
-          {/* Main Nav Items */}
-          <div className="space-y-1">
+        <nav className="flex-1 px-4 space-y-8 overflow-y-auto custom-scrollbar">
+          {/* Main Nav Sub-section */}
+          <div className="space-y-2">
+            {!isCollapsed && (
+              <div className="px-4 mb-4">
+                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-600">Main Console</span>
+              </div>
+            )}
             {navItems.map((item) => (
               <NavLink
                 key={item.path}
@@ -152,149 +147,95 @@ export default function Sidebar() {
                 end={item.exact}
                 onClick={handleNavClick}
                 className={({ isActive }) => `
-                  sidebar-item group flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 relative
+                  flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all relative group
                   ${
                     isActive
-                      ? "bg-gradient-to-r from-blue-600/20 to-purple-600/20 text-white shadow-lg shadow-blue-500/10 border border-blue-500/30"
-                      : "text-gray-400 hover:text-white hover:bg-white/5"
+                      ? "bg-blue-600 text-white shadow-lg shadow-blue-500/25 scale-[1.02]"
+                      : "text-gray-500 hover:text-gray-300 hover:bg-white/5"
                   }
                 `}
               >
-                <item.icon className="text-xl flex-shrink-0" />
-                <span
-                  className={`font-medium whitespace-nowrap transition-all duration-300 ${
-                    isCollapsed
-                      ? "lg:opacity-0 lg:w-0 lg:overflow-hidden"
-                      : "opacity-100"
-                  }`}
-                >
-                  {item.label}
-                </span>
-                {/* Tooltip for collapsed state */}
-                {isCollapsed && (
-                  <span className="sidebar-tooltip hidden lg:block">
+                <item.icon className={`text-xl ${isCollapsed ? "mx-auto" : ""}`} />
+                {!isCollapsed && (
+                  <span className="font-black text-xs uppercase tracking-widest animate-fade-in">
                     {item.label}
                   </span>
                 )}
+                {/* Active Indicator Bar */}
+                {/* {location.pathname === item.path && (
+                  <div className="absolute left-0 w-1 h-6 bg-white rounded-r-full shadow-[0_0_10px_white]" />
+                )} */}
               </NavLink>
             ))}
           </div>
 
-          {/* Platforms Section */}
-          <div className="mt-6">
-            <button
-              onClick={togglePlatforms}
-              className={`
-                sidebar-item w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 relative
-                text-gray-400 hover:text-white hover:bg-white/5
-                ${isPlatformRoute ? "text-white" : ""}
-              `}
-            >
-              <FiTarget className="text-xl flex-shrink-0" />
-              <span
-                className={`font-medium whitespace-nowrap flex-1 text-left transition-all duration-300 ${
-                  isCollapsed
-                    ? "lg:opacity-0 lg:w-0 lg:overflow-hidden"
-                    : "opacity-100"
-                }`}
-              >
-                Platforms
-              </span>
-              <span
-                className={`transition-transform duration-200 ${
-                  isCollapsed ? "lg:hidden" : ""
-                } ${isPlatformsExpanded ? "rotate-90" : ""}`}
-              >
-                <FiChevronRight />
-              </span>
-              {/* Tooltip for collapsed state */}
-              {isCollapsed && (
-                <span className="sidebar-tooltip hidden lg:block">
-                  Platforms
-                </span>
-              )}
-            </button>
+          {/* Platforms Sub-section */}
+          <div className="space-y-2">
+             <button
+                onClick={togglePlatforms}
+                className={`
+                   w-full flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all group
+                   ${isPlatformRoute ? "text-white bg-white/5 border border-white/10" : "text-gray-500 hover:text-gray-300 hover:bg-white/5"}
+                `}
+             >
+                <FiLayers className={`text-xl ${isCollapsed ? "mx-auto" : ""}`} />
+                {!isCollapsed && (
+                   <>
+                      <span className="font-black text-xs uppercase tracking-widest flex-1 text-left">Ecosystems</span>
+                      <FiChevronRight className={`transition-transform duration-300 ${isPlatformsExpanded ? "rotate-90" : ""}`} />
+                   </>
+                )}
+             </button>
 
-            {/* Platform Sub-items */}
-            <div
-              className={`
-              overflow-hidden transition-all duration-300 ease-in-out
-              ${
-                isPlatformsExpanded || isCollapsed
-                  ? "max-h-96 opacity-100"
-                  : "max-h-0 opacity-0"
-              }
-            `}
-            >
-              <div
-                className={`space-y-1 ${isCollapsed ? "lg:mt-1" : "mt-1 ml-4"}`}
-              >
-                {platformItems.map((item) => (
-                  <NavLink
-                    key={item.path}
-                    to={item.path}
-                    onClick={handleNavClick}
-                    className={({ isActive }) => `
-                      sidebar-item group flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 relative
-                      ${
-                        isActive
-                          ? `bg-gradient-to-r ${item.gradient} bg-opacity-20 text-white shadow-lg border border-white/10`
-                          : "text-gray-500 hover:text-white hover:bg-white/5"
-                      }
-                    `}
-                  >
-                    <item.icon className="text-lg flex-shrink-0" />
-                    <span
-                      className={`font-medium whitespace-nowrap transition-all duration-300 ${
-                        isCollapsed
-                          ? "lg:opacity-0 lg:w-0 lg:overflow-hidden"
-                          : "opacity-100"
-                      }`}
-                    >
-                      {item.label}
-                    </span>
-                    {/* Tooltip for collapsed state */}
-                    {isCollapsed && (
-                      <span className="sidebar-tooltip hidden lg:block">
-                        {item.label}
-                      </span>
-                    )}
-                  </NavLink>
-                ))}
-              </div>
-            </div>
+             {(isPlatformsExpanded || isCollapsed) && (
+                <div className={`space-y-1 ${isCollapsed ? "mt-2" : "mt-2 ml-4 border-l border-white/5 pl-4"} animate-fade-in`}>
+                   {platformItems.map((item) => (
+                      <NavLink
+                         key={item.path}
+                         to={item.path}
+                         onClick={handleNavClick}
+                         className={({ isActive }) => `
+                            flex items-center gap-4 px-4 py-3 rounded-xl transition-all relative group
+                            ${
+                               isActive
+                                 ? `${item.bg} ${item.color} ${item.border} border`
+                                 : "text-gray-600 hover:text-gray-400 hover:bg-white/5"
+                            }
+                         `}
+                      >
+                         <item.icon className="text-lg" />
+                         {!isCollapsed && (
+                            <span className="font-bold text-[11px] uppercase tracking-wider">{item.label}</span>
+                         )}
+                      </NavLink>
+                   ))}
+                </div>
+             )}
           </div>
 
-          {/* Admin Section */}
+          {/* Admin Sub-section */}
           {isAdmin && (
-            <div className="mt-6 pt-6 border-t border-blue-500/10">
+            <div className="space-y-2 pt-4 border-t border-white/5">
+              {!isCollapsed && (
+                <div className="px-4 mb-4">
+                  <span className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-600">Core Engine</span>
+                </div>
+              )}
               <NavLink
                 to="/admin"
                 onClick={handleNavClick}
                 className={({ isActive }) => `
-                  sidebar-item group flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 relative
+                  flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all group
                   ${
                     isActive
-                      ? "bg-gradient-to-r from-yellow-600/20 to-orange-600/20 text-white shadow-lg shadow-yellow-500/10 border border-yellow-500/30"
-                      : "text-gray-400 hover:text-white hover:bg-white/5"
+                      ? "bg-amber-500 text-white shadow-lg shadow-amber-500/25 scale-[1.02]"
+                      : "text-gray-500 hover:text-gray-300 hover:bg-white/5"
                   }
                 `}
               >
-                <FiSettings className="text-xl flex-shrink-0" />
-                <span
-                  className={`font-medium whitespace-nowrap transition-all duration-300 ${
-                    isCollapsed
-                      ? "lg:opacity-0 lg:w-0 lg:overflow-hidden"
-                      : "opacity-100"
-                  }`}
-                >
-                  Admin Panel
-                </span>
-                {/* Tooltip for collapsed state */}
-                {isCollapsed && (
-                  <span className="sidebar-tooltip hidden lg:block">
-                    Admin Panel
-                  </span>
+                <FiSettings className={`text-xl ${isCollapsed ? "mx-auto" : ""}`} />
+                {!isCollapsed && (
+                  <span className="font-black text-xs uppercase tracking-widest animate-fade-in">Sentinel Mode</span>
                 )}
               </NavLink>
             </div>
@@ -302,28 +243,14 @@ export default function Sidebar() {
         </nav>
 
         {/* Footer - Logout */}
-        <div className="p-3 border-t border-blue-500/10">
+        <div className="p-6 border-t border-white/5">
           <button
             onClick={handleLogout}
-            className={`
-              sidebar-item w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 relative
-              text-gray-400 hover:text-white hover:bg-gradient-to-r hover:from-red-500/10 hover:to-pink-500/10
-              hover:border hover:border-red-500/30
-            `}
+            className="w-full flex items-center gap-4 px-4 py-4 rounded-2xl text-gray-500 hover:text-red-400 hover:bg-red-500/5 transition-all group relative"
           >
-            <FiLogOut className="text-xl flex-shrink-0" />
-            <span
-              className={`font-medium whitespace-nowrap transition-all duration-300 ${
-                isCollapsed
-                  ? "lg:opacity-0 lg:w-0 lg:overflow-hidden"
-                  : "opacity-100"
-              }`}
-            >
-              Logout
-            </span>
-            {/* Tooltip for collapsed state */}
-            {isCollapsed && (
-              <span className="sidebar-tooltip hidden lg:block">Logout</span>
+            <FiLogOut className={`text-xl ${isCollapsed ? "mx-auto" : ""}`} />
+            {!isCollapsed && (
+              <span className="font-black text-xs uppercase tracking-widest">Terminate Session</span>
             )}
           </button>
         </div>

@@ -1,14 +1,5 @@
-import { createContext, useContext, useState, useEffect } from "react";
-
-const SidebarContext = createContext();
-
-export const useSidebar = () => {
-  const context = useContext(SidebarContext);
-  if (!context) {
-    throw new Error("useSidebar must be used within SidebarProvider");
-  }
-  return context;
-};
+import { useState, useEffect } from "react";
+import { SidebarContext } from "./SidebarContext";
 
 export const SidebarProvider = ({ children }) => {
   // Global collapse state with localStorage persistence

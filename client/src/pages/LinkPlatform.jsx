@@ -28,76 +28,94 @@ export default function LinkPlatform() {
 
   return (
     <>
-      <div className="mb-8 fade-in-scale">
-        <h2 className="text-4xl font-black text-[var(--text-primary)] mb-2">
-          Link New Platform
-        </h2>
-        <p className="text-[var(--text-secondary)] text-lg">
-          Connect your coding accounts to track progress
+      <div className="mb-12 fade-in-scale">
+        <h1 className="text-5xl md:text-6xl font-black mb-4 tracking-tight">
+          <span className="text-white opacity-90">Expand</span>
+          <br />
+          <span className="animate-text-shine inline-block">Ecosystem</span>
+        </h1>
+        <p className="text-gray-400 text-xl font-medium">
+          Integrate a new platform into your command center.
         </p>
       </div>
 
-      <form
-        onSubmit={submit}
-        className="max-w-lg platform-card p-8 rounded-2xl"
-        aria-live="polite"
-      >
-        {error && (
-          <div className="mb-4 text-sm text-red-400" role="alert">
-            {error}
-          </div>
-        )}
-        <div className="mb-6">
-          <label
-            htmlFor="platform"
-            className="block text-sm font-semibold text-[var(--text-secondary)] mb-3"
-          >
-            Platform
-          </label>
-          <select
-            id="platform"
-            className="w-full p-3 border border-[var(--border-color)] rounded-lg bg-[var(--bg-card-inner)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-blue)] focus:border-transparent transition-all"
-            value={platform}
-            onChange={(e) => setPlatform(e.target.value)}
-          >
-            <option value="leetcode">LeetCode</option>
-            <option value="codeforces">CodeForces</option>
-            <option value="github">GitHub</option>
-          </select>
-        </div>
-
-        <div className="mb-8">
-          <label
-            htmlFor="username"
-            className="block text-sm font-semibold text-[var(--text-secondary)] mb-3"
-          >
-            Username
-          </label>
-          <input
-            id="username"
-            value={username}
-            type="text"
-            placeholder="Enter your username"
-            className="w-full p-3 border border-[var(--border-color)] rounded-lg bg-[var(--bg-card-inner)] text-[var(--text-primary)] placeholder-[var(--text-secondary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-blue)] focus:border-transparent transition-all"
-            onChange={(e) => setUsername(e.target.value)}
-            required
-          />
-        </div>
-
-        <button
-          type="submit"
-          disabled={loading}
-          className="btn-primary w-full flex items-center justify-center gap-2"
+      <div className="max-w-2xl">
+        <form
+          onSubmit={submit}
+          className="glass-card-premium p-10 md:p-12 fade-in-up"
+          aria-live="polite"
         >
-          {loading ? (
-            "Linking..."
-          ) : (
-            <>
-              <FiLink /> Link Platform
-            </>
+          {error && (
+            <div className="mb-8 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm flex items-center gap-3 animate-shake" role="alert">
+              <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></div>
+              {error}
+            </div>
           )}
-        </button>
-      </form>
+
+          <div className="space-y-8">
+            <div className="space-y-3">
+              <label htmlFor="platform" className="block text-sm font-bold text-gray-400 uppercase tracking-widest ml-1">
+                Select Platform
+              </label>
+              <div className="relative">
+                <select
+                  id="platform"
+                  className="w-full px-6 py-4 bg-white/5 border border-white/10 rounded-2xl text-white appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-all font-bold cursor-pointer hover:bg-white/10"
+                  value={platform}
+                  onChange={(e) => setPlatform(e.target.value)}
+                >
+                  <option value="leetcode" className="bg-gray-900">LeetCode</option>
+                  <option value="codeforces" className="bg-gray-900">Codeforces</option>
+                  <option value="github" className="bg-gray-900">GitHub</option>
+                </select>
+                <div className="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500">
+                  ▼
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <label htmlFor="username" className="block text-sm font-bold text-gray-400 uppercase tracking-widest ml-1">
+                Platform Alias / Username
+              </label>
+              <input
+                id="username"
+                value={username}
+                type="text"
+                placeholder="e.g. touring_machine"
+                className="w-full px-6 py-4 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-all font-medium"
+                onChange={(e) => setUsername(e.target.value)}
+                required
+              />
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full mt-10 py-5 bg-blue-600 hover:bg-blue-500 disabled:bg-blue-800 disabled:cursor-not-allowed text-white font-black text-lg rounded-2xl shadow-xl shadow-blue-500/20 transition-all active:scale-[0.98] flex items-center justify-center gap-3"
+          >
+            {loading ? (
+              <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+            ) : (
+              <>
+                <FiLink className="group-hover:rotate-12 transition-transform" />
+                Initialize Link
+              </>
+            )}
+          </button>
+        </form>
+
+        <div className="mt-8 p-6 bg-white/[0.02] border border-white/5 rounded-2xl fade-in-up delay-200">
+          <h4 className="text-white font-bold mb-2 flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+            Connection Protocol
+          </h4>
+          <p className="text-gray-500 text-sm leading-relaxed">
+            By linking your account, DevLog will track public statistics and activity history. Some platforms have sync cooldowns to prevent API rate limiting.
+          </p>
+        </div>
+      </div>
     </>
   );
 }
