@@ -8,6 +8,10 @@ import LeetCodeDetails from "./pages/LeetCodeDetails";
 import CodeforcesDetails from "./pages/CodeforcesDetails";
 import GitHubDetails from "./pages/GitHubDetails";
 import AdminDashboard from "./pages/AdminDashboard";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
+import Profile from "./pages/Profile";
+import NotFound from "./pages/NotFound";
 import AuthenticatedLayout from "./components/AuthenticatedLayout";
 import { AuthContext } from "./context/AuthContext";
 import { SidebarProvider } from "./context/SidebarContext";
@@ -101,6 +105,14 @@ function App() {
           }
         />
         <Route
+          path="/profile"
+          element={
+            <PrivateRoute>
+              <Profile />
+            </PrivateRoute>
+          }
+        />
+        <Route
           path="/register"
           element={
             <PublicRoute>
@@ -116,6 +128,23 @@ function App() {
             </PublicRoute>
           }
         />
+        <Route
+          path="/forgot-password"
+          element={
+            <PublicRoute>
+              <ForgotPassword />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/reset-password/:token"
+          element={
+            <PublicRoute>
+              <ResetPassword />
+            </PublicRoute>
+          }
+        />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   );
