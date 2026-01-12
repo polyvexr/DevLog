@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import api from "../api/axios";
 import Loader from "../components/Loader";
-import { 
-  FiUsers, 
-  FiRefreshCw, 
-  FiShield, 
-  FiCheckCircle, 
-  FiAlertCircle, 
+import {
+  FiUsers,
+  FiRefreshCw,
+  FiShield,
+  FiCheckCircle,
+  FiAlertCircle,
   FiActivity,
   FiTerminal,
   FiDatabase,
@@ -79,7 +79,10 @@ export default function AdminDashboard() {
     <div className="max-w-7xl mx-auto py-8 px-4 relative overflow-hidden">
       {/* Background Blobs */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-blue-600/10 blur-[150px] -mr-48 -mt-48 animate-pulse"></div>
-      <div className="absolute bottom-0 left-0 w-96 h-96 bg-purple-600/10 blur-[150px] -ml-48 -mb-48 animate-pulse style={{ animationDelay: '2s' }}"></div>
+      <div
+        className="absolute bottom-0 left-0 w-96 h-96 bg-purple-600/10 blur-[150px] -ml-48 -mb-48 animate-pulse"
+        style={{ animationDelay: "2s" }}
+      ></div>
 
       {notification && (
         <div className="fixed top-24 right-6 z-50 animate-fade-in-scale">
@@ -209,8 +212,8 @@ export default function AdminDashboard() {
                           <td className="py-4 px-4 text-sm font-medium text-gray-500">{detail.platform || detail.username || "-"}</td>
                           <td className="py-4 px-4 text-center">
                             <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${
-                              detail.status === "success" 
-                                ? "bg-green-500/5 text-green-500 border-green-500/20" 
+                              detail.status === "success"
+                                ? "bg-green-500/5 text-green-500 border-green-500/20"
                                 : "bg-red-500/5 text-red-500 border-red-500/20"
                             }`}>
                               {detail.status}

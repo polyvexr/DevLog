@@ -3,14 +3,14 @@ import api from "../api/axios";
 import { AuthContext } from "../context/AuthContext";
 import Loader from "../components/Loader";
 import Dialog from "../components/Dialog";
-import { 
-  FiUser, 
-  FiMail, 
-  FiLock, 
-  FiTrash2, 
-  FiEdit3, 
-  FiSave, 
-  FiX, 
+import {
+  FiUser,
+  FiMail,
+  FiLock,
+  FiTrash2,
+  FiEdit3,
+  FiSave,
+  FiX,
   FiShield,
   FiEye,
   FiEyeOff
@@ -236,7 +236,7 @@ export default function Profile() {
                 type="submit"
                 className="w-full py-5 bg-white/5 hover:bg-white/10 text-white font-black text-lg rounded-2xl border border-white/5 transition-all shadow-xl active:scale-[0.98]"
               >
-                Rotating Authentication Keys
+                Rotate Authentication Keys
               </button>
             </form>
           </section>
@@ -265,7 +265,7 @@ export default function Profile() {
       <Dialog
         open={deleteDialogOpen}
         title="Execute Purge Protocol?"
-        message="Are you absolutely certain? This operation will terminate your access and atomize all aggregated developer intelligence. "
+        message="Are you absolutely certain? This operation will terminate your access and permanently delete all your data."
         confirmText="Confirm Atomization"
         cancelText="Abort"
         onConfirm={handleDeleteAccount}

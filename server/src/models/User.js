@@ -7,6 +7,23 @@ const userSchema = new mongoose.Schema({
   email: { type: String, unique: true, lowercase: true },
   password: String,
   oneTimeReaddUsed: { type: Map, of: Boolean, default: {} },
+  // Profile subdocument
+  profile: {
+    bio: { type: String, default: "" },
+    location: { type: String, default: "" },
+    website: { type: String, default: "" },
+  },
+  // Settings subdocument
+  settings: {
+    theme: { type: String, enum: ["light", "dark", "system"], default: "dark" },
+    emailNotifications: { type: Boolean, default: true },
+    progressMilestones: {
+      leetcode: { type: Number, default: 500 },
+      codeforces: { type: Number, default: 1500 },
+      github: { type: Number, default: 100 },
+    },
+    timezone: { type: String, default: "UTC" },
+  },
   // Password reset fields
   resetPasswordToken: String,
   resetPasswordExpires: Date,

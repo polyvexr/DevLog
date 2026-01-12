@@ -9,6 +9,8 @@ import { SiLeetcode } from "react-icons/si";
 
 export default function LeetCodeDetails() {
   const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -16,15 +18,42 @@ export default function LeetCodeDetails() {
       .get("/stats/all")
       .then((res) => {
         const leetcode = res.data.stats.find((s) => s.platform === "leetcode");
-        setData(leetcode);
+        if (leetcode) {
+          setData(leetcode);
+        } else {
+          setError(true);
+        }
       })
-      .catch(() => setData(null));
+      .catch(() => setError(true))
+      .finally(() => setLoading(false));
   }, []);
 
-  if (!data) return <Loader />;
+  if (loading) return <Loader />;
+  
+  if (error || !data) {
+    return (
+      <div className="text-center py-20">
+        <h2 className="text-2xl font-bold text-white mb-4">LeetCode Not Linked</h2>
+        <p className="text-gray-400 mb-8">Please link your LeetCode account first.</p>
+        <button
+          onClick={() => navigate("/link")}
+          className="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition-all"
+        >
+          Link LeetCode
+        </button>
+      </div>
+    );
+  }
 
-  const stats = data.stats;
-  const { easy, medium, hard, all } = stats.submissionsByDifficulty || {};
+  const stats = data.stats || {};
+  const submissionsByDifficulty = stats.submissionsByDifficulty || {};
+  const easy = submissionsByDifficulty.easy || { solved: 0, submissions: 0 };
+  const medium = submissionsByDifficulty.medium || { solved: 0, submissions: 0 };
+  const hard = submissionsByDifficulty.hard || { solved: 0, submissions: 0 };
+  const all = submissionsByDifficulty.all || { solved: 0, total: 1 }; // Default total to 1 to avoid division by zero
+
+  // Calculate efficiency safely
+  const efficiency = all.total > 0 ? ((all.solved / all.total) * 100).toFixed(1) : "0.0";
 
   return (
     <>
@@ -57,13 +86,13 @@ export default function LeetCodeDetails() {
         <div className="glass-card-premium p-8 lg:col-span-2">
           <div className="text-xs font-black uppercase tracking-[0.2em] text-gray-500 mb-4">Rank Intelligence</div>
           <div className="flex items-end gap-1">
-            <span className="text-6xl font-black text-white italic">#{stats.ranking?.toLocaleString()}</span>
+            <span className="text-6xl font-black text-white italic">#{stats.ranking?.toLocaleString() || "—"}</span>
             <span className="text-blue-500 font-black text-lg mb-2">Global</span>
           </div>
         </div>
         <div className="glass-card-premium p-8">
           <div className="text-xs font-black uppercase tracking-[0.2em] text-gray-500 mb-4">Reputation</div>
-          <div className="text-4xl font-black text-purple-400">{stats.reputation?.toLocaleString()}</div>
+          <div className="text-4xl font-black text-purple-400">{stats.reputation?.toLocaleString() || 0}</div>
         </div>
         <div className="glass-card-premium p-8">
           <div className="text-xs font-black uppercase tracking-[0.2em] text-gray-500 mb-4">Identity</div>
@@ -81,27 +110,27 @@ export default function LeetCodeDetails() {
           <div className="glass-card-premium p-8 border-none ring-1 ring-white/10 group">
             <div className="text-xs font-black uppercase tracking-widest text-gray-500 mb-6 group-hover:text-blue-400 transition-colors">Efficiency</div>
             <div className="text-5xl font-black text-white mb-2 italic">
-               {((all?.solved / all?.total) * 100).toFixed(1)}%
+               {efficiency}%
             </div>
-            <div className="text-xs font-bold text-gray-500">{all?.solved} / {all?.total} Solved</div>
+            <div className="text-xs font-bold text-gray-500">{all.solved} / {all.total} Solved</div>
           </div>
           
           <div className="glass-card-premium p-8 ring-1 ring-green-500/20">
             <div className="text-xs font-black uppercase tracking-widest text-green-500/50 mb-6">Fundamental</div>
-            <div className="text-5xl font-black text-green-400 mb-2 italic">{easy?.solved || 0}</div>
-            <div className="text-xs font-bold text-gray-500">{easy?.submissions} Submissions</div>
+            <div className="text-5xl font-black text-green-400 mb-2 italic">{easy.solved}</div>
+            <div className="text-xs font-bold text-gray-500">{easy.submissions} Submissions</div>
           </div>
 
           <div className="glass-card-premium p-8 ring-1 ring-yellow-500/20">
             <div className="text-xs font-black uppercase tracking-widest text-yellow-500/50 mb-6">Intermediate</div>
-            <div className="text-5xl font-black text-yellow-400 mb-2 italic">{medium?.solved || 0}</div>
-            <div className="text-xs font-bold text-gray-500">{medium?.submissions} Submissions</div>
+            <div className="text-5xl font-black text-yellow-400 mb-2 italic">{medium.solved}</div>
+            <div className="text-xs font-bold text-gray-500">{medium.submissions} Submissions</div>
           </div>
 
           <div className="glass-card-premium p-8 ring-1 ring-red-500/20">
             <div className="text-xs font-black uppercase tracking-widest text-red-500/50 mb-6">Advanced</div>
-            <div className="text-5xl font-black text-red-400 mb-2 italic">{hard?.solved || 0}</div>
-            <div className="text-xs font-bold text-gray-500">{hard?.submissions} Submissions</div>
+            <div className="text-5xl font-black text-red-400 mb-2 italic">{hard.solved}</div>
+            <div className="text-xs font-bold text-gray-500">{hard.submissions} Submissions</div>
           </div>
         </div>
       </div>

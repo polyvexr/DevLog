@@ -238,7 +238,7 @@ export default function Landing() {
               <div className="w-12 h-12 rounded-xl bg-blue-600 flex items-center justify-center text-xl shadow-lg shadow-blue-600/20">
                 <FiBarChart2 />
               </div>
-              <h3 className="text-xl font-bold">Unied Insights</h3>
+              <h3 className="text-xl font-bold">Unified Insights</h3>
               <p className="text-gray-500 text-sm leading-relaxed">Holistic overview of your performance across all platforms in real-time.</p>
             </div>
             <div className="space-y-4 fade-in-up delay-100">

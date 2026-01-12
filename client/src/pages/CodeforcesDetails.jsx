@@ -15,6 +15,8 @@ import { SiCodeforces } from "react-icons/si";
 
 export default function CodeforcesDetails() {
   const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -22,12 +24,32 @@ export default function CodeforcesDetails() {
       .get("/stats/all")
       .then((res) => {
         const cf = res.data.stats.find((s) => s.platform === "codeforces");
-        setData(cf);
+        if (cf) {
+          setData(cf);
+        } else {
+          setError(true);
+        }
       })
-      .catch(() => setData(null));
+      .catch(() => setError(true))
+      .finally(() => setLoading(false));
   }, []);
 
-  if (!data) return <Loader />;
+  if (loading) return <Loader />;
+
+  if (error || !data) {
+    return (
+      <div className="text-center py-20">
+        <h2 className="text-2xl font-bold text-white mb-4">Codeforces Not Linked</h2>
+        <p className="text-gray-400 mb-8">Please link your Codeforces account first.</p>
+        <button
+          onClick={() => navigate("/link")}
+          className="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition-all"
+        >
+          Link Codeforces
+        </button>
+      </div>
+    );
+  }
 
   const stats = data.stats || {};
 
@@ -71,7 +93,7 @@ export default function CodeforcesDetails() {
         </div>
         <div className="glass-card-premium p-8">
           <div className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 mb-4">Contribution</div>
-          <div className="text-4xl font-black text-green-400italic">+{stats.contribution || 0}</div>
+          <div className="text-4xl font-black text-green-400 italic">+{stats.contribution || 0}</div>
         </div>
       </div>
 
@@ -117,12 +139,12 @@ export default function CodeforcesDetails() {
                 <div key={idx} className="flex items-center justify-between p-6 bg-white/[0.02] border border-white/5 rounded-2xl hover:bg-white/5 transition-all group overflow-hidden relative">
                    {/* Background bar for visual flair */}
                    <div className={`absolute left-0 top-0 bottom-0 w-1 ${change.ratingChange >= 0 ? 'bg-green-500' : 'bg-red-500'} opacity-50`}></div>
-                   
+
                    <div className="flex-1 min-w-0 pr-6">
                       <div className="text-lg font-black text-white group-hover:text-blue-400 transition-colors truncate mb-1">{change.contestName}</div>
                       <div className="text-[10px] font-black uppercase tracking-widest text-gray-500">Contest Efficiency: Rank #{change.rank}</div>
                    </div>
-                   
+
                    <div className="text-right flex items-center gap-8">
                       <div className="hidden md:block">
                         <div className="text-[10px] font-black uppercase tracking-widest text-gray-600">Vector</div>
@@ -167,8 +189,8 @@ export default function CodeforcesDetails() {
                           <span className="text-gray-500">{count} Solves</span>
                        </div>
                        <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
-                          <div 
-                            className="h-full bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.5)] transition-all duration-1000" 
+                          <div
+                            className="h-full bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.5)] transition-all duration-1000"
                             style={{ width: `${(count / stats.totalSubmissions) * 100}%` }}
                           ></div>
                        </div>

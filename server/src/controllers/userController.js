@@ -1,4 +1,6 @@
 import User from "../models/User.js";
+import PlatformStat from "../models/PlatformStat.js";
+import PlatformAction from "../models/PlatformAction.js";
 import { sanitizeUser } from "../middleware/validation.js";
 
 /**
@@ -80,17 +82,26 @@ export const updatePassword = async (req, res) => {
 };
 
 /**
- * Delete account
+ * Delete account and all associated data
  * DELETE /api/user/account
  */
 export const deleteAccount = async (req, res) => {
   try {
-    // Also delete platform stats for this user
-    // (Importing PlatformStat and PlatformAction would be needed if we wanted to cleanup everything)
-    // For now, let's keep it simple and just delete the user.
-    await User.findByIdAndDelete(req.user._id);
+    const userId = req.user._id;
+
+    // Delete all platform stats for this user
+    await PlatformStat.deleteMany({ userId });
+
+    // Delete all platform actions for this user
+    await PlatformAction.deleteMany({ userId });
+
+    // Delete the user
+    await User.findByIdAndDelete(userId);
+
     res.json({ success: true, message: "Account deleted successfully" });
   } catch (err) {
+    console.error("Delete account error:", err);
     res.status(500).json({ message: "Server error" });
   }
 };
+
