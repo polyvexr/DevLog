@@ -1,24 +1,17 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Loader from "../components/Loader";
-import StatCard from "../components/StatCard";
 import api from "../api/axios";
 import {
   FiStar,
   FiGitBranch,
-  FiEye,
-  FiBarChart2,
   FiRefreshCw,
   FiUpload,
   FiGitPullRequest,
-  FiAlertCircle,
-  FiMessageSquare,
-  FiPlus,
-  FiTrash2,
-  FiCopy,
   FiBriefcase,
   FiMapPin,
 } from "react-icons/fi";
+import { SiGithub } from "react-icons/si";
 
 export default function GitHubDetails() {
   const [data, setData] = useState(null);
@@ -43,21 +36,22 @@ export default function GitHubDetails() {
     <>
       <button
         onClick={() => navigate("/")}
-        className="mb-6 text-[var(--accent-blue)] hover:opacity-80 flex items-center gap-2 fade-in-scale"
+        className="mb-10 text-gray-400 hover:text-white flex items-center gap-2 group transition-all fade-in-scale"
       >
-        ← Back to Dashboard
+        <span className="group-hover:-translate-x-1 transition-transform">←</span>
+        <span className="font-bold uppercase tracking-widest text-xs">Return to Command Center</span>
       </button>
 
-      <div className="mb-8 fade-in-scale">
-        <div className="flex items-center gap-4 mb-3">
-          <div className="w-16 h-16 rounded-xl github-gradient flex items-center justify-center text-3xl font-bold text-white shadow-lg">
-            GH
+      <div className="mb-12 fade-in-scale">
+        <div className="flex items-center gap-8">
+          <div className="w-24 h-24 rounded-3xl github-gradient flex items-center justify-center text-4xl shadow-2xl shadow-purple-500/20 group-hover:scale-110 transition-transform">
+            <SiGithub className="text-white" />
           </div>
           <div>
-            <h1 className="text-5xl font-black text-[var(--text-primary)]">
-              GitHub Profile
+            <h1 className="text-5xl md:text-7xl font-black tracking-tight text-white mb-2 italic">
+              GitHub <span className="animate-text-shine">Pulse</span>
             </h1>
-            <p className="text-[var(--text-secondary)] text-lg">
+            <p className="text-blue-400 text-xl font-black tracking-widest uppercase">
               @{data.username}
             </p>
           </div>
@@ -65,314 +59,164 @@ export default function GitHubDetails() {
       </div>
 
       {!hasStats ? (
-        <div className="platform-card p-12 rounded-2xl text-center">
-          <FiRefreshCw className="text-6xl mb-4 opacity-30 mx-auto animate-spin" />
-          <h3 className="text-2xl font-bold mb-2 text-[var(--text-secondary)]">
-            Stats Loading
-          </h3>
-          <p className="text-[var(--text-secondary)]">
-            GitHub stats are being fetched. Check back soon!
-          </p>
+        <div className="glass-card-premium p-20 text-center">
+          <FiRefreshCw className="text-6xl mb-6 text-blue-500 opacity-50 animate-spin mx-auto" />
+          <h3 className="text-3xl font-black mb-2 text-white">Aggregating Data</h3>
+          <p className="text-gray-500 text-lg">Retrieving repository intelligence from GitHub nodes...</p>
         </div>
       ) : (
         <>
-          {/* Profile Header */}
-          {stats.name && (
-            <div className="platform-card p-6 rounded-2xl mb-6 fade-in-up">
-              <div className="flex items-center gap-6">
-                {stats.avatar && (
+          {/* Enhanced Profile Summary */}
+          <div className="glass-card-premium p-10 mb-12 relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/5 blur-3xl -mr-32 -mt-32"></div>
+            <div className="flex flex-col md:flex-row items-center gap-10">
+              {stats.avatar && (
+                <div className="relative">
+                  <div className="absolute inset-0 bg-blue-500 blur-2xl opacity-20 group-hover:opacity-40 transition-opacity"></div>
                   <img
                     src={stats.avatar}
                     alt={stats.name}
-                    className="w-24 h-24 rounded-full border-4 border-purple-500/30"
+                    className="w-32 h-32 rounded-3xl border-2 border-white/10 relative z-10 shadow-2xl"
                   />
-                )}
-                <div className="flex-1">
-                  <h2 className="text-3xl font-bold text-[var(--text-primary)] mb-2">
-                    {stats.name}
-                  </h2>
-                  {stats.bio && (
-                    <p className="text-[var(--text-secondary)] mb-2">
-                      {stats.bio}
-                    </p>
-                  )}
+                </div>
+              )}
+              <div className="flex-1 text-center md:text-left">
+                <h2 className="text-4xl font-black text-white mb-2">{stats.name || data.username}</h2>
+                <p className="text-gray-400 text-lg mb-6 max-w-2xl">{stats.bio || "No biography available. Developer is a ghost in the shell."}</p>
+                <div className="flex flex-wrap justify-center md:justify-start gap-6">
                   {stats.company && (
-                    <p className="text-sm text-[var(--text-secondary)] flex items-center gap-1">
+                    <div className="flex items-center gap-2 text-blue-400 font-bold uppercase tracking-widest text-[10px] bg-blue-500/5 px-4 py-2 rounded-full border border-blue-500/10">
                       <FiBriefcase /> {stats.company}
-                    </p>
+                    </div>
                   )}
                   {stats.location && (
-                    <p className="text-sm text-[var(--text-secondary)] flex items-center gap-1">
+                    <div className="flex items-center gap-2 text-purple-400 font-bold uppercase tracking-widest text-[10px] bg-purple-500/5 px-4 py-2 rounded-full border border-purple-500/10">
                       <FiMapPin /> {stats.location}
-                    </p>
+                    </div>
                   )}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Main Stats */}
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold mb-4 text-[var(--text-primary)]">
-              Profile Overview
-            </h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="platform-card p-6 rounded-xl fade-in-up">
-                <div className="text-[var(--text-secondary)] text-sm mb-2">
-                  Followers
-                </div>
-                <div className="text-3xl font-bold text-[var(--accent-blue)]">
-                  {stats.followers?.toLocaleString() || 0}
-                </div>
-              </div>
-              <div className="platform-card p-6 rounded-xl fade-in-up delay-100">
-                <div className="text-[var(--text-secondary)] text-sm mb-2">
-                  Following
-                </div>
-                <div className="text-3xl font-bold text-purple-400">
-                  {stats.following?.toLocaleString() || 0}
-                </div>
-              </div>
-              <div className="platform-card p-6 rounded-xl fade-in-up delay-200">
-                <div className="text-[var(--text-secondary)] text-sm mb-2">
-                  Public Repos
-                </div>
-                <div className="text-3xl font-bold text-cyan-400">
-                  {stats.publicRepos?.toLocaleString() || 0}
-                </div>
-              </div>
-              <div className="platform-card p-6 rounded-xl fade-in-up delay-300">
-                <div className="text-[var(--text-secondary)] text-sm mb-2">
-                  Public Gists
-                </div>
-                <div className="text-3xl font-bold text-green-400">
-                  {stats.publicGists?.toLocaleString() || 0}
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Repository Stats */}
-          {stats.totalStars !== undefined && (
-            <div className="mb-8">
-              <h2 className="text-2xl font-bold mb-4 text-[var(--text-primary)]">
-                Repository Stats
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <StatCard
-                  label="Total Stars"
-                  value={stats.totalStars?.toLocaleString()}
-                  icon={FiStar}
-                />
-                <StatCard
-                  label="Total Forks"
-                  value={stats.totalForks?.toLocaleString()}
-                  icon={FiGitBranch}
-                />
-                <StatCard
-                  label="Total Watchers"
-                  value={stats.totalWatchers?.toLocaleString()}
-                  icon={FiEye}
-                />
-              </div>
+          {/* Core Metrics */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16">
+            <div className="glass-card-premium p-8 group hover:-translate-y-1 transition-all">
+              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 mb-4 group-hover:text-blue-400">Collaborators</div>
+              <div className="text-5xl font-black text-white italic">{stats.followers || 0}</div>
             </div>
-          )}
-
-          {/* Top Repositories */}
-          {stats.topRepositories && stats.topRepositories.length > 0 && (
-            <div className="mb-8">
-              <h2 className="text-2xl font-bold mb-4 text-[var(--text-primary)]">
-                Top Repositories
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {stats.topRepositories.slice(0, 6).map((repo, idx) => (
-                  <a
-                    key={repo.url}
-                    href={repo.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={`platform-card p-5 rounded-xl fade-in-up hover:scale-105 transition-transform`}
-                    style={{ animationDelay: `${idx * 100}ms` }}
-                  >
-                    <div className="flex items-start justify-between mb-3">
-                      <h3 className="text-lg font-bold text-[var(--accent-blue)] hover:opacity-80">
-                        {repo.name}
-                      </h3>
-                      <span className="px-2 py-1 bg-purple-500/20 rounded text-xs text-purple-300">
-                        {repo.language}
-                      </span>
-                    </div>
-                    {repo.description && (
-                      <p className="text-sm text-[var(--text-secondary)] mb-3 line-clamp-2">
-                        {repo.description}
-                      </p>
-                    )}
-                    <div className="flex gap-4 text-sm text-[var(--text-secondary)]">
-                      <span className="flex items-center gap-1">
-                        <FiStar /> {repo.stars?.toLocaleString()}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <FiGitBranch /> {repo.forks?.toLocaleString()}
-                      </span>
-                    </div>
-                  </a>
-                ))}
-              </div>
+            <div className="glass-card-premium p-8 group hover:-translate-y-1 transition-all">
+              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 mb-4 group-hover:text-purple-400">Following</div>
+              <div className="text-5xl font-black text-white italic">{stats.following || 0}</div>
             </div>
-          )}
+            <div className="glass-card-premium p-8 group hover:-translate-y-1 transition-all">
+              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 mb-4 group-hover:text-cyan-400">Total Stars</div>
+              <div className="text-5xl font-black text-white italic">{stats.totalStars || 0}</div>
+            </div>
+            <div className="glass-card-premium p-8 group hover:-translate-y-1 transition-all">
+              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 mb-4 group-hover:text-green-400">Public Nodes</div>
+              <div className="text-5xl font-black text-white italic">{stats.publicRepos || 0}</div>
+            </div>
+          </div>
 
-          {/* Languages Used */}
-          {stats.languagesUsed &&
-            Object.keys(stats.languagesUsed).length > 0 && (
-              <div className="mb-8">
-                <h2 className="text-2xl font-bold mb-4 text-[var(--text-primary)]">
-                  Languages Used
-                </h2>
-                <div className="platform-card p-6 rounded-2xl">
-                  <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                    {Object.entries(stats.languagesUsed)
-                      .sort((a, b) => b[1] - a[1])
-                      .slice(0, 12)
-                      .map(([lang, count]) => (
-                        <div
-                          key={lang}
-                          className="text-center p-3 rounded-lg bg-[var(--bg-card-inner)]"
-                        >
-                          <div className="text-2xl font-bold text-cyan-400">
-                            {count}
-                          </div>
-                          <div className="text-xs text-[var(--text-secondary)] mt-1">
-                            {lang}
-                          </div>
-                        </div>
-                      ))}
+          {/* Top Repositories Grid */}
+          <div className="mb-16">
+            <h2 className="text-2xl font-black mb-8 text-white uppercase tracking-widest flex items-center gap-3">
+              <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+              Repository Intelligence
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {stats.topRepositories?.slice(0, 6).map((repo) => (
+                <a
+                  key={repo.url}
+                  href={repo.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="glass-card-premium p-8 group hover:-translate-y-2 transition-all relative overflow-hidden"
+                >
+                  <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-20 group-hover:rotate-12 transition-all">
+                     <FiGitBranch size={48} />
                   </div>
-                </div>
-              </div>
-            )}
-
-          {/* Recent Activity */}
-          {stats.recentActivity && stats.recentActivity.length > 0 && (
-            <div className="mb-8">
-              <h2 className="text-2xl font-bold mb-4 text-[var(--text-primary)]">
-                Recent Activity
-              </h2>
-              <div className="platform-card p-6 rounded-2xl">
-                <div className="space-y-3">
-                  {stats.recentActivity.slice(0, 10).map((activity, idx) => (
-                    <div
-                      key={idx}
-                      className="flex items-center justify-between py-2 border-b border-[var(--border-color)] last:border-0"
-                    >
-                      <div className="flex items-center gap-3">
-                        <span className="text-xl">
-                          {activity.type === "PushEvent" ? (
-                            <FiUpload />
-                          ) : activity.type === "PullRequestEvent" ? (
-                            <FiGitPullRequest />
-                          ) : activity.type === "IssuesEvent" ? (
-                            <FiAlertCircle />
-                          ) : activity.type === "IssueCommentEvent" ? (
-                            <FiMessageSquare />
-                          ) : activity.type === "CreateEvent" ? (
-                            <FiPlus />
-                          ) : activity.type === "DeleteEvent" ? (
-                            <FiTrash2 />
-                          ) : activity.type === "ForkEvent" ? (
-                            <FiCopy />
-                          ) : (
-                            <FiBarChart2 />
-                          )}
+                  <div className="flex flex-col h-full">
+                    <h3 className="text-xl font-black text-white mb-2 group-hover:text-blue-400 transition-colors truncate">
+                      {repo.name}
+                    </h3>
+                    <p className="text-gray-500 text-sm mb-6 line-clamp-2 flex-grow">
+                      {repo.description || "The owner of this repository has not provided a description."}
+                    </p>
+                    <div className="flex items-center justify-between mt-auto pt-6 border-t border-white/5">
+                      <div className="flex gap-4">
+                        <span className="flex items-center gap-1.5 text-xs font-black text-gray-400 group-hover:text-yellow-500 transition-colors">
+                          <FiStar size={14} /> {repo.stars}
                         </span>
-                        <div>
-                          <div className="text-sm font-semibold text-[var(--text-primary)]">
-                            {activity.type.replace("Event", "")}
+                        <span className="flex items-center gap-1.5 text-xs font-black text-gray-400 group-hover:text-blue-400 transition-colors">
+                          <FiGitBranch size={14} /> {repo.forks}
+                        </span>
+                      </div>
+                      <span className="text-[10px] font-black uppercase tracking-widest text-blue-500/50">
+                        {repo.language || "Unknown"}
+                      </span>
+                    </div>
+                  </div>
+                </a>
+              ))}
+            </div>
+          </div>
+
+          {/* Activity Feed */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
+            <div className="space-y-8">
+               <h2 className="text-2xl font-black text-white uppercase tracking-widest">Network Activity</h2>
+               <div className="glass-card-premium p-4 md:p-6">
+                  <div className="space-y-2">
+                    {stats.recentActivity?.slice(0, 8).map((activity, idx) => (
+                      <div key={idx} className="flex items-center justify-between p-5 hover:bg-white/5 rounded-2xl transition-all group">
+                        <div className="flex items-center gap-5">
+                          <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-gray-400 group-hover:bg-blue-600 transition-colors group-hover:text-white group-hover:rotate-3">
+                             {activity.type === "PushEvent" ? <FiUpload /> : <FiGitPullRequest />}
                           </div>
-                          <div className="text-xs text-[var(--text-secondary)]">
-                            {activity.repo}
+                          <div>
+                            <div className="text-xs font-black text-white mb-1">{activity.type.replace('Event', '')}</div>
+                            <div className="text-[10px] font-black uppercase tracking-widest text-gray-500 truncate max-w-[150px]">{activity.repo}</div>
                           </div>
                         </div>
+                        <div className="text-[10px] font-black text-gray-600 uppercase tracking-widest">
+                          {new Date(activity.createdAt).toLocaleDateString()}
+                        </div>
                       </div>
-                      <div className="text-xs text-[var(--text-secondary)]">
-                        {new Date(activity.createdAt).toLocaleDateString()}
+                    ))}
+                  </div>
+               </div>
+            </div>
+
+            <div className="space-y-8">
+               <h2 className="text-2xl font-black text-white uppercase tracking-widest">Language Breakdown</h2>
+               <div className="glass-card-premium p-8">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-6 text-center">
+                    {Object.entries(stats.languagesUsed || {}).sort((a,b) => b[1]-a[1]).slice(0, 9).map(([lang, count]) => (
+                      <div key={lang} className="p-4 bg-white/5 border border-white/5 rounded-2xl group hover:border-blue-500/30 transition-all">
+                        <div className="text-2xl font-black text-white mb-1">{count}</div>
+                        <div className="text-[10px] font-black uppercase tracking-widest text-blue-500/50 group-hover:text-blue-400 transition-colors">{lang}</div>
                       </div>
+                    ))}
+                  </div>
+               </div>
+               
+               {/* Account Timeline Info */}
+               <div className="glass-card-premium p-8 bg-gradient-to-br from-white/[0.02] to-blue-500/[0.05]">
+                  <div className="grid grid-cols-2 gap-8">
+                    <div>
+                      <div className="text-[10px] font-black uppercase tracking-widest text-gray-600 mb-2">Protocol Init</div>
+                      <div className="text-lg font-black text-white">{new Date(stats.createdAt).toLocaleDateString()}</div>
                     </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Event Types Distribution */}
-          {stats.eventTypes && Object.keys(stats.eventTypes).length > 0 && (
-            <div className="mb-8">
-              <h2 className="text-2xl font-bold mb-4 text-[var(--text-primary)]">
-                Activity Breakdown
-              </h2>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-                {Object.entries(stats.eventTypes)
-                  .sort((a, b) => b[1] - a[1])
-                  .map(([event, count]) => (
-                    <StatCard
-                      key={event}
-                      label={event.replace("Event", "")}
-                      value={count}
-                      icon={FiBarChart2}
-                    />
-                  ))}
-              </div>
-            </div>
-          )}
-
-          {/* Account Info */}
-          {stats.createdAt && (
-            <div>
-              <h2 className="text-2xl font-bold mb-4 text-[var(--text-primary)]">
-                Account Information
-              </h2>
-              <div className="platform-card p-6 rounded-2xl">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div>
-                    <div className="text-[var(--text-secondary)] text-sm mb-1">
-                      Account Created
-                    </div>
-                    <div className="text-lg font-bold text-[var(--text-primary)]">
-                      {new Date(stats.createdAt).toLocaleDateString("en-US", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })}
+                    <div>
+                      <div className="text-[10px] font-black uppercase tracking-widest text-gray-600 mb-2">Last Sync</div>
+                      <div className="text-lg font-black text-blue-400">{new Date(stats.updatedAt).toLocaleDateString()}</div>
                     </div>
                   </div>
-                  <div>
-                    <div className="text-[var(--text-secondary)] text-sm mb-1">
-                      Last Updated
-                    </div>
-                    <div className="text-lg font-bold text-[var(--text-primary)]">
-                      {new Date(stats.updatedAt).toLocaleDateString("en-US", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })}
-                    </div>
-                  </div>
-                  <div>
-                    <div className="text-[var(--text-secondary)] text-sm mb-1">
-                      Profile URL
-                    </div>
-                    <a
-                      href={stats.profileUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-lg font-bold text-[var(--accent-blue)] hover:opacity-80"
-                    >
-                      View on GitHub →
-                    </a>
-                  </div>
-                </div>
-              </div>
+               </div>
             </div>
-          )}
+          </div>
         </>
       )}
     </>
