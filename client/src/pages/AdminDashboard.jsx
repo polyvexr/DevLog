@@ -10,7 +10,8 @@ import {
   FiActivity,
   FiTerminal,
   FiDatabase,
-  FiX
+  FiX,
+  FiCalendar
 } from "react-icons/fi";
 import { SiLeetcode, SiCodeforces, SiGithub } from "react-icons/si";
 
@@ -21,6 +22,8 @@ export default function AdminDashboard() {
   const [syncResults, setSyncResults] = useState(null);
   const [activeSync, setActiveSync] = useState("");
   const [notification, setNotification] = useState(null);
+  const [contestSyncing, setContestSyncing] = useState(false);
+  const [contestResults, setContestResults] = useState(null);
 
   useEffect(() => {
     fetchStats();
@@ -70,6 +73,33 @@ export default function AdminDashboard() {
     } finally {
       setSyncing(false);
       setActiveSync("");
+    }
+  };
+
+  const handleContestSync = async () => {
+    try {
+      setContestSyncing(true);
+      setContestResults(null);
+
+      const res = await api.post("/cron/contests");
+      const platforms = res.data.platforms;
+      setContestResults(platforms);
+
+      const totalFetched = res.data.totalFetched || 
+        (platforms ? Object.values(platforms).reduce((sum, r) => sum + (r.fetched || 0), 0) : 0);
+
+      setNotification({
+        type: "success",
+        message: `Contest Data Synchronized: ${totalFetched} contests fetched.`,
+      });
+    } catch (error) {
+      console.error("Error syncing contests:", error);
+      setNotification({
+        type: "error",
+        message: error.response?.data?.message || error.response?.data?.error || "Contest Sync Failed: Unable to fetch contest data.",
+      });
+    } finally {
+      setContestSyncing(false);
     }
   };
 
@@ -170,6 +200,63 @@ export default function AdminDashboard() {
             </button>
           ))}
         </div>
+      </div>
+
+      {/* Contest Data Sync */}
+      <div className="glass-card-premium p-10 mb-16 border-none ring-1 ring-white/5 relative overflow-hidden">
+        <div className="flex items-center gap-6 mb-12">
+          <div className="w-16 h-16 bg-purple-600/10 rounded-2xl flex items-center justify-center border border-purple-500/20 shadow-inner">
+            <FiCalendar className={`text-3xl text-purple-500 ${contestSyncing ? 'animate-pulse' : ''}`} />
+          </div>
+          <div>
+            <h2 className="text-3xl font-black text-white italic">Contest Data Synchronization</h2>
+            <p className="text-xs font-black uppercase tracking-widest text-gray-500">Fetch Upcoming Contests from All Platforms</p>
+          </div>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-6">
+          <button
+            onClick={handleContestSync}
+            disabled={contestSyncing}
+            className={`group glass-card-premium px-8 py-6 border-none ring-1 text-left transition-all active:scale-95 ${
+              contestSyncing ? 'ring-purple-500 ring-2' : 'ring-purple-500/10 hover:ring-purple-500/40'
+            }`}
+          >
+            <div className="flex items-center gap-4">
+              <FiRefreshCw className={`text-2xl text-purple-500 ${contestSyncing ? 'animate-spin' : 'group-hover:rotate-180 transition-transform duration-500'}`} />
+              <div>
+                <div className="text-xl font-black text-white italic mb-1">Fetch Contest Data</div>
+                <div className="text-[10px] font-black uppercase tracking-widest text-gray-500">
+                  {contestSyncing ? 'Fetching from all platforms...' : 'LeetCode • Codeforces • CodeChef • AtCoder'}
+                </div>
+              </div>
+            </div>
+          </button>
+        </div>
+
+        {/* Contest Sync Results */}
+        {contestResults && (
+          <div className="mt-10 grid grid-cols-2 md:grid-cols-4 gap-4 fade-in-up">
+            {Object.entries(contestResults).map(([platform, result]) => (
+              <div key={platform} className="glass-card-premium p-6 border-none ring-1 ring-white/5">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-sm font-black uppercase tracking-wider text-gray-400">{platform}</span>
+                  {result.error ? (
+                    <FiAlertCircle className="text-red-500" />
+                  ) : (
+                    <FiCheckCircle className="text-green-500" />
+                  )}
+                </div>
+                <div className={`text-3xl font-black ${result.error ? 'text-red-400' : 'text-white'}`}>
+                  {result.error ? 'Error' : result.fetched}
+                </div>
+                <div className="text-[10px] font-black uppercase tracking-widest text-gray-500 mt-1">
+                  {result.error ? result.error.slice(0, 20) + '...' : 'Contests Fetched'}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Sync Results Visualization */}

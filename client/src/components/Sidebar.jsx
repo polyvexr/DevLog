@@ -47,6 +47,7 @@ export default function Sidebar() {
     { path: "/", icon: FiBarChart2, label: "Dashboard", exact: true },
     { path: "/link", icon: FiLink, label: "Connect Hub" },
     { path: "/profile", icon: FiUser, label: "User Pulse" },
+    { path: "/contests", icon: FiTarget, label: "Contests" },
   ];
 
   const platformItems = [

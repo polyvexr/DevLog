@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
-import { FaCalendarAlt, FaFilter, FaCode } from "react-icons/fa";
+import { FiCalendar, FiClock, FiExternalLink, FiRefreshCw, FiFilter, FiZap } from "react-icons/fi";
+import { FaCode } from "react-icons/fa";
 import { SiLeetcode, SiCodeforces, SiCodechef } from "react-icons/si";
-import AuthenticatedLayout from "../components/AuthenticatedLayout";
 import ContestCard from "../components/ContestCard";
 import Loader from "../components/Loader";
 import api from "../api/axios";
 
 /**
- * Contests Page - Unified contest calendar with filters
+ * Contests Page - Premium contest calendar with filters
  */
 export default function Contests() {
   const [contests, setContests] = useState([]);
@@ -21,10 +21,10 @@ export default function Contests() {
   ]);
 
   const platforms = [
-    { id: "leetcode", name: "LeetCode", icon: SiLeetcode, color: "#ffa116" },
-    { id: "codeforces", name: "Codeforces", icon: SiCodeforces, color: "#1f8acb" },
-    { id: "codechef", name: "CodeChef", icon: SiCodechef, color: "#8b6914" },
-    { id: "atcoder", name: "AtCoder", icon: FaCode, color: "#00a0e9" },
+    { id: "leetcode", name: "LeetCode", icon: SiLeetcode, color: "#ffa116", bgColor: "bg-orange-500/10", borderColor: "border-orange-500/20", ringColor: "ring-orange-500/40" },
+    { id: "codeforces", name: "Codeforces", icon: SiCodeforces, color: "#1f8acb", bgColor: "bg-blue-500/10", borderColor: "border-blue-500/20", ringColor: "ring-blue-500/40" },
+    { id: "codechef", name: "CodeChef", icon: SiCodechef, color: "#8b6914", bgColor: "bg-amber-500/10", borderColor: "border-amber-500/20", ringColor: "ring-amber-500/40" },
+    { id: "atcoder", name: "AtCoder", icon: FaCode, color: "#00a0e9", bgColor: "bg-cyan-500/10", borderColor: "border-cyan-500/20", ringColor: "ring-cyan-500/40" },
   ];
 
   useEffect(() => {
@@ -84,96 +84,174 @@ export default function Contests() {
     });
   };
 
+  // Get relative time label for date headers
+  const getDateBadge = (dateString) => {
+    const date = new Date(dateString);
+    const today = new Date();
+    const diffDays = Math.ceil((date - today) / (1000 * 60 * 60 * 24));
+    
+    if (diffDays <= 0) return { label: "Live Now", color: "bg-green-500/20 text-green-400 border-green-500/30" };
+    if (diffDays === 1) return { label: "Tomorrow", color: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30" };
+    if (diffDays <= 3) return { label: "This Week", color: "bg-blue-500/20 text-blue-400 border-blue-500/30" };
+    return { label: `In ${diffDays} days`, color: "bg-gray-500/20 text-gray-400 border-gray-500/30" };
+  };
+
   return (
-    <AuthenticatedLayout>
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-6">
-        <div className="max-w-6xl mx-auto">
-          {/* Header */}
-          <div className="mb-8">
-            <div className="flex items-center gap-3 mb-2">
-              <FaCalendarAlt className="text-purple-400" size={24} />
-              <h1 className="text-2xl font-bold text-white">Contest Calendar</h1>
-            </div>
-            <p className="text-gray-400">
-              Upcoming contests from all major competitive programming platforms
-            </p>
-          </div>
+    <>
+      {/* Hero Header */}
+      <div className="mb-12 fade-in-scale">
+        <h1 className="text-5xl md:text-8xl font-black mb-4 tracking-tight">
+          <span className="text-white opacity-90">Contest</span>
+          <br />
+          <span className="animate-text-shine inline-block">Arena</span>
+        </h1>
+        <p className="text-gray-400 text-xl md:text-2xl font-medium max-w-2xl leading-relaxed">
+          Track upcoming competitive programming battles across the global ecosystem.
+        </p>
+      </div>
 
-          {/* Platform filters */}
-          <div className="flex flex-wrap items-center gap-3 mb-8">
-            <span className="flex items-center gap-2 text-gray-400 text-sm">
-              <FaFilter size={14} />
-              Filter:
-            </span>
-            {platforms.map((platform) => {
-              const Icon = platform.icon;
-              const isSelected = selectedPlatforms.includes(platform.id);
-              return (
-                <button
-                  key={platform.id}
-                  onClick={() => togglePlatform(platform.id)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-all ${
-                    isSelected
-                      ? "border-purple-500 bg-purple-500/20 text-white"
-                      : "border-gray-700 bg-gray-800/50 text-gray-400 hover:border-gray-600"
-                  }`}
-                >
-                  <Icon
-                    size={16}
-                    style={{ color: isSelected ? platform.color : "currentColor" }}
-                  />
-                  <span className="text-sm">{platform.name}</span>
-                </button>
-              );
-            })}
+      {/* Platform Filter Section */}
+      <div className="glass-card-premium p-8 mb-10 fade-in-up border-none ring-1 ring-white/5">
+        <div className="flex items-center gap-6 mb-8">
+          <div className="w-14 h-14 bg-purple-600/10 rounded-2xl flex items-center justify-center border border-purple-500/20 shadow-inner">
+            <FiFilter className="text-2xl text-purple-500" />
           </div>
+          <div>
+            <h2 className="text-xl font-black text-white italic">Ecosystem Filter</h2>
+            <p className="text-xs font-black uppercase tracking-widest text-gray-500">Select Platforms to Monitor</p>
+          </div>
+        </div>
 
-          {/* Content */}
-          {loading ? (
-            <div className="flex justify-center py-20">
-              <Loader />
-            </div>
-          ) : error ? (
-            <div className="text-center py-20">
-              <p className="text-red-400">{error}</p>
+        <div className="flex flex-wrap gap-4">
+          {platforms.map((platform) => {
+            const Icon = platform.icon;
+            const isSelected = selectedPlatforms.includes(platform.id);
+            return (
               <button
-                onClick={fetchContests}
-                className="mt-4 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                key={platform.id}
+                onClick={() => togglePlatform(platform.id)}
+                className={`group flex items-center gap-3 px-6 py-4 rounded-2xl border transition-all active:scale-95 ${
+                  isSelected
+                    ? `${platform.bgColor} ${platform.borderColor} ring-2 ${platform.ringColor}`
+                    : "bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20"
+                }`}
               >
-                Try Again
+                <Icon
+                  size={20}
+                  style={{ color: isSelected ? platform.color : "#6b7280" }}
+                  className="transition-colors"
+                />
+                <span className={`font-bold text-sm ${isSelected ? "text-white" : "text-gray-400"}`}>
+                  {platform.name}
+                </span>
               </button>
-            </div>
-          ) : contests.length === 0 ? (
-            <div className="text-center py-20">
-              <FaCalendarAlt className="mx-auto text-gray-600 mb-4" size={48} />
-              <p className="text-gray-400">No upcoming contests found</p>
-              <p className="text-gray-500 text-sm mt-1">
-                Try selecting more platforms or check back later
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-8">
-              {Object.entries(groupedContests).map(([date, dateContests]) => (
-                <div key={date}>
-                  {/* Date header */}
-                  <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                    <span className="w-8 h-0.5 bg-purple-500/50"></span>
-                    {formatDateHeader(date)}
-                    <span className="text-sm text-gray-500">({dateContests.length})</span>
-                  </h2>
-
-                  {/* Contest grid */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {dateContests.map((contest) => (
-                      <ContestCard key={contest._id} contest={contest} />
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+            );
+          })}
         </div>
       </div>
-    </AuthenticatedLayout>
+
+      {/* Content */}
+      {loading ? (
+        <div className="flex justify-center py-20">
+          <Loader />
+        </div>
+      ) : error ? (
+        <div className="glass-card-premium p-16 md:p-24 text-center fade-in-up">
+          <div className="w-24 h-24 bg-red-600/10 border border-red-500/20 rounded-3xl flex items-center justify-center mx-auto mb-10 shadow-2xl">
+            <FiCalendar className="text-5xl text-red-500" />
+          </div>
+          <h3 className="text-4xl font-black mb-4 text-white italic">
+            Connection <span className="text-red-500">Failed</span>
+          </h3>
+          <p className="text-gray-500 text-xl max-w-md mx-auto mb-12 font-medium leading-relaxed">
+            {error}
+          </p>
+          <button
+            onClick={fetchContests}
+            className="px-10 py-5 bg-purple-600 hover:bg-purple-500 text-white font-black text-lg rounded-2xl transition-all shadow-2xl shadow-purple-500/30 active:scale-95 group flex items-center gap-3 mx-auto"
+          >
+            <FiRefreshCw className="text-xl group-hover:rotate-180 transition-transform duration-500" />
+            Retry Connection
+          </button>
+        </div>
+      ) : contests.length === 0 ? (
+        <div className="glass-card-premium p-16 md:p-24 text-center fade-in-up">
+          <div className="w-24 h-24 bg-purple-600/10 border border-purple-500/20 rounded-3xl flex items-center justify-center mx-auto mb-10 shadow-2xl pulse-ring">
+            <FiCalendar className="text-5xl text-purple-500" />
+          </div>
+          <h3 className="text-4xl font-black mb-4 text-white italic">
+            Arena <span className="text-gray-600">Empty</span>
+          </h3>
+          <p className="text-gray-500 text-xl max-w-md mx-auto mb-12 font-medium leading-relaxed">
+            No upcoming contests detected in the selected ecosystems. Try expanding your filter range.
+          </p>
+          <button
+            onClick={() => setSelectedPlatforms(["leetcode", "codeforces", "codechef", "atcoder"])}
+            className="px-10 py-5 bg-white/5 hover:bg-white/10 text-white font-black text-lg rounded-2xl transition-all border border-white/10 active:scale-95"
+          >
+            Reset Filters
+          </button>
+        </div>
+      ) : (
+        <div className="space-y-12">
+          {/* Stats Bar */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 fade-in-up">
+            <div className="glass-card-premium p-6 text-center border-none ring-1 ring-white/5">
+              <div className="text-3xl font-black text-white mb-1">{contests.length}</div>
+              <div className="text-[10px] font-black uppercase tracking-widest text-gray-500">Total Events</div>
+            </div>
+            <div className="glass-card-premium p-6 text-center border-none ring-1 ring-white/5">
+              <div className="text-3xl font-black text-orange-400 mb-1">
+                {contests.filter(c => c.platform === "leetcode").length}
+              </div>
+              <div className="text-[10px] font-black uppercase tracking-widest text-gray-500">LeetCode</div>
+            </div>
+            <div className="glass-card-premium p-6 text-center border-none ring-1 ring-white/5">
+              <div className="text-3xl font-black text-blue-400 mb-1">
+                {contests.filter(c => c.platform === "codeforces").length}
+              </div>
+              <div className="text-[10px] font-black uppercase tracking-widest text-gray-500">Codeforces</div>
+            </div>
+            <div className="glass-card-premium p-6 text-center border-none ring-1 ring-white/5">
+              <div className="text-3xl font-black text-cyan-400 mb-1">
+                {contests.filter(c => ["codechef", "atcoder"].includes(c.platform)).length}
+              </div>
+              <div className="text-[10px] font-black uppercase tracking-widest text-gray-500">Others</div>
+            </div>
+          </div>
+
+          {/* Grouped Contests */}
+          {Object.entries(groupedContests).map(([date, dateContests], groupIndex) => {
+            const badge = getDateBadge(date);
+            return (
+              <div key={date} className={`fade-in-up`} style={{ animationDelay: `${groupIndex * 100}ms` }}>
+                {/* Date header */}
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="w-12 h-12 bg-purple-600/10 rounded-xl flex items-center justify-center border border-purple-500/20">
+                    <FiZap className="text-xl text-purple-500" />
+                  </div>
+                  <div className="flex-1">
+                    <h2 className="text-2xl font-black text-white italic">{formatDateHeader(date)}</h2>
+                    <p className="text-xs font-black uppercase tracking-widest text-gray-500">
+                      {dateContests.length} Event{dateContests.length > 1 ? "s" : ""} Scheduled
+                    </p>
+                  </div>
+                  <span className={`px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest border ${badge.color}`}>
+                    {badge.label}
+                  </span>
+                </div>
+
+                {/* Contest grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {dateContests.map((contest) => (
+                    <ContestCard key={contest._id} contest={contest} />
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </>
   );
 }
