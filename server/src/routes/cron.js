@@ -6,16 +6,18 @@ import {
   handleInsightsCron, 
   handleNotificationsCron 
 } from "../controllers/cronController.js";
+import { optionalAuth } from "../middleware/auth.js";
 
 const router = express.Router();
 
 // Cron routes - protected by CRON_SECRET header
+// Contests route also accepts admin authentication
 
 // POST /api/cron/sync - Process sync jobs (every 1 min)
 router.post("/sync", handleSyncCron);
 
-// POST /api/cron/contests - Fetch contests (hourly)
-router.post("/contests", handleContestsCron);
+// POST /api/cron/contests - Fetch contests (hourly or admin-triggered)
+router.post("/contests", optionalAuth, handleContestsCron);
 
 // POST /api/cron/snapshots - Create snapshots (daily)
 router.post("/snapshots", handleSnapshotsCron);
