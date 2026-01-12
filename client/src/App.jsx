@@ -12,6 +12,9 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
+// V2 Pages
+import Contests from "./pages/Contests";
+import PublicProfile from "./pages/PublicProfile";
 import AuthenticatedLayout from "./components/AuthenticatedLayout";
 import { AuthContext } from "./context/AuthContext";
 import { SidebarProvider } from "./context/SidebarProvider";
@@ -64,6 +67,8 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<HomeRoute />} />
+        
+        {/* Admin route */}
         <Route
           path="/admin"
           element={
@@ -72,6 +77,8 @@ function App() {
             </AdminRoute>
           }
         />
+        
+        {/* Platform routes */}
         <Route
           path="/link"
           element={
@@ -104,6 +111,18 @@ function App() {
             </PrivateRoute>
           }
         />
+        
+        {/* V2 Routes */}
+        <Route
+          path="/contests"
+          element={
+            <PrivateRoute>
+              <Contests />
+            </PrivateRoute>
+          }
+        />
+        
+        {/* User profile */}
         <Route
           path="/profile"
           element={
@@ -112,6 +131,8 @@ function App() {
             </PrivateRoute>
           }
         />
+        
+        {/* Auth routes */}
         <Route
           path="/register"
           element={
@@ -144,6 +165,11 @@ function App() {
             </PublicRoute>
           }
         />
+        
+        {/* Public profile - NO AUTH REQUIRED */}
+        <Route path="/u/:username" element={<PublicProfile />} />
+        
+        {/* 404 */}
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
