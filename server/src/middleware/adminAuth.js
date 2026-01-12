@@ -1,6 +1,7 @@
-import dotenv from "dotenv";
-dotenv.config();
-
+/**
+ * Admin Authorization Middleware
+ * Uses role-based access control (RBAC) instead of email comparison
+ */
 export const adminAuth = (req, res, next) => {
   try {
     // Check if user is authenticated first
@@ -11,17 +12,8 @@ export const adminAuth = (req, res, next) => {
       });
     }
 
-    // Check if user email matches admin email from env
-    const adminEmail = process.env.ADMIN_EMAIL;
-
-    if (!adminEmail) {
-      return res.status(500).json({
-        success: false,
-        message: "Admin configuration missing",
-      });
-    }
-
-    if (req.user.email !== adminEmail) {
+    // Check if user has admin role (RBAC)
+    if (req.user.role !== "admin") {
       return res.status(403).json({
         success: false,
         message: "Admin access required",
