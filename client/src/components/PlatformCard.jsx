@@ -146,76 +146,87 @@ const PlatformCard = ({
   };
 
   return (
-    <div className="platform-card cursor-pointer" onClick={onClick}>
+    <div 
+      className="glass-card-premium p-8 cursor-pointer group hover:-translate-y-2"
+      onClick={onClick}
+    >
       {/* Header */}
-      <div className="platform-card-header">
+      <div className="flex items-center gap-6 mb-8">
         <div
-          className="platform-card-icon"
-          style={{ background: config.gradient }}
+          className="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl shadow-2xl transition-all group-hover:scale-110 group-hover:rotate-3"
+          style={{ background: config.gradient, boxShadow: `0 10px 30px -5px ${config.color}40` }}
         >
-          <Icon size={24} />
+          <Icon className="text-white" />
         </div>
         <div className="flex-1">
-          <h3 className="text-[var(--text-primary)] font-semibold text-lg">
+          <h3 className="text-2xl font-black text-white group-hover:text-white/90">
             {config.name}
           </h3>
-          <p className="text-[var(--text-secondary)] text-sm">@{username}</p>
+          <p className="text-blue-400 font-bold tracking-tight">@{username}</p>
         </div>
       </div>
 
       {/* Stats Grid */}
-      <div className="platform-card-stats">
+      <div className="grid grid-cols-2 gap-4 mb-8">
         {statsDisplay.map((stat, index) => {
           const StatIcon = stat.icon;
           return (
-            <div key={index} className="platform-card-stat">
-              <div className="flex items-center justify-center gap-1.5 mb-1">
-                <StatIcon size={14} className="text-[var(--text-secondary)]" />
-                <span className="platform-card-stat-value">{stat.value}</span>
+            <div key={index} className="bg-white/5 border border-white/5 rounded-2xl p-4 group-hover:border-white/10 transition-all">
+              <div className="flex items-center gap-2 mb-1.5 overflow-hidden">
+                <StatIcon size={14} className="text-gray-500 group-hover:translate-y-0 transition-transform" />
+                <span className="text-[10px] font-black uppercase tracking-widest text-gray-500">{stat.label}</span>
               </div>
-              <div className="platform-card-stat-label">{stat.label}</div>
+              <div className="text-xl font-black text-white">{stat.value}</div>
             </div>
           );
         })}
       </div>
 
       {/* Progress */}
-      <div className="platform-card-progress">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-sm text-[var(--text-secondary)]">Progress</span>
-          <span className="text-sm font-medium text-[var(--text-primary)]">
+      <div className="mb-8 space-y-3">
+        <div className="flex items-center justify-between px-1">
+          <span className="text-xs font-black uppercase tracking-widest text-gray-500">Mastery Progress</span>
+          <span className="text-sm font-black text-white">
             {progress}%
           </span>
         </div>
-        <div className="progress-container">
+        <div className="h-2.5 bg-white/5 rounded-full overflow-hidden border border-white/5">
           <div
-            className={`progress-fill ${config.progressClass}`}
-            style={{ width: `${progress}%` }}
+            className={`h-full rounded-full transition-all duration-1000 ease-out shadow-[0_0_15px_rgba(255,255,255,0.2)]`}
+            style={{ 
+              width: `${progress}%`,
+              background: config.gradient
+            }}
           />
         </div>
       </div>
 
       {/* Actions */}
-      <div className="platform-card-actions">
-        <button className="btn-secondary flex-1" onClick={handleVisit}>
-          <FiExternalLink size={16} />
-          Visit Platform
+      <div className="flex gap-4">
+        <button 
+          className="flex-1 py-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl text-xs font-black uppercase tracking-widest text-white transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+          onClick={handleVisit}
+        >
+          <FiExternalLink size={14} />
+          Profile
         </button>
-        <div className="tooltip-container flex-1">
+        <div className="flex-1 relative">
           <button
-            className="btn-primary w-full"
+            className="w-full py-4 bg-blue-600 hover:bg-blue-500 disabled:bg-blue-800 disabled:cursor-not-allowed rounded-2xl text-xs font-black uppercase tracking-widest text-white transition-all active:scale-[0.98] flex items-center justify-center gap-2 shadow-lg shadow-blue-500/20"
             onClick={handleRefresh}
             disabled={!canRefresh || isRefreshing}
           >
             {isRefreshing ? (
-              <div className="spinner" />
+              <FiRefreshCw size={14} className="animate-spin" />
             ) : (
-              <FiRefreshCw size={16} />
+              <FiZap size={14} className="group-hover:animate-pulse" />
             )}
-            {isRefreshing ? "Updating..." : "Update Stats"}
+            {isRefreshing ? "Syncing..." : "Sync Stats"}
           </button>
           {!canRefresh && timeRemaining && (
-            <div className="tooltip">Available in {timeRemaining}</div>
+            <div className="absolute -top-10 left-1/2 -translate-x-1/2 px-3 py-1 bg-black/80 backdrop-blur rounded text-[10px] font-bold text-blue-400 whitespace-nowrap border border-blue-500/30">
+              Cooldown: {timeRemaining}
+            </div>
           )}
         </div>
       </div>
