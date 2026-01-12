@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { FaCalendarAlt, FaFilter } from "react-icons/fa";
-import { SiLeetcode, SiCodeforces, SiCodechef, SiAtcoder } from "react-icons/si";
+import { FaCalendarAlt, FaFilter, FaCode } from "react-icons/fa";
+import { SiLeetcode, SiCodeforces, SiCodechef } from "react-icons/si";
 import AuthenticatedLayout from "../components/AuthenticatedLayout";
 import ContestCard from "../components/ContestCard";
 import Loader from "../components/Loader";
@@ -24,7 +24,7 @@ export default function Contests() {
     { id: "leetcode", name: "LeetCode", icon: SiLeetcode, color: "#ffa116" },
     { id: "codeforces", name: "Codeforces", icon: SiCodeforces, color: "#1f8acb" },
     { id: "codechef", name: "CodeChef", icon: SiCodechef, color: "#8b6914" },
-    { id: "atcoder", name: "AtCoder", icon: SiAtcoder, color: "#222222" },
+    { id: "atcoder", name: "AtCoder", icon: FaCode, color: "#00a0e9" },
   ];
 
   useEffect(() => {

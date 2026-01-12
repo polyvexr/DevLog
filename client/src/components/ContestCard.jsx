@@ -1,5 +1,5 @@
-import { FaCalendarAlt, FaClock, FaExternalLinkAlt } from "react-icons/fa";
-import { SiLeetcode, SiCodeforces, SiCodechef, SiAtcoder } from "react-icons/si";
+import { FaCalendarAlt, FaClock, FaExternalLinkAlt, FaCode } from "react-icons/fa";
+import { SiLeetcode, SiCodeforces, SiCodechef } from "react-icons/si";
 
 /**
  * ContestCard - Displays upcoming contest with platform-specific styling
@@ -29,10 +29,10 @@ export default function ContestCard({ contest }) {
     },
     atcoder: {
       name: "AtCoder",
-      icon: SiAtcoder,
-      color: "#222222",
-      bgGradient: "from-gray-400/20 to-gray-400/5",
-      borderColor: "border-gray-500/30",
+      icon: FaCode,
+      color: "#00a0e9",
+      bgGradient: "from-[#00a0e9]/20 to-[#00a0e9]/5",
+      borderColor: "border-[#00a0e9]/30",
     },
   };
 
