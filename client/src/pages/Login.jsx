@@ -31,110 +31,116 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-8">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen relative flex items-center justify-center px-4 py-8 overflow-hidden">
+      {/* Background blobs for depth */}
+      <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-blue-600/10 rounded-full blur-[100px] animate-blob"></div>
+      <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-purple-600/10 rounded-full blur-[100px] animate-blob animation-delay-2000"></div>
+
+      <div className="w-full max-w-lg relative z-10">
         <Link
           to="/"
-          className="inline-flex items-center gap-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors mb-6 fade-in-up"
+          className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-all mb-8 group fade-in-up"
         >
-          <span>←</span>
-          <span>Back to Home</span>
+          <span className="group-hover:-translate-x-1 transition-transform">←</span>
+          <span className="font-medium">Back to Home</span>
         </Link>
+
         <form
           onSubmit={handleSubmit}
-          className="platform-card p-8 shadow-2xl rounded-2xl w-full fade-in-scale"
+          className="glass-card-premium p-10 md:p-12 fade-in-scale"
           aria-live="polite"
         >
-          <div className="text-center mb-8">
-            <h2 className="text-4xl font-black text-[var(--text-primary)] mb-2">
-              Welcome Back
+          <div className="text-center mb-10">
+            <h2 className="text-4xl md:text-5xl font-black text-white mb-3 tracking-tight">
+              Sign In
             </h2>
-            <p className="text-[var(--text-secondary)]">
-              Sign in to continue your coding journey
+            <p className="text-gray-400 font-medium">
+              Continue your coding journey with DevLog
             </p>
           </div>
 
           {error && (
-            <div className="mb-4 text-sm text-red-400" role="alert">
+            <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm flex items-center gap-3 animate-shake" role="alert">
+              <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></div>
               {error}
             </div>
           )}
 
-          <div className="mb-5">
-            <label
-              htmlFor="email"
-              className="block text-sm font-semibold text-[var(--text-secondary)] mb-2"
-            >
-              Email
-            </label>
-            <input
-              id="email"
-              value={form.email}
-              type="email"
-              placeholder="your@email.com"
-              className="w-full p-3 border border-[var(--border-color)] rounded-lg bg-[var(--bg-card-inner)] text-[var(--text-primary)] placeholder-[var(--text-secondary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-blue)] focus:border-transparent transition-all"
-              onChange={(e) => setForm({ ...form, email: e.target.value })}
-              required
-            />
-          </div>
-
-          <div className="mb-6">
-            <label
-              htmlFor="password"
-              className="block text-sm font-semibold text-[var(--text-secondary)] mb-2"
-            >
-              Password
-            </label>
-            <div className="relative">
+          <div className="space-y-6">
+            <div className="space-y-3">
+              <label htmlFor="email" className="block text-sm font-bold text-gray-400 uppercase tracking-widest ml-1">
+                Email Address
+              </label>
               <input
-                id="password"
-                value={form.password}
-                type={showPassword ? "text" : "password"}
-                placeholder="••••••••"
-                className="w-full p-3 pr-12 border border-[var(--border-color)] rounded-lg bg-[var(--bg-card-inner)] text-[var(--text-primary)] placeholder-[var(--text-secondary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-blue)] focus:border-transparent transition-all"
-                onChange={(e) => setForm({ ...form, password: e.target.value })}
+                id="email"
+                value={form.email}
+                type="email"
+                placeholder="developer@example.com"
+                className="w-full px-6 py-4 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/40 transition-all font-medium"
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
                 required
               />
-              <button
-                type="button"
-                onClick={() => setShowPassword((s) => !s)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors p-1"
-                aria-label={showPassword ? "Hide password" : "Show password"}
-              >
-                {showPassword ? (
-                  <FiEyeOff className="text-lg" />
-                ) : (
-                  <FiEye className="text-lg" />
-                )}
-              </button>
             </div>
-          </div>
 
-          <div className="flex items-center justify-end">
-            <Link 
-              to="/forgot-password"
-              className="text-sm text-blue-400 hover:text-blue-300 transition-colors"
-            >
-              Forgot Password?
-            </Link>
+            <div className="space-y-3">
+              <div className="flex justify-between items-center px-1">
+                <label htmlFor="password" className="block text-sm font-bold text-gray-400 uppercase tracking-widest">
+                  Password
+                </label>
+                <Link 
+                  to="/forgot-password"
+                  className="text-xs font-bold text-blue-400 hover:text-blue-300 transition-colors uppercase tracking-wider"
+                >
+                  Forgot?
+                </Link>
+              </div>
+              <div className="relative group">
+                <input
+                  id="password"
+                  value={form.password}
+                  type={showPassword ? "text" : "password"}
+                  placeholder="••••••••"
+                  className="w-full px-6 py-4 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/40 transition-all font-medium"
+                  onChange={(e) => setForm({ ...form, password: e.target.value })}
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((s) => !s)}
+                  className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white transition-colors p-1"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? (
+                    <FiEyeOff className="text-xl" />
+                  ) : (
+                    <FiEye className="text-xl" />
+                  )}
+                </button>
+              </div>
+            </div>
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="btn-primary w-full"
+            className="w-full mt-10 py-5 bg-blue-600 hover:bg-blue-500 disabled:bg-blue-800 disabled:cursor-not-allowed text-white font-black text-lg rounded-2xl shadow-xl shadow-blue-500/20 transition-all active:scale-[0.98] flex items-center justify-center gap-3"
           >
-            {loading ? "Signing in..." : "Sign In"}
+            {loading ? (
+              <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+            ) : (
+              "Sign In →"
+            )}
           </button>
 
-          <div className="mt-6 text-center">
-            <p className="text-sm text-[var(--text-secondary)]">
-              Don't have an account?{" "}
+          <div className="mt-8 text-center">
+            <p className="text-gray-400 font-medium">
+              New here?{" "}
               <Link
                 to="/register"
-                className="text-[var(--accent-blue)] hover:opacity-80 font-semibold underline"
+                className="text-blue-400 hover:text-blue-300 font-black relative group"
               >
-                Create one
+                Create Account
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-400 group-hover:w-full transition-all duration-300"></span>
               </Link>
             </p>
           </div>
