@@ -1,36 +1,42 @@
 import { FiZap } from "react-icons/fi";
 
-export default function StatCard({
-  label,
-  value,
-  icon: Icon = FiZap,
-  gradient = "from-blue-500 to-purple-500",
-}) {
-  const formatValue = (val) => {
-    if (typeof val === "number") {
-      return val.toLocaleString();
-    }
-    return String(val);
+export default function StatCard(props) {
+  const {
+    label,
+    value,
+    icon: StatIcon = FiZap,
+    color = "blue",
+  } = props;
+  const colorMap = {
+    blue: "from-blue-500 to-indigo-600",
+    purple: "from-purple-500 to-violet-600",
+    green: "from-emerald-500 to-teal-600",
+    orange: "from-orange-500 to-amber-600",
+    pink: "from-pink-500 to-rose-600",
+    cyan: "from-cyan-500 to-blue-600",
   };
 
+  const gradient = colorMap[color] || colorMap.blue;
+
   return (
-    <div className="platform-card p-5 rounded-xl fade-in-scale relative overflow-hidden group">
-      <div
-        className={`absolute inset-0 bg-gradient-to-br ${gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}
-      />
+    <div className="glass-card-premium p-8 group hover:-translate-y-2 relative overflow-hidden transition-all duration-300">
+      <div className={`absolute -bottom-10 -right-10 w-24 h-24 bg-gradient-to-br ${gradient} opacity-0 group-hover:opacity-10 blur-2xl transition-opacity duration-500`}></div>
+      
       <div className="relative z-10">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-[var(--text-secondary)] text-sm">{label}</span>
-          {typeof Icon === "function" ? (
-            <Icon className="text-2xl opacity-40 group-hover:opacity-70 transition-opacity text-[var(--text-secondary)]" />
-          ) : (
-            <span className="text-2xl opacity-40 group-hover:opacity-70 transition-opacity">
-              {Icon}
-            </span>
-          )}
+        <div className="flex items-center justify-between mb-6">
+          <div className={`p-3 rounded-xl bg-gradient-to-br ${gradient} shadow-lg shadow-blue-500/20 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300`}>
+             <StatIcon size={20} className="text-white" />
+          </div>
+          <FiZap size={14} className="text-gray-800 group-hover:text-blue-500/50 transition-colors animate-pulse" />
         </div>
-        <div className="text-3xl font-bold text-[var(--accent-blue)] mt-1">
-          {formatValue(value)}
+        
+        <div className="space-y-1">
+          <div className="text-3xl font-black text-white italic group-hover:scale-105 transition-transform origin-left">
+             {typeof value === "number" ? value.toLocaleString() : value}
+          </div>
+          <div className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 group-hover:text-gray-400 transition-colors">
+            {label}
+          </div>
         </div>
       </div>
     </div>
