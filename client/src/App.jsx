@@ -14,7 +14,7 @@ import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import AuthenticatedLayout from "./components/AuthenticatedLayout";
 import { AuthContext } from "./context/AuthContext";
-import { SidebarProvider } from "./context/SidebarContext";
+import { SidebarProvider } from "./context/SidebarProvider";
 import { useContext } from "react";
 
 const PrivateRoute = ({ children }) => {
