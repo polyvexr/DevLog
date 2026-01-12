@@ -9,6 +9,7 @@ import {
   FiTarget,
   FiSettings,
   FiLogOut,
+  FiUser,
   FiChevronRight,
   FiX,
 } from "react-icons/fi";
@@ -45,6 +46,7 @@ export default function Sidebar() {
   const navItems = [
     { path: "/", icon: FiBarChart2, label: "Dashboard", exact: true },
     { path: "/link", icon: FiLink, label: "Link Platform" },
+    { path: "/profile", icon: FiUser, label: "Profile" }, // Added Profile link
   ];
 
   const platformItems = [
