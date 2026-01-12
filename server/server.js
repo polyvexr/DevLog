@@ -7,10 +7,17 @@ import authRoutes from "./src/routes/auth.js";
 import platformRoutes from "./src/routes/platforms.js";
 import statsRoutes from "./src/routes/stats.js";
 import adminRoutes from "./src/routes/admin.js";
+import passwordRoutes from "./src/routes/password.js";
+import userRoutes from "./src/routes/user.js";
+import { apiLimiter } from "./src/middleware/rateLimit.js";
 
 dotenv.config();
 
+const PORT = process.env.PORT || 5000;
 const app = express();
+
+// Rate limiting
+app.use("/api", apiLimiter);
 
 // Middleware
 app.use(express.json());
@@ -75,11 +82,11 @@ app.get("/api/health", (req, res) => {
 
 // API Routes
 app.use("/api/auth", authRoutes);
+app.use("/api/auth", passwordRoutes); // Mount password reset routes
 app.use("/api/platforms", platformRoutes);
 app.use("/api/stats", statsRoutes);
 app.use("/api/admin", adminRoutes);
-
-const PORT = process.env.PORT || 5000;
+app.use("/api/user", userRoutes); // Mount user routes
 
 // Create HTTP server
 const server = http.createServer(app);
