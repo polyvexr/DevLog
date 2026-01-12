@@ -3,28 +3,37 @@ import { FiHome, FiAlertCircle } from "react-icons/fi";
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-6 bg-[radial-gradient(circle_at_50%_50%,rgba(17,24,39,1)_0%,rgba(2,6,23,1)_100%)]">
-      <div className="w-full max-w-lg bg-slate-900/40 border border-slate-800/50 p-12 rounded-3xl backdrop-blur-xl text-center fade-in-scale">
-        <div className="relative mb-8">
-          <div className="text-[12rem] font-black leading-none text-slate-800 select-none">404</div>
+    <div className="min-h-screen relative flex items-center justify-center px-4 py-8 overflow-hidden">
+      {/* Background blobs for depth */}
+      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-600/10 rounded-full blur-[120px] animate-blob"></div>
+      <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-purple-600/10 rounded-full blur-[150px] animate-blob animation-delay-2000"></div>
+
+      <div className="w-full max-w-2xl relative z-10 text-center">
+        <div className="relative mb-4 group">
+          <div className="text-[15vw] md:text-[180px] font-black leading-none text-white opacity-5 select-none transition-all group-hover:opacity-10">404</div>
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-24 h-24 bg-blue-600/20 rounded-full flex items-center justify-center border border-blue-500/30 animate-pulse">
-              <FiAlertCircle className="text-5xl text-blue-500" />
+            <div className="w-32 h-32 bg-white/5 rounded-3xl flex items-center justify-center border border-white/10 shadow-2xl backdrop-blur-3xl group-hover:scale-110 transition-transform duration-500">
+              <FiAlertCircle className="text-6xl text-blue-500 opacity-50" />
             </div>
           </div>
         </div>
         
-        <h1 className="text-4xl font-black text-white mb-4 neon-text">Page Not Found</h1>
-        <p className="text-slate-400 mb-10 text-lg max-w-xs mx-auto">
-          The page you are looking for doesn't exist or has been moved.
-        </p>
-        
-        <Link 
-          to="/"
-          className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold rounded-2xl shadow-lg shadow-blue-500/25 transition-all hover:scale-105 active:scale-95"
-        >
-          <FiHome className="text-xl" /> Return Dashboard
-        </Link>
+        <div className="fade-in-up">
+          <h1 className="text-5xl md:text-7xl font-black text-white mb-6 italic tracking-tight italic">
+            Signal <span className="animate-text-shine">Lost</span>
+          </h1>
+          <p className="text-gray-500 mb-12 text-xl font-medium max-w-md mx-auto leading-relaxed">
+            The requested neural node could not be located in the current datastream.
+          </p>
+          
+          <Link 
+            to="/"
+            className="inline-flex items-center gap-4 px-10 py-5 bg-blue-600 hover:bg-blue-500 text-white font-black text-lg rounded-2xl shadow-xl shadow-blue-500/20 transition-all active:scale-[0.98] group"
+          >
+            <FiHome className="text-2xl group-hover:-translate-y-1 transition-transform" /> 
+            Reconnect Dashboard
+          </Link>
+        </div>
       </div>
     </div>
   );
