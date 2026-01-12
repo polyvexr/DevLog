@@ -1,7 +1,10 @@
 import PlatformStat from "../models/PlatformStat.js";
-import { fetchLeetCode } from "../utils/fetchLeetCode.js";
-import { fetchCodeforces } from "../utils/fetchCodeforces.js";
-import { fetchGithub } from "../utils/fetchGithub.js";
+import SyncJob from "../models/SyncJob.js";
+import User from "../models/User.js";
+import { platformService } from "../services/platformService.js";
+
+// Cooldown duration (6 hours for V2)
+const COOLDOWN_MS = 6 * 60 * 60 * 1000;
 
 // Calculate progress percentage for a platform
 const calculateProgress = (platform, stats) => {
@@ -9,18 +12,15 @@ const calculateProgress = (platform, stats) => {
 
   switch (platform) {
     case "leetcode": {
-      // Progress based on total problems solved vs all questions
       const totalSolved = stats.totalSolved || 0;
-      const allQuestions = stats.allQuestionsCount || 3250; // Fallback total
+      const allQuestions = stats.allQuestionsCount || 3250;
       return Math.min(Math.round((totalSolved / allQuestions) * 100), 100);
     }
     case "codeforces": {
-      // Progress based on rating (3000 = grandmaster level target)
       const rating = stats.rating || 0;
       return Math.min(Math.round((rating / 3000) * 100), 100);
     }
     case "github": {
-      // Progress based on recent activity (max 100 events from API)
       const recentActivity = stats.totalEvents || 0;
       return Math.min(Math.round((recentActivity / 100) * 100), 100);
     }
@@ -29,31 +29,37 @@ const calculateProgress = (platform, stats) => {
   }
 };
 
-// Get next refresh available time
-const getNextRefreshTime = (lastManualRefresh) => {
-  if (!lastManualRefresh) return null;
-  const cooldownMs = 60 * 60 * 1000; // 1 hour
-  const nextRefresh = new Date(lastManualRefresh.getTime() + cooldownMs);
-  return nextRefresh > new Date() ? nextRefresh : null;
+// Get next refresh available time from user cooldowns
+const getNextRefreshTime = (user, platform) => {
+  const cooldown = user?.cooldowns?.[platform];
+  if (!cooldown?.nextAvailable) return null;
+  return new Date(cooldown.nextAvailable) > new Date() 
+    ? new Date(cooldown.nextAvailable) 
+    : null;
 };
 
 export const getAllStats = async (req, res) => {
-  const stats = await PlatformStat.find({ userId: req.user._id });
+  try {
+    const stats = await PlatformStat.find({ userId: req.user._id });
+    const user = await User.findById(req.user._id).select("cooldowns");
 
-  // Add progress and refresh info to each platform
-  const enrichedStats = stats.map((stat) => {
-    const progress = calculateProgress(stat.platform, stat.stats);
-    const nextRefreshAvailable = getNextRefreshTime(stat.lastManualRefresh);
+    // Add progress and refresh info to each platform
+    const enrichedStats = stats.map((stat) => {
+      const progress = calculateProgress(stat.platform, stat.stats);
+      const nextRefreshAvailable = getNextRefreshTime(user, stat.platform);
 
-    return {
-      ...stat.toObject(),
-      progress,
-      nextRefreshAvailable,
-      canRefresh: !nextRefreshAvailable,
-    };
-  });
+      return {
+        ...stat.toObject(),
+        progress,
+        nextRefreshAvailable,
+        canRefresh: !nextRefreshAvailable,
+      };
+    });
 
-  res.json({ success: true, stats: enrichedStats });
+    res.json({ success: true, stats: enrichedStats });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 };
 
 // Get aggregate stats summary
@@ -67,11 +73,7 @@ export const getStatsSummary = async (req, res) => {
     let lastUpdated = null;
 
     stats.forEach((stat) => {
-      // Track most recent update
-      if (
-        !lastUpdated ||
-        (stat.lastUpdated && stat.lastUpdated > lastUpdated)
-      ) {
+      if (!lastUpdated || (stat.lastUpdated && stat.lastUpdated > lastUpdated)) {
         lastUpdated = stat.lastUpdated;
       }
 
@@ -80,9 +82,7 @@ export const getStatsSummary = async (req, res) => {
 
       if (stat.platform === "leetcode") {
         totalProblemsSolved += stat.stats?.totalSolved || 0;
-        // Streak is in streakData.currentStreak
-        const leetcodeStreak =
-          stat.stats?.streakData?.currentStreak || stat.stats?.streak || 0;
+        const leetcodeStreak = stat.stats?.streakData?.currentStreak || stat.stats?.streak || 0;
         if (leetcodeStreak > activeStreak) activeStreak = leetcodeStreak;
       }
 
@@ -91,15 +91,13 @@ export const getStatsSummary = async (req, res) => {
       }
 
       if (stat.platform === "github") {
-        // Use total events as activity indicator
         const githubActivity = stat.stats?.totalEvents || 0;
         if (githubActivity > activeStreak) activeStreak = githubActivity;
       }
     });
 
     const platformsLinked = stats.length;
-    const averageProgress =
-      platformsLinked > 0 ? Math.round(totalProgress / platformsLinked) : 0;
+    const averageProgress = platformsLinked > 0 ? Math.round(totalProgress / platformsLinked) : 0;
 
     res.json({
       success: true,
@@ -116,7 +114,10 @@ export const getStatsSummary = async (req, res) => {
   }
 };
 
-// Refresh stats for a specific platform
+/**
+ * Refresh stats for a specific platform (V2 - Async via SyncJob)
+ * Returns 202 Accepted immediately, job processed by cron
+ */
 export const refreshPlatformStats = async (req, res) => {
   try {
     const { platform } = req.params;
@@ -125,6 +126,7 @@ export const refreshPlatformStats = async (req, res) => {
       return res.status(400).json({ message: "Invalid platform" });
     }
 
+    // Verify platform is linked
     const platformStat = await PlatformStat.findOne({
       userId: req.user._id,
       platform,
@@ -134,59 +136,58 @@ export const refreshPlatformStats = async (req, res) => {
       return res.status(404).json({ message: "Platform not linked" });
     }
 
-    // Check cooldown (1 hour)
-    const cooldownMs = 60 * 60 * 1000;
-    if (platformStat.lastManualRefresh) {
-      const timeSinceRefresh =
-        Date.now() - platformStat.lastManualRefresh.getTime();
-      if (timeSinceRefresh < cooldownMs) {
-        const remainingMs = cooldownMs - timeSinceRefresh;
-        const remainingMinutes = Math.ceil(remainingMs / (60 * 1000));
-        return res.status(429).json({
-          message: `Please wait ${remainingMinutes} minutes before refreshing again`,
-          nextRefreshAvailable: new Date(
-            platformStat.lastManualRefresh.getTime() + cooldownMs
-          ),
-        });
-      }
+    // Check cooldown from user document
+    const canRefresh = await platformService.canRefresh(req.user._id, platform);
+    
+    if (!canRefresh.allowed) {
+      const remainingMinutes = Math.ceil(canRefresh.remainingMs / (60 * 1000));
+      return res.status(429).json({
+        message: `Please wait ${remainingMinutes} minutes before refreshing again`,
+        nextRefreshAvailable: canRefresh.nextAvailable,
+      });
     }
 
-    // Fetch fresh stats
-    let newStats;
-    try {
-      switch (platform) {
-        case "leetcode":
-          newStats = await fetchLeetCode(platformStat.username);
-          break;
-        case "codeforces":
-          newStats = await fetchCodeforces(platformStat.username);
-          break;
-        case "github":
-          newStats = await fetchGithub(platformStat.username);
-          break;
-      }
-    } catch (fetchError) {
-      return res
-        .status(500)
-        .json({ message: "Failed to fetch stats from platform" });
+    // Enqueue sync job (async processing)
+    const result = await platformService.enqueueSyncJob(req.user._id, platform, "user");
+
+    // Return 202 Accepted for async processing
+    res.status(202).json({
+      success: true,
+      message: result.queued ? "Refresh queued for processing" : result.message,
+      jobId: result.jobId,
+      status: "pending",
+      nextRefreshAvailable: new Date(Date.now() + COOLDOWN_MS),
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+/**
+ * Get refresh job status
+ */
+export const getRefreshStatus = async (req, res) => {
+  try {
+    const { jobId } = req.params;
+
+    const job = await SyncJob.findOne({
+      _id: jobId,
+      userId: req.user._id,
+    });
+
+    if (!job) {
+      return res.status(404).json({ message: "Job not found" });
     }
-
-    // Update the stats
-    platformStat.stats = newStats;
-    platformStat.lastUpdated = new Date();
-    platformStat.lastManualRefresh = new Date();
-    await platformStat.save();
-
-    const progress = calculateProgress(platform, newStats);
-    const nextRefreshAvailable = new Date(Date.now() + cooldownMs);
 
     res.json({
       success: true,
-      stat: {
-        ...platformStat.toObject(),
-        progress,
-        nextRefreshAvailable,
-        canRefresh: false,
+      job: {
+        id: job._id,
+        platform: job.platform,
+        status: job.status,
+        createdAt: job.createdAt,
+        completedAt: job.completedAt,
+        error: job.lastError,
       },
     });
   } catch (err) {
