@@ -7,12 +7,31 @@ const userSchema = new mongoose.Schema({
   email: { type: String, unique: true, lowercase: true },
   password: String,
   oneTimeReaddUsed: { type: Map, of: Boolean, default: {} },
+  
+  // RBAC - Role-based access control
+  role: { 
+    type: String, 
+    enum: ["user", "admin"], 
+    default: "user" 
+  },
+  permissions: [String],
+  
   // Profile subdocument
   profile: {
     bio: { type: String, default: "" },
     location: { type: String, default: "" },
     website: { type: String, default: "" },
   },
+  
+  // Public profile settings for /u/:username route
+  publicProfile: {
+    enabled: { type: Boolean, default: false },
+    username: { type: String, unique: true, sparse: true },
+    showLeetCode: { type: Boolean, default: true },
+    showCodeforces: { type: Boolean, default: true },
+    showGitHub: { type: Boolean, default: true },
+  },
+  
   // Settings subdocument
   settings: {
     theme: { type: String, enum: ["light", "dark", "system"], default: "dark" },
@@ -24,11 +43,33 @@ const userSchema = new mongoose.Schema({
     },
     timezone: { type: String, default: "UTC" },
   },
+  
+  // Cooldowns for stateless enforcement (serverless)
+  cooldowns: {
+    leetcode: { 
+      lastRefresh: { type: Date, default: null },
+      nextAvailable: { type: Date, default: null }
+    },
+    codeforces: { 
+      lastRefresh: { type: Date, default: null },
+      nextAvailable: { type: Date, default: null }
+    },
+    github: { 
+      lastRefresh: { type: Date, default: null },
+      nextAvailable: { type: Date, default: null }
+    }
+  },
+  
+  // Serverless job tracking
+  lastSnapshotDate: { type: Date, default: null },
+  lastInsightDate: { type: Date, default: null },
+  
   // Password reset fields
   resetPasswordToken: String,
   resetPasswordExpires: Date,
   createdAt: { type: Date, default: Date.now },
 });
+
 
 // Hash password
 userSchema.pre("save", async function () {

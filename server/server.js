@@ -9,6 +9,13 @@ import statsRoutes from "./src/routes/stats.js";
 import adminRoutes from "./src/routes/admin.js";
 import passwordRoutes from "./src/routes/password.js";
 import userRoutes from "./src/routes/user.js";
+// New V2 routes
+import historyRoutes from "./src/routes/history.js";
+import contestRoutes from "./src/routes/contests.js";
+import insightRoutes from "./src/routes/insights.js";
+import notificationRoutes from "./src/routes/notifications.js";
+import publicRoutes from "./src/routes/public.js";
+import cronRoutes from "./src/routes/cron.js";
 import { apiLimiter } from "./src/middleware/rateLimit.js";
 
 dotenv.config();
@@ -37,16 +44,12 @@ console.log("Allowed Origins:", allowedOrigins);
 
 const corsOptions = {
   origin: function (origin, callback) {
-    console.log("🔍 Request from origin:", origin);
-
-    // Allow requests with no origin (mobile apps, Postman, etc.)
+    // Allow requests with no origin (mobile apps, Postman, cron jobs, etc.)
     if (!origin) {
-      console.log("✅ Allowing request with no origin");
       return callback(null, true);
     }
 
     if (allowedOrigins.includes(origin)) {
-      console.log("✅ Origin allowed:", origin);
       callback(null, true);
     } else {
       console.log("❌ Origin blocked:", origin);
@@ -54,8 +57,8 @@ const corsOptions = {
     }
   },
   credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "X-Cron-Secret"],
   exposedHeaders: ["set-cookie"],
 };
 
@@ -66,13 +69,14 @@ connectDB();
 
 // Root route
 app.get("/", (req, res) => {
-  res.send("DevLog API is running...");
+  res.send("DevLog API V2 is running...");
 });
 
-// Health check endpoint to verify environment variables
+// Health check endpoint
 app.get("/api/health", (req, res) => {
   res.json({
     status: "ok",
+    version: "2.0.0",
     environment: process.env.NODE_ENV,
     clientUrl: process.env.CLIENT_URL,
     port: PORT,
@@ -80,18 +84,28 @@ app.get("/api/health", (req, res) => {
   });
 });
 
-// API Routes
+// Core API Routes
 app.use("/api/auth", authRoutes);
-app.use("/api/auth", passwordRoutes); // Mount password reset routes
+app.use("/api/auth", passwordRoutes);
 app.use("/api/platforms", platformRoutes);
 app.use("/api/stats", statsRoutes);
 app.use("/api/admin", adminRoutes);
-app.use("/api/user", userRoutes); // Mount user routes
+app.use("/api/user", userRoutes);
+
+// V2 API Routes
+app.use("/api/history", historyRoutes);
+app.use("/api/contests", contestRoutes);
+app.use("/api/insights", insightRoutes);
+app.use("/api/notifications", notificationRoutes);
+app.use("/api/cron", cronRoutes);
+
+// Public profile route (no /api prefix for clean URLs)
+app.use("/u", publicRoutes);
 
 // Create HTTP server
 const server = http.createServer(app);
 
 server.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-  console.log(`Open server at http://localhost:${PORT}`);
+  console.log(`🚀 DevLog V2 Server running on port ${PORT}`);
+  console.log(`📡 Open server at http://localhost:${PORT}`);
 });
