@@ -1,8 +1,6 @@
 import User from "../models/User.js";
 import jwt from "jsonwebtoken";
-
-// Email validation regex
-const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+import { emailRegex } from "../middleware/validation.js";
 
 export const register = async (req, res) => {
   try {
@@ -10,21 +8,21 @@ export const register = async (req, res) => {
 
     // Input validation
     if (!name || !name.trim()) {
-      return res.status(400).json({ error: "Name is required" });
+      return res.status(400).json({ success: false, message: "Name is required" });
     }
 
     if (!email || !emailRegex.test(email)) {
-      return res.status(400).json({ error: "Valid email is required" });
+      return res.status(400).json({ success: false, message: "Valid email is required" });
     }
 
     if (!password || password.length < 6) {
-      return res.status(400).json({ error: "Password must be at least 6 characters" });
+      return res.status(400).json({ success: false, message: "Password must be at least 6 characters" });
     }
 
     // Check if user already exists
     const existingUser = await User.findOne({ email: email.toLowerCase() });
     if (existingUser) {
-      return res.status(400).json({ error: "Email already registered" });
+      return res.status(400).json({ success: false, message: "Email already registered" });
     }
 
     const user = await User.create({
@@ -40,9 +38,9 @@ export const register = async (req, res) => {
       email: user.email,
     };
 
-    res.json({ success: true, user: userResponse });
+    res.json({ success: true, message: "Registration successful", data: { user: userResponse } });
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    res.status(400).json({ success: false, message: err.message });
   }
 };
 
@@ -52,37 +50,37 @@ export const login = async (req, res) => {
 
     // Input validation
     if (!email || !password) {
-      return res.status(400).json({ message: "Email and password are required" });
+      return res.status(400).json({ success: false, message: "Email and password are required" });
     }
 
     const user = await User.findOne({ email: email.toLowerCase() });
     if (!user) {
-      return res.status(400).json({ message: "Invalid email or password" });
+      return res.status(400).json({ success: false, message: "Invalid email or password" });
     }
 
     const match = await user.matchPassword(password);
     if (!match) {
-      return res.status(400).json({ message: "Invalid email or password" });
+      return res.status(400).json({ success: false, message: "Invalid email or password" });
     }
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
       expiresIn: "7d",
     });
 
-    // Check if user is admin
-    const isAdmin = email.toLowerCase() === process.env.ADMIN_EMAIL?.toLowerCase();
+    // Check if user is admin from role field
+    const isAdmin = user.role === "admin";
 
-    res.json({ success: true, token, isAdmin });
+    res.json({ success: true, message: "Login successful", token, isAdmin });
   } catch (err) {
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ success: false, message: "Server error" });
   }
 };
 
 // Get current user profile
 export const getMe = async (req, res) => {
   try {
-    const user = await User.findById(req.user._id).select("-password");
-    if (!user) return res.status(404).json({ message: "User not found" });
+    const user = await User.findById(req.user._id).select("-password -resetPasswordToken -resetPasswordExpires");
+    if (!user) return res.status(404).json({ success: false, message: "User not found" });
 
     res.json({
       success: true,
@@ -90,12 +88,15 @@ export const getMe = async (req, res) => {
         id: user._id,
         name: user.name,
         email: user.email,
+        role: user.role || "user",
         profile: user.profile || {},
         settings: user.settings || {},
+        publicProfile: user.publicProfile || {},
+        createdAt: user.createdAt,
       },
     });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ success: false, message: err.message });
   }
 };
 
@@ -105,7 +106,7 @@ export const updateProfile = async (req, res) => {
     const { name, bio, location, website } = req.body;
 
     const user = await User.findById(req.user._id);
-    if (!user) return res.status(404).json({ message: "User not found" });
+    if (!user) return res.status(404).json({ success: false, message: "User not found" });
 
     // Initialize profile if not exists
     if (!user.profile) {
@@ -121,15 +122,18 @@ export const updateProfile = async (req, res) => {
 
     res.json({
       success: true,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        profile: user.profile,
+      message: "Profile updated successfully",
+      data: {
+        user: {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          profile: user.profile,
+        },
       },
     });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ success: false, message: err.message });
   }
 };
 
@@ -139,15 +143,19 @@ export const updatePassword = async (req, res) => {
     const { currentPassword, newPassword } = req.body;
 
     if (!currentPassword || !newPassword) {
-      return res.status(400).json({ message: "Both passwords are required" });
+      return res.status(400).json({ success: false, message: "Both passwords are required" });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({ success: false, message: "New password must be at least 6 characters" });
     }
 
     const user = await User.findById(req.user._id);
-    if (!user) return res.status(404).json({ message: "User not found" });
+    if (!user) return res.status(404).json({ success: false, message: "User not found" });
 
     const match = await user.matchPassword(currentPassword);
     if (!match) {
-      return res.status(400).json({ message: "Current password is incorrect" });
+      return res.status(400).json({ success: false, message: "Current password is incorrect" });
     }
 
     user.password = newPassword;
@@ -155,18 +163,18 @@ export const updatePassword = async (req, res) => {
 
     res.json({ success: true, message: "Password updated successfully" });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ success: false, message: err.message });
   }
 };
 
 // Update user settings
 export const updateSettings = async (req, res) => {
   try {
-    const { theme, emailNotifications, progressMilestones, timezone } =
+    const { theme, emailNotifications, progressMilestones, timezone, publicProfile } =
       req.body;
 
     const user = await User.findById(req.user._id);
-    if (!user) return res.status(404).json({ message: "User not found" });
+    if (!user) return res.status(404).json({ success: false, message: "User not found" });
 
     // Initialize settings if not exists
     if (!user.settings) {
@@ -188,15 +196,27 @@ export const updateSettings = async (req, res) => {
       user.markModified('settings.progressMilestones');
     }
     if (timezone !== undefined) user.settings.timezone = timezone;
+    
+    // Update public profile settings
+    if (publicProfile !== undefined) {
+      if (!user.publicProfile) {
+        user.publicProfile = {};
+      }
+      Object.assign(user.publicProfile, publicProfile);
+      user.markModified('publicProfile');
+    }
 
     await user.save();
 
     res.json({
       success: true,
-      settings: user.settings,
+      message: "Settings updated successfully",
+      data: {
+        settings: user.settings,
+        publicProfile: user.publicProfile,
+      },
     });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ success: false, message: err.message });
   }
 };
-
