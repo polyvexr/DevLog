@@ -28,33 +28,33 @@ export default function ProgressChart({ platform, metricKey, title, color = "#88
   };
 
   useEffect(() => {
-    fetchHistory();
-  }, [platform, period]);
-
-  const fetchHistory = async () => {
-    try {
-      setLoading(true);
-      const response = await api.get(`/history/${platform}?days=${periodDays[period]}`);
-      
-      if (response.data.success) {
-        const history = response.data.history.map((h) => ({
-          date: new Date(h.snapshotDate).toLocaleDateString("en-US", {
-            month: "short",
-            day: "numeric",
-          }),
-          value: h.metrics?.[metricKey] || 0,
-          fullDate: h.snapshotDate,
-        }));
-        setData(history);
+    const fetchHistory = async () => {
+      try {
+        setLoading(true);
+        const response = await api.get(`/history/${platform}?days=${periodDays[period]}`);
+        
+        if (response.data.success) {
+          const history = response.data.history.map((h) => ({
+            date: new Date(h.snapshotDate).toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+            }),
+            value: h.metrics?.[metricKey] || 0,
+            fullDate: h.snapshotDate,
+          }));
+          setData(history);
+        }
+        setError(null);
+      } catch (err) {
+        setError("Failed to load history");
+        console.error(err);
+      } finally {
+        setLoading(false);
       }
-      setError(null);
-    } catch (err) {
-      setError("Failed to load history");
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
+
+    fetchHistory();
+  }, [platform, period, metricKey]); // Added metricKey and periodDays is constant so it's fine
 
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
