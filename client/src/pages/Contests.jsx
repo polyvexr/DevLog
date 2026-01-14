@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { FiCalendar, FiClock, FiExternalLink, FiRefreshCw, FiFilter, FiZap } from "react-icons/fi";
 import { FaCode } from "react-icons/fa";
 import { SiLeetcode, SiCodeforces, SiCodechef } from "react-icons/si";
@@ -27,11 +27,7 @@ export default function Contests() {
     { id: "atcoder", name: "AtCoder", icon: FaCode, color: "#00a0e9", bgColor: "bg-cyan-500/10", borderColor: "border-cyan-500/20", ringColor: "ring-cyan-500/40" },
   ];
 
-  useEffect(() => {
-    fetchContests();
-  }, [selectedPlatforms]);
-
-  const fetchContests = async () => {
+  const fetchContests = useCallback(async () => {
     try {
       setLoading(true);
       const response = await api.get(`/contests?platforms=${selectedPlatforms.join(",")}&days=30`);
@@ -39,13 +35,16 @@ export default function Contests() {
         setContests(response.data.contests);
       }
       setError(null);
-    } catch (err) {
+    } catch {
       setError("Failed to load contests");
-      console.error(err);
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedPlatforms]);
+
+  useEffect(() => {
+    fetchContests();
+  }, [fetchContests]);
 
   const togglePlatform = (platformId) => {
     setSelectedPlatforms((prev) => {

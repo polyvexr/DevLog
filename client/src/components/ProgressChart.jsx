@@ -15,17 +15,17 @@ import api from "../api/axios";
 /**
  * ProgressChart - Displays historical progress data with Recharts
  */
+const periodDays = {
+  week: 7,
+  month: 30,
+  quarter: 90,
+};
+
 export default function ProgressChart({ platform, metricKey, title, color = "#8884d8" }) {
   const [data, setData] = useState([]);
   const [period, setPeriod] = useState("week");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  const periodDays = {
-    week: 7,
-    month: 30,
-    quarter: 90,
-  };
 
   useEffect(() => {
     const fetchHistory = async () => {
