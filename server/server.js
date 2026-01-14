@@ -32,6 +32,10 @@ app.use(express.json());
 // CORS configuration for production
 const allowedOrigins = [
   process.env.CLIENT_URL,
+  // Production URLs
+  "https://my-devlog.vercel.app",
+  "https://devlog-server.vercel.app",
+  // Local development URLs
   "http://localhost:5173",
   "http://localhost:5174",
   "http://localhost:3000",
