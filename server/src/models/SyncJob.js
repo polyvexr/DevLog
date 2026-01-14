@@ -13,7 +13,7 @@ const syncJobSchema = new mongoose.Schema({
   },
   platform: { 
     type: String, 
-    enum: ["leetcode", "codeforces", "github"], 
+    enum: ["leetcode", "codeforces", "github", "codechef", "atcoder"], 
     required: true 
   },
   status: { 
@@ -54,5 +54,7 @@ const syncJobSchema = new mongoose.Schema({
 // Compound index for efficient cron job queries
 syncJobSchema.index({ status: 1, nextRetryAt: 1 });
 syncJobSchema.index({ status: 1, createdAt: 1 });
+syncJobSchema.index({ platform: 1, status: 1 });
+syncJobSchema.index({ userId: 1, platform: 1, status: 1 });
 
 export default mongoose.model("SyncJob", syncJobSchema);
