@@ -2,6 +2,8 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import http from "http";
+import helmet from "helmet";
+import compression from "compression";
 import connectDB from "./src/config/db.js";
 import authRoutes from "./src/routes/auth.js";
 import platformRoutes from "./src/routes/platforms.js";
@@ -17,34 +19,28 @@ import notificationRoutes from "./src/routes/notifications.js";
 import publicRoutes from "./src/routes/public.js";
 import cronRoutes from "./src/routes/cron.js";
 import { apiLimiter } from "./src/middleware/rateLimit.js";
+import logger from "./src/utils/logger.js";
 
 dotenv.config();
 
-const PORT = process.env.PORT || 5000;
 const app = express();
+const PORT = process.env.PORT || 5000;
 
-// Rate limiting
-app.use("/api", apiLimiter);
-
-// Middleware
-app.use(express.json());
-
-// CORS configuration for production
+// CORS configuration
 const allowedOrigins = [
   process.env.CLIENT_URL,
+  // Production URLs
+  "https://my-devlog.vercel.app",
+  "https://devlog-server.vercel.app",
+  // Local development URLs
   "http://localhost:5173",
   "http://localhost:5174",
   "http://localhost:3000",
 ].filter(Boolean);
 
-// Log CORS configuration for debugging
-console.log("🔐 CORS Configuration:");
-console.log("CLIENT_URL:", process.env.CLIENT_URL);
-console.log("Allowed Origins:", allowedOrigins);
-
 const corsOptions = {
   origin: function (origin, callback) {
-    // Allow requests with no origin (mobile apps, Postman, cron jobs, etc.)
+    // Allow requests with no origin only for specific paths (handled in custom middleware after this)
     if (!origin) {
       return callback(null, true);
     }
@@ -52,7 +48,7 @@ const corsOptions = {
     if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      console.log("❌ Origin blocked:", origin);
+      logger.warn("Origin blocked by CORS", { origin });
       callback(new Error(`Not allowed by CORS: ${origin}`));
     }
   },
@@ -63,6 +59,48 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
+
+// Body parser with size limit (prevent DoS)
+app.use(express.json({ limit: "10kb" }));
+
+// Security middleware - helmet for HTTP headers
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" },
+  contentSecurityPolicy: process.env.NODE_ENV === "production" ? undefined : false,
+}));
+
+// Compression middleware for faster responses
+app.use(compression());
+
+// Rate limiting
+app.use("/api", apiLimiter);
+
+// Paths that allow no-origin requests (for cron jobs)
+const noOriginAllowedPaths = ["/api/cron", "/api/health", "/"];
+
+// Custom CORS middleware to restrict no-origin requests
+app.use((req, res, next) => {
+  // Always allow preflight requests to pass through
+  if (req.method === 'OPTIONS') {
+    return next();
+  }
+
+  const origin = req.headers.origin;
+  const path = req.path;
+  
+  // If no origin, only allow specific paths
+  if (!origin) {
+    const isAllowedPath = noOriginAllowedPaths.some(p => path === p || path.startsWith(p + "/"));
+    if (!isAllowedPath) {
+      logger.warn("Request blocked: No origin and not an allowed path", { path });
+      return res.status(403).json({ 
+        success: false, 
+        message: "Origin required for this endpoint" 
+      });
+    }
+  }
+  next();
+});
 
 // Connect database
 connectDB();
@@ -75,12 +113,13 @@ app.get("/", (req, res) => {
 // Health check endpoint
 app.get("/api/health", (req, res) => {
   res.json({
-    status: "ok",
-    version: "2.0.0",
-    environment: process.env.NODE_ENV,
-    clientUrl: process.env.CLIENT_URL,
-    port: PORT,
-    timestamp: new Date().toISOString(),
+    success: true,
+    data: {
+      status: "ok",
+      version: "2.0.0",
+      environment: process.env.NODE_ENV,
+      timestamp: new Date().toISOString(),
+    }
   });
 });
 
@@ -102,10 +141,45 @@ app.use("/api/cron", cronRoutes);
 // Public profile route (no /api prefix for clean URLs)
 app.use("/u", publicRoutes);
 
+// 404 handler for undefined routes
+app.use((req, res, next) => {
+  res.status(404).json({
+    success: false,
+    message: `Route ${req.originalUrl} not found`,
+  });
+});
+
+// Global error handler
+app.use((err, req, res, next) => {
+  // Log error
+  logger.error("Unhandled error", {
+    error: err.message,
+    stack: process.env.NODE_ENV === "development" ? err.stack : undefined,
+    path: req.path,
+    method: req.method,
+  });
+
+  // CORS errors
+  if (err.message && err.message.includes("CORS")) {
+    return res.status(403).json({
+      success: false,
+      message: "CORS error: Origin not allowed",
+    });
+  }
+
+  // Default error response
+  res.status(err.status || 500).json({
+    success: false,
+    message: process.env.NODE_ENV === "production" 
+      ? "Internal server error" 
+      : err.message,
+  });
+});
+
 // Create HTTP server
 const server = http.createServer(app);
 
 server.listen(PORT, () => {
-  console.log(`🚀 DevLog V2 Server running on port ${PORT}`);
-  console.log(`📡 Open server at http://localhost:${PORT}`);
+  logger.info(`DevLog V2 Server running on port ${PORT}`);
+  logger.info(`Open server at http://localhost:${PORT}`);
 });

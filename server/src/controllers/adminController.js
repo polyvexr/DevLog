@@ -3,251 +3,187 @@ import PlatformStat from "../models/PlatformStat.js";
 import { fetchLeetCode } from "../utils/fetchLeetCode.js";
 import { fetchCodeforces } from "../utils/fetchCodeforces.js";
 import { fetchGithub } from "../utils/fetchGithub.js";
+import { fetchCodeChef } from "../utils/fetchCodeChef.js";
+import { fetchAtCoder } from "../utils/fetchAtCoder.js";
+import logger from "../utils/logger.js";
+
+// Platform fetch function mapping
+const platformFetchers = {
+  leetcode: fetchLeetCode,
+  codeforces: fetchCodeforces,
+  github: fetchGithub,
+  codechef: fetchCodeChef,
+  atcoder: fetchAtCoder,
+};
+
+/**
+ * Generic sync function for any platform
+ * @param {string} platform - Platform name
+ * @returns {object} Sync results
+ */
+async function syncPlatformStats(platform) {
+  const fetchFunction = platformFetchers[platform];
+  
+  if (!fetchFunction) {
+    throw new Error(`Unknown platform: ${platform}`);
+  }
+
+  const platformStats = await PlatformStat.find({ platform }).populate("userId", "email");
+  
+  const syncResults = {
+    platform,
+    total: platformStats.length,
+    success: 0,
+    failed: 0,
+    details: [],
+  };
+
+  for (const platformStat of platformStats) {
+    if (!platformStat.username || !platformStat.userId) continue;
+
+    try {
+      const data = await fetchFunction(platformStat.username);
+      platformStat.stats = data;
+      platformStat.lastUpdated = Date.now();
+      await platformStat.save();
+
+      syncResults.success++;
+      syncResults.details.push({
+        user: platformStat.userId.email,
+        username: platformStat.username,
+        status: "success",
+      });
+    } catch (error) {
+      syncResults.failed++;
+      syncResults.details.push({
+        user: platformStat.userId?.email || "Unknown",
+        username: platformStat.username,
+        status: "failed",
+        error: error.message,
+      });
+    }
+  }
+
+  logger.info(`Sync completed for ${platform}`, {
+    total: syncResults.total,
+    success: syncResults.success,
+    failed: syncResults.failed,
+  });
+
+  return syncResults;
+}
 
 // Sync all platforms for all users
 export const syncAllPlatforms = async (req, res) => {
   try {
-    // Get all platform stats (which contain the usernames)
-    const platformStats = await PlatformStat.find({}).populate(
-      "userId",
-      "email"
-    );
-    let syncResults = {
+    const allPlatforms = Object.keys(platformFetchers);
+    const results = {};
+
+    for (const platform of allPlatforms) {
+      try {
+        results[platform] = await syncPlatformStats(platform);
+      } catch (error) {
+        results[platform] = { error: error.message };
+        logger.error(`Sync failed for ${platform}`, { error: error.message });
+      }
+    }
+
+    // Calculate totals
+    const totals = {
       total: 0,
       success: 0,
       failed: 0,
-      details: [],
     };
 
-    for (const platformStat of platformStats) {
-      if (!platformStat.username || !platformStat.userId) continue;
-
-      syncResults.total++;
-
-      try {
-        let data;
-        if (platformStat.platform === "leetcode") {
-          data = await fetchLeetCode(platformStat.username);
-        } else if (platformStat.platform === "codeforces") {
-          data = await fetchCodeforces(platformStat.username);
-        } else if (platformStat.platform === "github") {
-          data = await fetchGithub(platformStat.username);
-        }
-
-        // Update the stats
-        platformStat.stats = data;
-        platformStat.lastUpdated = Date.now();
-        await platformStat.save();
-
-        syncResults.success++;
-        syncResults.details.push({
-          user: platformStat.userId.email,
-          platform: platformStat.platform,
-          username: platformStat.username,
-          status: "success",
-        });
-      } catch (error) {
-        syncResults.failed++;
-        syncResults.details.push({
-          user: platformStat.userId?.email || "Unknown",
-          platform: platformStat.platform,
-          username: platformStat.username,
-          status: "failed",
-          error: error.message,
-        });
+    Object.values(results).forEach((result) => {
+      if (result.total) {
+        totals.total += result.total;
+        totals.success += result.success || 0;
+        totals.failed += result.failed || 0;
       }
-    }
+    });
 
     res.json({
       success: true,
-      message: "Sync completed",
-      results: syncResults,
+      message: "Sync completed for all platforms",
+      data: {
+        totals,
+        platforms: results,
+      },
     });
   } catch (error) {
-    console.error("Sync all platforms error:", error);
+    logger.error("Sync all platforms error", { error: error.message });
     res.status(500).json({
       success: false,
       message: "Failed to sync platforms",
-      error: error.message,
     });
   }
 };
 
-// Sync LeetCode for all users
+// Sync specific platform for all users
+export const syncPlatform = async (req, res) => {
+  const { platform } = req.params;
+
+  if (!platformFetchers[platform]) {
+    return res.status(400).json({
+      success: false,
+      message: `Unsupported platform: ${platform}. Supported: ${Object.keys(platformFetchers).join(", ")}`,
+    });
+  }
+
+  try {
+    const results = await syncPlatformStats(platform);
+
+    res.json({
+      success: true,
+      message: `${platform} sync completed`,
+      data: { results },
+    });
+  } catch (error) {
+    logger.error(`Sync ${platform} error`, { error: error.message });
+    res.status(500).json({
+      success: false,
+      message: `Failed to sync ${platform}`,
+    });
+  }
+};
+
+// Legacy individual platform sync endpoints (for backwards compatibility)
 export const syncLeetCode = async (req, res) => {
-  try {
-    const platformStats = await PlatformStat.find({
-      platform: "leetcode",
-    }).populate("userId", "email");
-    let syncResults = {
-      total: platformStats.length,
-      success: 0,
-      failed: 0,
-      details: [],
-    };
-
-    for (const platformStat of platformStats) {
-      if (!platformStat.username || !platformStat.userId) continue;
-
-      try {
-        const data = await fetchLeetCode(platformStat.username);
-        platformStat.stats = data;
-        platformStat.lastUpdated = Date.now();
-        await platformStat.save();
-
-        syncResults.success++;
-        syncResults.details.push({
-          user: platformStat.userId.email,
-          username: platformStat.username,
-          status: "success",
-        });
-      } catch (error) {
-        syncResults.failed++;
-        syncResults.details.push({
-          user: platformStat.userId?.email || "Unknown",
-          username: platformStat.username,
-          status: "failed",
-          error: error.message,
-        });
-      }
-    }
-
-    res.json({
-      success: true,
-      message: "LeetCode sync completed",
-      results: syncResults,
-    });
-  } catch (error) {
-    console.error("Sync LeetCode error:", error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to sync LeetCode",
-      error: error.message,
-    });
-  }
+  req.params.platform = "leetcode";
+  return syncPlatform(req, res);
 };
 
-// Sync Codeforces for all users
 export const syncCodeforces = async (req, res) => {
-  try {
-    const platformStats = await PlatformStat.find({
-      platform: "codeforces",
-    }).populate("userId", "email");
-    let syncResults = {
-      total: platformStats.length,
-      success: 0,
-      failed: 0,
-      details: [],
-    };
-
-    for (const platformStat of platformStats) {
-      if (!platformStat.username || !platformStat.userId) continue;
-
-      try {
-        const data = await fetchCodeforces(platformStat.username);
-        platformStat.stats = data;
-        platformStat.lastUpdated = Date.now();
-        await platformStat.save();
-
-        syncResults.success++;
-        syncResults.details.push({
-          user: platformStat.userId.email,
-          username: platformStat.username,
-          status: "success",
-        });
-      } catch (error) {
-        syncResults.failed++;
-        syncResults.details.push({
-          user: platformStat.userId?.email || "Unknown",
-          username: platformStat.username,
-          status: "failed",
-          error: error.message,
-        });
-      }
-    }
-
-    res.json({
-      success: true,
-      message: "Codeforces sync completed",
-      results: syncResults,
-    });
-  } catch (error) {
-    console.error("Sync Codeforces error:", error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to sync Codeforces",
-      error: error.message,
-    });
-  }
+  req.params.platform = "codeforces";
+  return syncPlatform(req, res);
 };
 
-// Sync GitHub for all users
 export const syncGitHub = async (req, res) => {
-  try {
-    const platformStats = await PlatformStat.find({
-      platform: "github",
-    }).populate("userId", "email");
-    let syncResults = {
-      total: platformStats.length,
-      success: 0,
-      failed: 0,
-      details: [],
-    };
+  req.params.platform = "github";
+  return syncPlatform(req, res);
+};
 
-    for (const platformStat of platformStats) {
-      if (!platformStat.username || !platformStat.userId) continue;
+export const syncCodeChef = async (req, res) => {
+  req.params.platform = "codechef";
+  return syncPlatform(req, res);
+};
 
-      try {
-        const data = await fetchGithub(platformStat.username);
-        platformStat.stats = data;
-        platformStat.lastUpdated = Date.now();
-        await platformStat.save();
-
-        syncResults.success++;
-        syncResults.details.push({
-          user: platformStat.userId.email,
-          username: platformStat.username,
-          status: "success",
-        });
-      } catch (error) {
-        syncResults.failed++;
-        syncResults.details.push({
-          user: platformStat.userId?.email || "Unknown",
-          username: platformStat.username,
-          status: "failed",
-          error: error.message,
-        });
-      }
-    }
-
-    res.json({
-      success: true,
-      message: "GitHub sync completed",
-      results: syncResults,
-    });
-  } catch (error) {
-    console.error("Sync GitHub error:", error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to sync GitHub",
-      error: error.message,
-    });
-  }
+export const syncAtCoder = async (req, res) => {
+  req.params.platform = "atcoder";
+  return syncPlatform(req, res);
 };
 
 // Get sync statistics
 export const getSyncStats = async (req, res) => {
   try {
     const totalUsers = await User.countDocuments({});
-    const usersWithLeetCode = await PlatformStat.countDocuments({
-      platform: "leetcode",
-    });
-    const usersWithCodeforces = await PlatformStat.countDocuments({
-      platform: "codeforces",
-    });
-    const usersWithGitHub = await PlatformStat.countDocuments({
-      platform: "github",
-    });
+    
+    // Get counts for all platforms dynamically
+    const platformCounts = {};
+    for (const platform of Object.keys(platformFetchers)) {
+      platformCounts[platform] = await PlatformStat.countDocuments({ platform });
+    }
 
     const lastSyncedStats = await PlatformStat.find({})
       .sort({ lastUpdated: -1 })
@@ -256,22 +192,18 @@ export const getSyncStats = async (req, res) => {
 
     res.json({
       success: true,
-      stats: {
+      data: {
         totalUsers,
-        platformCounts: {
-          leetcode: usersWithLeetCode,
-          codeforces: usersWithCodeforces,
-          github: usersWithGitHub,
-        },
+        platformCounts,
+        supportedPlatforms: Object.keys(platformFetchers),
         recentSyncs: lastSyncedStats,
       },
     });
   } catch (error) {
-    console.error("Get sync stats error:", error);
+    logger.error("Get sync stats error", { error: error.message });
     res.status(500).json({
       success: false,
       message: "Failed to get sync stats",
-      error: error.message,
     });
   }
 };

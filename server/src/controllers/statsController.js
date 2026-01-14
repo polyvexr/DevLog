@@ -121,8 +121,9 @@ export const getStatsSummary = async (req, res) => {
 export const refreshPlatformStats = async (req, res) => {
   try {
     const { platform } = req.params;
+    const supportedPlatforms = ["leetcode", "codeforces", "github", "codechef", "atcoder"];
 
-    if (!["leetcode", "codeforces", "github"].includes(platform)) {
+    if (!supportedPlatforms.includes(platform)) {
       return res.status(400).json({ message: "Invalid platform" });
     }
 
@@ -147,16 +148,43 @@ export const refreshPlatformStats = async (req, res) => {
       });
     }
 
-    // Enqueue sync job (async processing)
-    const result = await platformService.enqueueSyncJob(req.user._id, platform, "user");
+    // Process sync job synchronously for the user
+    // We create a temporary job object or just call the service method
+    const job = {
+      userId: req.user._id,
+      platform,
+      save: async () => {}, // Mock save
+    };
 
-    // Return 202 Accepted for async processing
-    res.status(202).json({
+    const result = await platformService.processSyncJob(job);
+
+    if (!result.success) {
+      return res.status(500).json({ 
+        success: false, 
+        message: `Failed to refresh ${platform}: ${result.error}` 
+      });
+    }
+
+    // Get the updated stat
+    const updatedStat = await PlatformStat.findOne({
+      userId: req.user._id,
+      platform,
+    });
+
+    // Determine progress
+    const progress = calculateProgress(platform, updatedStat.stats);
+
+    res.json({
       success: true,
-      message: result.queued ? "Refresh queued for processing" : result.message,
-      jobId: result.jobId,
-      status: "pending",
-      nextRefreshAvailable: new Date(Date.now() + COOLDOWN_MS),
+      message: "Platform stats refreshed successfully",
+      data: { 
+        stat: {
+          ...updatedStat.toObject(),
+          progress,
+          canRefresh: false,
+          nextRefreshAvailable: new Date(Date.now() + COOLDOWN_MS)
+        }
+      }
     });
   } catch (err) {
     res.status(500).json({ error: err.message });

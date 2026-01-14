@@ -13,11 +13,17 @@ import {
   FiChevronRight,
   FiX,
   FiLayers,
+  FiTrendingUp,
+  FiClock,
+  FiBell,
 } from "react-icons/fi";
-import { SiLeetcode, SiCodeforces, SiGithub } from "react-icons/si";
+import { SiLeetcode, SiCodeforces, SiGithub, SiCodechef } from "react-icons/si";
+import { getNotifications } from "../api/axios";
+import { useEffect, useState } from "react";
 
 export default function Sidebar() {
   const { logout, isAdmin } = useContext(AuthContext);
+  const [unreadNotifications, setUnreadNotifications] = useState(0);
   const {
     isCollapsed,
     isMobileOpen,
@@ -39,16 +45,36 @@ export default function Sidebar() {
     closeMobile();
   };
 
-  const isPlatformRoute = ["/leetcode", "/codeforces", "/github"].includes(
+  const isPlatformRoute = ["/leetcode", "/codeforces", "/github", "/codechef", "/atcoder"].includes(
     location.pathname
   );
 
   const navItems = [
     { path: "/", icon: FiBarChart2, label: "Dashboard", exact: true },
     { path: "/link", icon: FiLink, label: "Connect Hub" },
-    { path: "/profile", icon: FiUser, label: "User Pulse" },
+    { path: "/insights", icon: FiTrendingUp, label: "Insights" },
+    { path: "/history", icon: FiClock, label: "History" },
     { path: "/contests", icon: FiTarget, label: "Contests" },
+    { path: "/notifications", icon: FiBell, label: "Notifications", count: unreadNotifications },
+    { path: "/profile", icon: FiUser, label: "Profile" },
   ];
+
+  useEffect(() => {
+    const fetchUnreadCount = async () => {
+      try {
+        const res = await getNotifications();
+        const notifications = res.data.data?.notifications || res.data.notifications || [];
+        setUnreadNotifications(notifications.filter(n => !n.read).length);
+      } catch {
+        console.error("Failed to fetch notification count");
+      }
+    };
+    fetchUnreadCount();
+    
+    // Refresh count每 2 分钟 or when location changes
+    const interval = setInterval(fetchUnreadCount, 120000);
+    return () => clearInterval(interval);
+  }, [location.pathname]);
 
   const platformItems = [
     {
@@ -74,6 +100,22 @@ export default function Sidebar() {
       color: "text-purple-400",
       bg: "bg-purple-500/10",
       border: "border-purple-500/20",
+    },
+    {
+      path: "/codechef",
+      icon: SiCodechef,
+      label: "CodeChef",
+      color: "text-amber-400",
+      bg: "bg-amber-500/10",
+      border: "border-amber-500/20",
+    },
+    {
+      path: "/atcoder",
+      icon: null, // Text fallback
+      label: "AtCoder",
+      color: "text-cyan-400",
+      bg: "bg-cyan-500/10",
+      border: "border-cyan-500/20",
     },
   ];
 
@@ -158,14 +200,20 @@ export default function Sidebar() {
               >
                 <item.icon className={`text-xl ${isCollapsed ? "mx-auto" : ""}`} />
                 {!isCollapsed && (
-                  <span className="font-black text-xs uppercase tracking-widest animate-fade-in">
-                    {item.label}
-                  </span>
+                  <div className="flex-1 flex items-center justify-between overflow-hidden">
+                    <span className="font-black text-xs uppercase tracking-widest animate-fade-in line-clamp-1">
+                      {item.label}
+                    </span>
+                    {item.count > 0 && (
+                      <span className="ml-2 bg-red-500 text-white text-[10px] font-black px-1.5 py-0.5 rounded-full animate-fade-in shrink-0">
+                        {item.count}
+                      </span>
+                    )}
+                  </div>
                 )}
-                {/* Active Indicator Bar */}
-                {/* {location.pathname === item.path && (
-                  <div className="absolute left-0 w-1 h-6 bg-white rounded-r-full shadow-[0_0_10px_white]" />
-                )} */}
+                {isCollapsed && item.count > 0 && (
+                  <div className="absolute top-3 right-5 w-2.5 h-2.5 bg-red-500 rounded-full ring-2 ring-[#0a111b] animate-pulse" />
+                )}
               </NavLink>
             ))}
           </div>
@@ -204,7 +252,13 @@ export default function Sidebar() {
                             }
                          `}
                       >
-                         <item.icon className="text-lg" />
+                         {item.icon ? (
+                           <item.icon className="text-lg" />
+                         ) : (
+                           <span className="text-xs font-black w-5 h-5 flex items-center justify-center bg-gray-700 rounded text-white">
+                             AT
+                           </span>
+                         )}
                          {!isCollapsed && (
                             <span className="font-bold text-[11px] uppercase tracking-wider">{item.label}</span>
                          )}

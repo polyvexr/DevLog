@@ -1,5 +1,40 @@
 import React, { useEffect } from "react";
-import { FiAlertTriangle, FiX } from "react-icons/fi";
+import { FiAlertTriangle, FiX, FiCheckCircle, FiInfo, FiAlertCircle } from "react-icons/fi";
+
+const typeConfig = {
+  success: {
+    icon: FiCheckCircle,
+    colorClass: "text-green-500",
+    bgClass: "bg-green-500",
+    borderClass: "border-green-500/20",
+    bgLightClass: "bg-green-500/10",
+    shadowClass: "shadow-green-500/20"
+  },
+  error: {
+    icon: FiAlertTriangle,
+    colorClass: "text-red-500",
+    bgClass: "bg-red-500",
+    borderClass: "border-red-500/20",
+    bgLightClass: "bg-red-500/10",
+    shadowClass: "shadow-red-500/20"
+  },
+  warning: {
+    icon: FiAlertCircle,
+    colorClass: "text-yellow-500",
+    bgClass: "bg-yellow-500",
+    borderClass: "border-yellow-500/20",
+    bgLightClass: "bg-yellow-500/10",
+    shadowClass: "shadow-yellow-500/20"
+  },
+  info: {
+    icon: FiInfo,
+    colorClass: "text-blue-500",
+    bgClass: "bg-blue-500",
+    borderClass: "border-blue-500/20",
+    bgLightClass: "bg-blue-500/10",
+    shadowClass: "shadow-blue-500/20"
+  }
+};
 
 export default function Dialog({
   open,
@@ -7,6 +42,7 @@ export default function Dialog({
   message,
   confirmText = "Confirm",
   cancelText = "Cancel",
+  type = "info",
   onConfirm,
   onCancel,
 }) {
@@ -20,6 +56,9 @@ export default function Dialog({
   }, [open]);
 
   if (!open) return null;
+
+  const config = typeConfig[type] || typeConfig.info;
+  const Icon = config.icon;
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 sm:p-4">
@@ -37,8 +76,8 @@ export default function Dialog({
         </button>
 
         <div className="flex flex-col items-center text-center">
-          <div className="w-16 h-16 bg-red-500/10 rounded-2xl flex items-center justify-center mb-8 border border-red-500/20">
-            <FiAlertTriangle className="text-3xl text-red-500" />
+          <div className={`w-16 h-16 ${config.bgLightClass} rounded-2xl flex items-center justify-center mb-8 border ${config.borderClass}`}>
+            <Icon className={`text-3xl ${config.colorClass}`} />
           </div>
           
           <h3 className="text-2xl font-black text-white italic mb-4 tracking-tight">{title}</h3>
@@ -49,7 +88,7 @@ export default function Dialog({
           <div className="w-full space-y-3">
              <button
               onClick={onConfirm}
-              className="w-full py-4 bg-red-500 hover:bg-red-400 text-white font-black text-xs uppercase tracking-[0.2em] rounded-2xl transition-all shadow-xl shadow-red-500/20 active:scale-95"
+              className={`w-full py-4 ${config.bgClass} hover:opacity-90 text-white font-black text-xs uppercase tracking-[0.2em] rounded-2xl transition-all shadow-xl ${config.shadowClass} active:scale-95`}
             >
               {confirmText}
             </button>

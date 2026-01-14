@@ -32,7 +32,7 @@ const insightSchema = new mongoose.Schema({
   // Associated platform (optional - some insights are cross-platform)
   platform: { 
     type: String, 
-    enum: ["leetcode", "codeforces", "github", null], 
+    enum: ["leetcode", "codeforces", "github", "codechef", "atcoder", null], 
     default: null 
   },
   

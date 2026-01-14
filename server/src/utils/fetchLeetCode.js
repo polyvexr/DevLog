@@ -33,13 +33,6 @@ export const fetchLeetCode = async (username) => {
                 submissions
               }
             }
-            submitStatsGlobal {
-              acSubmissionNum {
-                difficulty
-                count
-                submissions
-              }
-            }
             badges {
               id
               displayName
@@ -52,6 +45,7 @@ export const fetchLeetCode = async (username) => {
               progress
             }
             activeBadge {
+              id
               displayName
               icon
             }
@@ -76,13 +70,6 @@ export const fetchLeetCode = async (username) => {
               activeYears
               streak
               totalActiveDays
-              dccBadges {
-                timestamp
-                badge {
-                  name
-                  icon
-                }
-              }
               submissionCalendar
             }
             languageProblemCount {
@@ -131,7 +118,18 @@ export const fetchLeetCode = async (username) => {
         }
       `,
       variables: { username },
+    }, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
+        "Content-Type": "application/json",
+      },
+      timeout: 10000
     });
+
+    if (res.data.errors) {
+      console.log("LeetCode GraphQL Errors:", JSON.stringify(res.data.errors));
+      return {};
+    }
 
     const data = res.data.data;
     const matchedUser = data.matchedUser;
@@ -146,26 +144,10 @@ export const fetchLeetCode = async (username) => {
     const totalSubmissions = submitStats.totalSubmissionNum || [];
 
     const submissionsByDifficulty = {
-      easy: {
-        solved: 0,
-        total: 0,
-        submissions: 0,
-      },
-      medium: {
-        solved: 0,
-        total: 0,
-        submissions: 0,
-      },
-      hard: {
-        solved: 0,
-        total: 0,
-        submissions: 0,
-      },
-      all: {
-        solved: 0,
-        total: 0,
-        submissions: 0,
-      },
+      easy: { solved: 0, total: 0, submissions: 0 },
+      medium: { solved: 0, total: 0, submissions: 0 },
+      hard: { solved: 0, total: 0, submissions: 0 },
+      all: { solved: 0, total: 0, submissions: 0 },
     };
 
     acSubmissions.forEach((item) => {
@@ -179,52 +161,15 @@ export const fetchLeetCode = async (username) => {
     totalSubmissions.forEach((item) => {
       const difficulty = item.difficulty.toLowerCase();
       if (submissionsByDifficulty[difficulty]) {
-        submissionsByDifficulty[difficulty].total = item.submissions;
+        submissionsByDifficulty[difficulty].total = item.count;
       }
     });
 
-    // Process tag problem counts
-    const tagStats = {
-      advanced: [],
-      intermediate: [],
-      fundamental: [],
-    };
-
-    if (matchedUser.tagProblemCounts) {
-      tagStats.advanced = matchedUser.tagProblemCounts.advanced || [];
-      tagStats.intermediate = matchedUser.tagProblemCounts.intermediate || [];
-      tagStats.fundamental = matchedUser.tagProblemCounts.fundamental || [];
-    }
-
-    // Process language stats
-    const languageStats = matchedUser.languageProblemCount || [];
-
-    // Process calendar and streak data
-    const calendar = matchedUser.userCalendar || {};
-    const streakData = {
-      currentStreak: calendar.streak || 0,
-      totalActiveDays: calendar.totalActiveDays || 0,
-      activeYears: calendar.activeYears || [],
-      dccBadges: calendar.dccBadges || [],
-    };
-
-    // Process contest ranking
-    const contestRanking = data.userContestRanking || {};
-    const contestHistory = data.userContestRankingHistory || [];
-
-    // Process recent submissions
-    const recentSubmissions = data.recentAcSubmissionList || [];
-
-    // Process badges
-    const badges = matchedUser.badges || [];
-    const upcomingBadges = matchedUser.upcomingBadges || [];
-    const activeBadge = matchedUser.activeBadge || null;
-
     // Profile information
     const profile = matchedUser.profile || {};
+    const calendar = matchedUser.userCalendar || {};
 
     return {
-      // Basic profile
       username: matchedUser.username,
       realName: profile.realName,
       avatar: profile.userAvatar,
@@ -238,78 +183,29 @@ export const fetchLeetCode = async (username) => {
       websites: profile.websites || [],
       starRating: profile.starRating,
 
-      // Submission statistics
       submissionsByDifficulty,
-      totalSolved:
-        submissionsByDifficulty.easy.solved +
-        submissionsByDifficulty.medium.solved +
-        submissionsByDifficulty.hard.solved,
-      totalSubmissions:
-        submissionsByDifficulty.easy.total +
-        submissionsByDifficulty.medium.total +
-        submissionsByDifficulty.hard.total,
-      acceptanceRate:
-        submissionsByDifficulty.all.total > 0
-          ? (
-              (submissionsByDifficulty.all.solved /
-                submissionsByDifficulty.all.total) *
-              100
-            ).toFixed(2)
-          : 0,
-
-      // Tag-based statistics
-      tagStats,
-
-      // Language statistics
-      languageStats,
-
-      // Streak and calendar
-      streakData,
-
-      // Contest information
-      contestRanking: {
-        attendedContestsCount: contestRanking.attendedContestsCount || 0,
-        rating: contestRanking.rating ? Math.round(contestRanking.rating) : 0,
-        globalRanking: contestRanking.globalRanking || 0,
-        totalParticipants: contestRanking.totalParticipants || 0,
-        topPercentage: contestRanking.topPercentage
-          ? contestRanking.topPercentage.toFixed(2)
-          : 0,
-        badge: contestRanking.badge?.name || null,
+      totalSolved: submissionsByDifficulty.all.solved,
+      totalSubmissions: submissionsByDifficulty.all.submissions,
+      
+      tagStats: matchedUser.tagProblemCounts || {},
+      languageStats: matchedUser.languageProblemCount || [],
+      
+      streakData: {
+        currentStreak: calendar.streak || 0,
+        totalActiveDays: calendar.totalActiveDays || 0,
+        activeYears: calendar.activeYears || [],
       },
-      contestHistory: contestHistory.slice(0, 10).map((contest) => ({
-        attended: contest.attended,
-        rating: Math.round(contest.rating),
-        ranking: contest.ranking,
-        problemsSolved: contest.problemsSolved,
-        totalProblems: contest.totalProblems,
-        contestTitle: contest.contest?.title,
-        contestDate: contest.contest?.startTime,
-      })),
 
-      // Recent activity
-      recentSubmissions: recentSubmissions.map((sub) => ({
+      contestRanking: data.userContestRanking || {},
+      contestHistory: (data.userContestRankingHistory || []).slice(-10),
+      recentSubmissions: (data.recentAcSubmissionList || []).map(sub => ({
         title: sub.title,
         titleSlug: sub.titleSlug,
-        timestamp: sub.timestamp,
+        timestamp: sub.timestamp
       })),
-
-      // Badges
-      badges: badges.map((badge) => ({
-        id: badge.id,
-        displayName: badge.displayName,
-        icon: badge.icon,
-        creationDate: badge.creationDate,
-      })),
-      upcomingBadges,
-      activeBadge,
-
-      // Contributions
-      contributions: matchedUser.contributions || {
-        points: 0,
-        questionCount: 0,
-        testcaseCount: 0,
-      },
+      badges: matchedUser.badges || [],
+      activeBadge: matchedUser.activeBadge,
+      contributions: matchedUser.contributions || {}
     };
   } catch (err) {
     console.log("LC Fetch Error:", err.message);

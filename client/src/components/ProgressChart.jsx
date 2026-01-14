@@ -15,46 +15,46 @@ import api from "../api/axios";
 /**
  * ProgressChart - Displays historical progress data with Recharts
  */
+const periodDays = {
+  week: 7,
+  month: 30,
+  quarter: 90,
+};
+
 export default function ProgressChart({ platform, metricKey, title, color = "#8884d8" }) {
   const [data, setData] = useState([]);
   const [period, setPeriod] = useState("week");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const periodDays = {
-    week: 7,
-    month: 30,
-    quarter: 90,
-  };
-
   useEffect(() => {
-    fetchHistory();
-  }, [platform, period]);
-
-  const fetchHistory = async () => {
-    try {
-      setLoading(true);
-      const response = await api.get(`/history/${platform}?days=${periodDays[period]}`);
-      
-      if (response.data.success) {
-        const history = response.data.history.map((h) => ({
-          date: new Date(h.snapshotDate).toLocaleDateString("en-US", {
-            month: "short",
-            day: "numeric",
-          }),
-          value: h.metrics?.[metricKey] || 0,
-          fullDate: h.snapshotDate,
-        }));
-        setData(history);
+    const fetchHistory = async () => {
+      try {
+        setLoading(true);
+        const response = await api.get(`/history/${platform}?days=${periodDays[period]}`);
+        
+        if (response.data.success) {
+          const history = response.data.history.map((h) => ({
+            date: new Date(h.snapshotDate).toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+            }),
+            value: h.metrics?.[metricKey] || 0,
+            fullDate: h.snapshotDate,
+          }));
+          setData(history);
+        }
+        setError(null);
+      } catch (err) {
+        setError("Failed to load history");
+        console.error(err);
+      } finally {
+        setLoading(false);
       }
-      setError(null);
-    } catch (err) {
-      setError("Failed to load history");
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
+
+    fetchHistory();
+  }, [platform, period, metricKey]); // Added metricKey and periodDays is constant so it's fine
 
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {

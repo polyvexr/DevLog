@@ -1,7 +1,12 @@
 import User from "../models/User.js";
 import PlatformStat from "../models/PlatformStat.js";
 import PlatformAction from "../models/PlatformAction.js";
+import PlatformStatHistory from "../models/PlatformStatHistory.js";
+import Notification from "../models/Notification.js";
+import Insight from "../models/Insight.js";
+import SyncJob from "../models/SyncJob.js";
 import { sanitizeUser } from "../middleware/validation.js";
+import logger from "../utils/logger.js";
 
 /**
  * Get current user profile
@@ -9,13 +14,13 @@ import { sanitizeUser } from "../middleware/validation.js";
  */
 export const getProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.user._id).select("-password");
+    const user = await User.findById(req.user._id).select("-password -resetPasswordToken -resetPasswordExpires");
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(404).json({ success: false, message: "User not found" });
     }
-    res.json({ success: true, user });
+    res.json({ success: true, data: { user } });
   } catch (err) {
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ success: false, message: "Server error" });
   }
 };
 
@@ -25,27 +30,106 @@ export const getProfile = async (req, res) => {
  */
 export const updateProfile = async (req, res) => {
   try {
-    const { name } = req.body;
+    const { name, bio, location, website, publicProfile } = req.body;
     
-    if (!name || !name.trim()) {
-      return res.status(400).json({ message: "Name is required" });
-    }
-
     const user = await User.findById(req.user._id);
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(404).json({ success: false, message: "User not found" });
     }
 
-    user.name = name.trim();
+    // Update name
+    if (name && name.trim()) {
+      user.name = name.trim();
+    }
+
+    // Update profile fields
+    if (!user.profile) {
+      user.profile = {};
+    }
+    if (bio !== undefined) user.profile.bio = bio;
+    if (location !== undefined) user.profile.location = location;
+    if (website !== undefined) user.profile.website = website;
+
+    // Update public profile settings
+    if (publicProfile !== undefined) {
+      if (!user.publicProfile) {
+        user.publicProfile = {};
+      }
+      
+      // Handle username uniqueness check
+      if (publicProfile.username && publicProfile.username !== user.publicProfile.username) {
+        const existingUser = await User.findOne({ 
+          "publicProfile.username": publicProfile.username,
+          _id: { $ne: user._id }
+        });
+        if (existingUser) {
+          return res.status(400).json({ 
+            success: false, 
+            message: "Username is already taken" 
+          });
+        }
+      }
+      
+      Object.assign(user.publicProfile, publicProfile);
+      user.markModified('publicProfile');
+    }
+
     await user.save();
 
     res.json({ 
       success: true, 
-      user: sanitizeUser(user),
-      message: "Profile updated successfully" 
+      message: "Profile updated successfully",
+      data: { user: sanitizeUser(user) }
     });
   } catch (err) {
-    res.status(500).json({ message: "Server error" });
+    logger.error("Update profile error", { error: err.message });
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+/**
+ * Update user settings
+ * PUT /api/user/settings
+ */
+export const updateSettings = async (req, res) => {
+  try {
+    const { theme, emailNotifications, progressMilestones, timezone } = req.body;
+    
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    // Initialize settings if not exists
+    if (!user.settings) {
+      user.settings = {};
+    }
+
+    if (theme !== undefined) user.settings.theme = theme;
+    if (emailNotifications !== undefined) user.settings.emailNotifications = emailNotifications;
+    if (timezone !== undefined) user.settings.timezone = timezone;
+    
+    if (progressMilestones !== undefined) {
+      const currentMilestones = user.settings.progressMilestones?.toObject?.() 
+        || user.settings.progressMilestones 
+        || {};
+      user.settings.progressMilestones = {
+        ...currentMilestones,
+        ...progressMilestones,
+      };
+      user.markModified('settings.progressMilestones');
+    }
+
+    await user.save();
+
+    res.json({ 
+      success: true, 
+      message: "Settings updated successfully",
+      data: { settings: user.settings }
+    });
+  } catch (err) {
+    logger.error("Update settings error", { error: err.message });
+    res.status(500).json({ success: false, message: "Server error" });
   }
 };
 
@@ -58,18 +142,21 @@ export const updatePassword = async (req, res) => {
     const { currentPassword, newPassword } = req.body;
 
     if (!currentPassword || !newPassword) {
-      return res.status(400).json({ message: "Both current and new passwords are required" });
+      return res.status(400).json({ success: false, message: "Both current and new passwords are required" });
     }
 
     if (newPassword.length < 6) {
-      return res.status(400).json({ message: "New password must be at least 6 characters" });
+      return res.status(400).json({ success: false, message: "New password must be at least 6 characters" });
     }
 
     const user = await User.findById(req.user._id);
-    const isMatch = await user.matchPassword(currentPassword);
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
 
+    const isMatch = await user.matchPassword(currentPassword);
     if (!isMatch) {
-      return res.status(400).json({ message: "Invalid current password" });
+      return res.status(400).json({ success: false, message: "Invalid current password" });
     }
 
     user.password = newPassword;
@@ -77,31 +164,54 @@ export const updatePassword = async (req, res) => {
 
     res.json({ success: true, message: "Password updated successfully" });
   } catch (err) {
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ success: false, message: "Server error" });
   }
 };
 
 /**
- * Delete account and all associated data
+ * Delete account and all associated data (cascade delete)
  * DELETE /api/user/account
  */
 export const deleteAccount = async (req, res) => {
   try {
     const userId = req.user._id;
+    
+    logger.info("Account deletion initiated", { userId });
 
-    // Delete all platform stats for this user
-    await PlatformStat.deleteMany({ userId });
+    // Delete all related data (cascade delete)
+    const deletions = await Promise.allSettled([
+      PlatformStat.deleteMany({ userId }),
+      PlatformAction.deleteMany({ userId }),
+      PlatformStatHistory.deleteMany({ userId }),
+      Notification.deleteMany({ userId }),
+      Insight.deleteMany({ userId }),
+      SyncJob.deleteMany({ userId }),
+    ]);
 
-    // Delete all platform actions for this user
-    await PlatformAction.deleteMany({ userId });
+    // Log deletion results
+    const collections = ['PlatformStat', 'PlatformAction', 'PlatformStatHistory', 'Notification', 'Insight', 'SyncJob'];
+    deletions.forEach((result, index) => {
+      if (result.status === 'fulfilled') {
+        logger.info(`Deleted ${collections[index]}`, { 
+          userId, 
+          deletedCount: result.value.deletedCount 
+        });
+      } else {
+        logger.error(`Failed to delete ${collections[index]}`, { 
+          userId, 
+          error: result.reason 
+        });
+      }
+    });
 
     // Delete the user
     await User.findByIdAndDelete(userId);
+    
+    logger.info("Account deleted successfully", { userId });
 
-    res.json({ success: true, message: "Account deleted successfully" });
+    res.json({ success: true, message: "Account and all associated data deleted successfully" });
   } catch (err) {
-    console.error("Delete account error:", err);
-    res.status(500).json({ message: "Server error" });
+    logger.error("Delete account error", { error: err.message });
+    res.status(500).json({ success: false, message: "Server error" });
   }
 };
-

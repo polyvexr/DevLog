@@ -13,7 +13,7 @@ const platformStatHistorySchema = new mongoose.Schema({
   },
   platform: { 
     type: String, 
-    enum: ["leetcode", "codeforces", "github"], 
+    enum: ["leetcode", "codeforces", "github", "codechef", "atcoder"], 
     required: true 
   },
   
@@ -47,7 +47,18 @@ const platformStatHistorySchema = new mongoose.Schema({
     totalRepos: { type: Number, default: null },
     totalStars: { type: Number, default: null },
     totalCommits: { type: Number, default: null },
-    contributions: { type: Number, default: null }
+    contributions: { type: Number, default: null },
+    
+    // CodeChef metrics
+    highestRating: { type: Number, default: null },
+    stars: { type: Number, default: null },
+    globalRank: { type: Number, default: null },
+    countryRank: { type: Number, default: null },
+    
+    // AtCoder metrics
+    acCount: { type: Number, default: null },
+    contestsParticipated: { type: Number, default: null },
+    averagePerformance: { type: Number, default: null }
   },
   
   createdAt: { type: Date, default: Date.now }

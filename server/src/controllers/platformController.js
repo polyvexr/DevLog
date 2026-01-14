@@ -3,8 +3,21 @@ import PlatformAction from "../models/PlatformAction.js";
 import { fetchLeetCode } from "../utils/fetchLeetCode.js";
 import { fetchGithub } from "../utils/fetchGithub.js";
 import { fetchCodeforces } from "../utils/fetchCodeforces.js";
+import { fetchCodeChef } from "../utils/fetchCodeChef.js";
+import { fetchAtCoder } from "../utils/fetchAtCoder.js";
+import { platformService } from "../services/platformService.js";
+import logger from "../utils/logger.js";
 
 const FIFTEEN_DAYS_MS = 15 * 24 * 60 * 60 * 1000;
+
+// Platform fetch function mapping
+const platformFetchers = {
+  leetcode: fetchLeetCode,
+  codeforces: fetchCodeforces,
+  github: fetchGithub,
+  codechef: fetchCodeChef,
+  atcoder: fetchAtCoder,
+};
 
 async function checkMonthlyLimit(userId, platform) {
   const last = await PlatformAction.findOne({ userId, platform }).sort({
@@ -29,6 +42,14 @@ async function checkMonthlyLimit(userId, platform) {
 export const linkPlatform = async (req, res) => {
   const { platform, username } = req.body;
 
+  // Validate platform
+  if (!platformFetchers[platform]) {
+    return res.status(400).json({ 
+      success: false, 
+      message: `Unsupported platform: ${platform}` 
+    });
+  }
+
   // Enforce 15-day-per-platform restriction with one-time re-add exception
   const blocked = await checkMonthlyLimit(req.user._id, platform);
   if (blocked) {
@@ -51,13 +72,13 @@ export const linkPlatform = async (req, res) => {
       try {
         await req.user.save();
       } catch (err) {
-        console.error("Failed to mark oneTimeReaddUsed:", err?.message || err);
+        logger.error("Failed to mark oneTimeReaddUsed", { error: err.message });
       }
       // allow link to proceed
     } else {
       return res.status(429).json({
-        message:
-          "You can add or remove this platform at most once every 15 days.",
+        success: false,
+        message: "You can add or remove this platform at most once every 15 days.",
         retryAfter: blocked.retryAfter,
       });
     }
@@ -67,8 +88,9 @@ export const linkPlatform = async (req, res) => {
     userId: req.user._id,
     platform,
   });
-  if (existing)
-    return res.status(400).json({ message: "Platform already linked" });
+  if (existing) {
+    return res.status(400).json({ success: false, message: "Platform already linked" });
+  }
 
   const entry = await PlatformStat.create({
     userId: req.user._id,
@@ -80,20 +102,26 @@ export const linkPlatform = async (req, res) => {
 
   // Fetch platform stats immediately for this user only
   try {
-    let fetched = {};
-    if (platform === "leetcode") {
-      fetched = await fetchLeetCode(username);
-    } else if (platform === "github") {
-      fetched = await fetchGithub(username);
-    } else if (platform === "codeforces") {
-      fetched = await fetchCodeforces(username);
-    }
+    const fetchFunction = platformFetchers[platform];
+    const freshData = await fetchFunction(username);
 
-    entry.stats = fetched || {};
+    // Use platformService to normalize data consistently
+    entry.data = freshData || {};
+    entry.stats = platformService.extractStats(platform, entry.data);
     entry.lastUpdated = new Date();
     await entry.save();
+    
+    logger.info("Platform linked and stats fetched", { 
+      userId: req.user._id, 
+      platform, 
+      username 
+    });
   } catch (err) {
-    console.error("Platform fetch error:", err?.message || err);
+    logger.error("Platform fetch error during link", { 
+      error: err.message, 
+      platform, 
+      username 
+    });
     // keep entry with empty stats; do not fail the link operation
   }
 
@@ -106,15 +134,19 @@ export const linkPlatform = async (req, res) => {
       meta: { username },
     });
   } catch (err) {
-    console.error("PlatformAction write error:", err?.message || err);
+    logger.error("PlatformAction write error", { error: err.message });
   }
 
-  res.json({ success: true, entry });
+  res.json({ success: true, message: "Platform linked successfully", data: { entry } });
 };
 
 export const getPlatforms = async (req, res) => {
-  const data = await PlatformStat.find({ userId: req.user._id });
-  res.json(data);
+  try {
+    const data = await PlatformStat.find({ userId: req.user._id });
+    res.json({ success: true, data: { platforms: data } });
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Server error" });
+  }
 };
 
 export const unlinkPlatform = async (req, res) => {
@@ -124,8 +156,8 @@ export const unlinkPlatform = async (req, res) => {
   const blocked = await checkMonthlyLimit(req.user._id, platform);
   if (blocked) {
     return res.status(429).json({
-      message:
-        "You can add or remove this platform at most once every 15 days.",
+      success: false,
+      message: "You can add or remove this platform at most once every 15 days.",
       retryAfter: blocked.retryAfter,
     });
   }
@@ -134,7 +166,9 @@ export const unlinkPlatform = async (req, res) => {
     userId: req.user._id,
     platform,
   });
-  if (!existing) return res.status(404).json({ message: "Platform not found" });
+  if (!existing) {
+    return res.status(404).json({ success: false, message: "Platform not found" });
+  }
 
   await PlatformStat.deleteOne({ _id: existing._id });
 
@@ -146,9 +180,66 @@ export const unlinkPlatform = async (req, res) => {
       action: "unlink",
       meta: { username: existing.username },
     });
+    
+    logger.info("Platform unlinked", { 
+      userId: req.user._id, 
+      platform, 
+      username: existing.username 
+    });
   } catch (err) {
-    console.error("PlatformAction write error:", err?.message || err);
+    logger.error("PlatformAction write error", { error: err.message });
   }
 
-  res.json({ success: true, message: "Platform unlinked" });
+  res.json({ success: true, message: "Platform unlinked successfully" });
+};
+
+/**
+ * Refresh platform stats
+ * POST /api/platforms/:platform/refresh
+ */
+export const refreshPlatform = async (req, res) => {
+  const { platform } = req.params;
+  
+  // Validate platform
+  if (!platformFetchers[platform]) {
+    return res.status(400).json({ 
+      success: false, 
+      message: `Unsupported platform: ${platform}` 
+    });
+  }
+
+  try {
+    const platformStat = await PlatformStat.findOne({
+      userId: req.user._id,
+      platform,
+    });
+
+    if (!platformStat) {
+      return res.status(404).json({ success: false, message: "Platform not linked" });
+    }
+
+    const fetchFunction = platformFetchers[platform];
+    const freshData = await fetchFunction(platformStat.username);
+
+    platformStat.data = freshData || {};
+    platformStat.stats = platformService.extractStats(platform, platformStat.data);
+    platformStat.lastUpdated = new Date();
+    platformStat.lastManualRefresh = new Date();
+    await platformStat.save();
+
+    logger.info("Platform refreshed", { 
+      userId: req.user._id, 
+      platform, 
+      username: platformStat.username 
+    });
+
+    res.json({ 
+      success: true, 
+      message: "Platform stats refreshed successfully",
+      data: { stat: platformStat }
+    });
+  } catch (err) {
+    logger.error("Platform refresh error", { error: err.message, platform });
+    res.status(500).json({ success: false, message: "Failed to refresh platform stats" });
+  }
 };

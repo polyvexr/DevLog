@@ -5,14 +5,33 @@ import PlatformStatHistory from "../models/PlatformStatHistory.js";
 import { fetchLeetCode } from "../utils/fetchLeetCode.js";
 import { fetchCodeforces } from "../utils/fetchCodeforces.js";
 import { fetchGithub } from "../utils/fetchGithub.js";
+import { fetchCodeChef } from "../utils/fetchCodeChef.js";
+import { fetchAtCoder } from "../utils/fetchAtCoder.js";
+import logger from "../utils/logger.js";
 
 // Cooldown duration in milliseconds (6 hours)
 const COOLDOWN_MS = 6 * 60 * 60 * 1000;
+
+// Platform fetch function mapping
+const platformFetchers = {
+  leetcode: fetchLeetCode,
+  codeforces: fetchCodeforces,
+  github: fetchGithub,
+  codechef: fetchCodeChef,
+  atcoder: fetchAtCoder,
+};
 
 /**
  * Platform Service - Business logic for platform operations
  */
 export const platformService = {
+  /**
+   * Get list of supported platforms
+   */
+  getSupportedPlatforms() {
+    return Object.keys(platformFetchers);
+  },
+
   /**
    * Check if user can refresh a platform (cooldown enforcement)
    */
@@ -112,21 +131,14 @@ export const platformService = {
         throw new Error(`No linked ${job.platform} account found`);
       }
 
-      // Fetch fresh data from external API
-      let freshData;
-      switch (job.platform) {
-        case "leetcode":
-          freshData = await fetchLeetCode(platformStat.username);
-          break;
-        case "codeforces":
-          freshData = await fetchCodeforces(platformStat.username);
-          break;
-        case "github":
-          freshData = await fetchGithub(platformStat.username);
-          break;
-        default:
-          throw new Error(`Unknown platform: ${job.platform}`);
+      // Get fetch function for platform
+      const fetchFunction = platformFetchers[job.platform];
+      if (!fetchFunction) {
+        throw new Error(`Unknown platform: ${job.platform}`);
       }
+
+      // Fetch fresh data from external API
+      const freshData = await fetchFunction(platformStat.username);
 
       // Update platform stat
       platformStat.data = freshData;
@@ -143,6 +155,12 @@ export const platformService = {
       job.completedAt = new Date();
       job.executionDurationMs = Date.now() - startTime;
       await job.save();
+
+      logger.info("Sync job completed", {
+        jobId: job._id,
+        platform: job.platform,
+        duration: job.executionDurationMs,
+      });
 
       return { success: true, job };
     } catch (error) {
@@ -161,6 +179,13 @@ export const platformService = {
       job.executionDurationMs = Date.now() - startTime;
       await job.save();
 
+      logger.error("Sync job failed", {
+        jobId: job._id,
+        platform: job.platform,
+        error: error.message,
+        retryCount: job.retryCount,
+      });
+
       return { success: false, error: error.message, job };
     }
   },
@@ -169,32 +194,17 @@ export const platformService = {
    * Extract normalized stats from raw platform data
    */
   extractStats(platform, data) {
+    if (!data || Object.keys(data).length === 0) return {};
+    
+    // For now, return the full data as stats to ensure frontend compatibility
+    // but we can add platform-specific normalization if needed
     switch (platform) {
       case "leetcode":
-        return {
-          totalSolved: data.totalSolved || 0,
-          easySolved: data.submissionsByDifficulty?.easy?.solved || 0,
-          mediumSolved: data.submissionsByDifficulty?.medium?.solved || 0,
-          hardSolved: data.submissionsByDifficulty?.hard?.solved || 0,
-          ranking: data.ranking || null,
-          rating: data.contestRanking?.rating || null
-        };
       case "codeforces":
-        return {
-          rating: data.rating || 0,
-          maxRating: data.maxRating || 0,
-          rank: data.rank || "unrated",
-          problemsSolved: data.problemsSolved || 0,
-          contestsParticipated: data.totalContests || 0
-        };
       case "github":
-        return {
-          publicRepos: data.publicRepos || 0,
-          followers: data.followers || 0,
-          following: data.following || 0,
-          totalStars: data.totalStars || 0,
-          totalForks: data.totalForks || 0
-        };
+      case "codechef":
+      case "atcoder":
+        return { ...data };
       default:
         return {};
     }
@@ -228,25 +238,50 @@ export const platformService = {
   extractMetrics(platform, platformStat) {
     const data = platformStat.data || {};
     
+    // Helper to sanitize numeric values (handles strings like "974?", "N/A", etc.)
+    const s = (val) => {
+      if (val === null || val === undefined || val === "") return null;
+      if (typeof val === 'number') return val;
+      const cleaned = String(val).replace(/[^0-9.-]/g, '');
+      if (cleaned === "" || cleaned === "-") return null;
+      const parsed = parseFloat(cleaned);
+      return isNaN(parsed) ? null : parsed;
+    };
+    
     switch (platform) {
       case "leetcode":
         return {
-          totalSolved: data.totalSolved || null,
-          easySolved: data.submissionsByDifficulty?.easy?.solved || null,
-          mediumSolved: data.submissionsByDifficulty?.medium?.solved || null,
-          hardSolved: data.submissionsByDifficulty?.hard?.solved || null
+          totalSolved: s(data.totalSolved),
+          easySolved: s(data.submissionsByDifficulty?.easy?.solved),
+          mediumSolved: s(data.submissionsByDifficulty?.medium?.solved),
+          hardSolved: s(data.submissionsByDifficulty?.hard?.solved)
         };
       case "codeforces":
         return {
-          rating: data.rating || null,
-          maxRating: data.maxRating || null,
-          problemsSolved: data.problemsSolved || null
+          rating: s(data.rating),
+          maxRating: s(data.maxRating),
+          problemsSolved: s(data.problemsSolved)
         };
       case "github":
         return {
-          totalRepos: data.publicRepos || null,
-          totalStars: data.totalStars || null,
-          contributions: data.contributions || null
+          totalRepos: s(data.publicRepos),
+          totalStars: s(data.totalStars),
+          contributions: s(data.totalEvents || data.contributions)
+        };
+      case "codechef":
+        return {
+          rating: s(data.rating || data.currentRating),
+          highestRating: s(data.highestRating),
+          totalSolved: s(data.totalSolved),
+          stars: s(data.stars),
+          globalRank: s(data.globalRank),
+          countryRank: s(data.countryRank)
+        };
+      case "atcoder":
+        return {
+          rating: s(data.rating),
+          highestRating: s(data.highestRating),
+          totalSolved: s(data.totalSolved || data.acCount)
         };
       default:
         return {};
