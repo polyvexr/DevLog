@@ -13,7 +13,12 @@ import {
   FiZap,
   FiCheckCircle,
 } from "react-icons/fi";
-import { SiLeetcode, SiCodeforces, SiGithub } from "react-icons/si";
+import { SiLeetcode, SiCodeforces, SiGithub, SiCodechef } from "react-icons/si";
+
+// AtCoder text icon component
+const AtCoderIcon = ({ className }) => (
+  <span className={`font-black text-sm ${className}`}>AT</span>
+);
 
 const platformConfig = {
   leetcode: {
@@ -39,6 +44,23 @@ const platformConfig = {
     gradient: "linear-gradient(135deg, #6e5494, #9575cd)",
     url: (username) => `https://github.com/${username}`,
     progressClass: "progress-fill-github",
+  },
+  codechef: {
+    name: "CodeChef",
+    icon: SiCodechef,
+    color: "#5B4638",
+    gradient: "linear-gradient(135deg, #5B4638, #8B7355)",
+    url: (username) => `https://www.codechef.com/users/${username}`,
+    progressClass: "progress-fill-codechef",
+  },
+  atcoder: {
+    name: "AtCoder",
+    icon: AtCoderIcon,
+    color: "#222222",
+    gradient: "linear-gradient(135deg, #333333, #666666)",
+    url: (username) => `https://atcoder.jp/users/${username}`,
+    progressClass: "progress-fill-atcoder",
+    isTextIcon: true,
   },
 };
 
@@ -85,6 +107,20 @@ const getStatsDisplay = (platform, stats) => {
           value: stats.totalEvents || 0,
           icon: FiActivity,
         },
+      ];
+    case "codechef":
+      return [
+        { label: "Rating", value: stats.rating || 0, icon: FiTrendingUp },
+        { label: "Stars", value: "★".repeat(stats.stars || 1), icon: FiStar },
+        { label: "Solved", value: stats.totalSolved || 0, icon: FiCheckCircle },
+        { label: "Global Rank", value: stats.globalRank ? `#${stats.globalRank}` : "N/A", icon: FiAward },
+      ];
+    case "atcoder":
+      return [
+        { label: "Rating", value: stats.rating || 0, icon: FiTrendingUp },
+        { label: "Rank Color", value: stats.rankColor || "Unrated", icon: FiAward },
+        { label: "Solved", value: stats.totalSolved || stats.acCount || 0, icon: FiCheckCircle },
+        { label: "Contests", value: stats.contestsParticipated || 0, icon: FiActivity },
       ];
     default:
       return [];
@@ -156,7 +192,11 @@ const PlatformCard = ({
           className="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl shadow-2xl transition-all group-hover:scale-110 group-hover:rotate-3"
           style={{ background: config.gradient, boxShadow: `0 10px 30px -5px ${config.color}40` }}
         >
-          <Icon className="text-white" />
+          {config.isTextIcon ? (
+            <Icon className="text-white" />
+          ) : (
+            <Icon className="text-white" />
+          )}
         </div>
         <div className="flex-1">
           <h3 className="text-2xl font-black text-white group-hover:text-white/90">

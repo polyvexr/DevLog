@@ -7,6 +7,8 @@ import LinkPlatform from "./pages/LinkPlatform";
 import LeetCodeDetails from "./pages/LeetCodeDetails";
 import CodeforcesDetails from "./pages/CodeforcesDetails";
 import GitHubDetails from "./pages/GitHubDetails";
+import CodeChefDetails from "./pages/CodeChefDetails";
+import AtCoderDetails from "./pages/AtCoderDetails";
 import AdminDashboard from "./pages/AdminDashboard";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
@@ -14,6 +16,9 @@ import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 // V2 Pages
 import Contests from "./pages/Contests";
+import Insights from "./pages/Insights";
+import History from "./pages/History";
+import Notifications from "./pages/Notifications";
 import PublicProfile from "./pages/PublicProfile";
 import AuthenticatedLayout from "./components/AuthenticatedLayout";
 import { AuthContext } from "./context/AuthContext";
@@ -21,7 +26,16 @@ import { SidebarProvider } from "./context/SidebarProvider";
 import { useContext } from "react";
 
 const PrivateRoute = ({ children }) => {
-  const { token } = useContext(AuthContext);
+  const { token, loading } = useContext(AuthContext);
+  
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-blue-500/30 border-t-blue-500 rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+  
   return token ? (
     <SidebarProvider>
       <AuthenticatedLayout>{children}</AuthenticatedLayout>
@@ -32,7 +46,16 @@ const PrivateRoute = ({ children }) => {
 };
 
 const AdminRoute = ({ children }) => {
-  const { token, isAdmin } = useContext(AuthContext);
+  const { token, isAdmin, loading } = useContext(AuthContext);
+  
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-blue-500/30 border-t-blue-500 rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+  
   if (!token) return <Navigate to="/login" />;
   if (!isAdmin) return <Navigate to="/" />;
   return (
@@ -44,13 +67,31 @@ const AdminRoute = ({ children }) => {
 
 // PublicRoute: Redirect authenticated users away from public pages
 const PublicRoute = ({ children }) => {
-  const { token } = useContext(AuthContext);
+  const { token, loading } = useContext(AuthContext);
+  
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-blue-500/30 border-t-blue-500 rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+  
   return token ? <Navigate to="/" replace /> : children;
 };
 
 // Context-aware home route: Landing for guests, Dashboard for authenticated users
 const HomeRoute = () => {
-  const { token } = useContext(AuthContext);
+  const { token, loading } = useContext(AuthContext);
+  
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-blue-500/30 border-t-blue-500 rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+  
   return token ? (
     <SidebarProvider>
       <AuthenticatedLayout>
@@ -111,6 +152,22 @@ function App() {
             </PrivateRoute>
           }
         />
+        <Route
+          path="/codechef"
+          element={
+            <PrivateRoute>
+              <CodeChefDetails />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/atcoder"
+          element={
+            <PrivateRoute>
+              <AtCoderDetails />
+            </PrivateRoute>
+          }
+        />
         
         {/* V2 Routes */}
         <Route
@@ -121,8 +178,33 @@ function App() {
             </PrivateRoute>
           }
         />
+        <Route
+          path="/insights"
+          element={
+            <PrivateRoute>
+              <Insights />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/history"
+          element={
+            <PrivateRoute>
+              <History />
+            </PrivateRoute>
+          }
+        />
         
-        {/* User profile */}
+        <Route
+          path="/notifications"
+          element={
+            <PrivateRoute>
+              <Notifications />
+            </PrivateRoute>
+          }
+        />
+        
+        {/* User profile (includes settings) */}
         <Route
           path="/profile"
           element={
@@ -131,6 +213,8 @@ function App() {
             </PrivateRoute>
           }
         />
+        {/* Redirect /settings to /profile */}
+        <Route path="/settings" element={<Navigate to="/profile" replace />} />
         
         {/* Auth routes */}
         <Route

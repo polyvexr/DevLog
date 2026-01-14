@@ -64,8 +64,8 @@ export const getAllHistory = () => api.get("/history");
 
 // Insights API
 export const getInsights = () => api.get("/insights");
-export const markInsightRead = (id) => api.post(`/insights/${id}/read`);
-export const dismissInsight = (id) => api.delete(`/insights/${id}`);
+export const markInsightRead = (id) => api.patch(`/insights/${id}/read`);
+export const dismissInsight = (id) => api.patch(`/insights/${id}/dismiss`);
 
 // Notifications API
 export const getNotifications = () => api.get("/notifications");
