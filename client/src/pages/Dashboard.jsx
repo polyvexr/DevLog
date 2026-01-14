@@ -1,12 +1,12 @@
 import Loader from "../components/Loader";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import api, { getStatsSummary, refreshPlatformStats } from "../api/axios";
+import api, { getStatsSummary, refreshPlatformStats, getInsights, getNotifications } from "../api/axios";
 import Dialog from "../components/Dialog";
 import FilterButtons from "../components/FilterButtons";
 import PlatformCard from "../components/PlatformCard";
 import SummarySection from "../components/SummarySection";
-import { FiBarChart2 } from "react-icons/fi";
+import { FiBarChart2, FiTrendingUp, FiClock, FiBell } from "react-icons/fi";
 
 // Filter persistence key
 const FILTER_STORAGE_KEY = "dashboardFilter";
@@ -15,6 +15,8 @@ export default function Dashboard() {
   const [stats, setStats] = useState(null);
   const [summary, setSummary] = useState(null);
   const [summaryLoading, setSummaryLoading] = useState(true);
+  const [insightsCount, setInsightsCount] = useState(0);
+  const [notificationsCount, setNotificationsCount] = useState(0);
   const [activeFilter, setActiveFilter] = useState(() => {
     return localStorage.getItem(FILTER_STORAGE_KEY) || "all";
   });
@@ -94,10 +96,31 @@ export default function Dashboard() {
   useEffect(() => {
     api
       .get("/stats/all")
-      .then((res) => setStats(res.data.stats))
+      .then((res) => {
+        const statsData = res.data.data?.stats || res.data.stats || [];
+        setStats(statsData);
+      })
       .catch(() => setStats([]));
 
     fetchSummary();
+    
+    // Fetch insights count for badge
+    getInsights()
+      .then((res) => {
+        const insights = res.data.data?.insights || res.data.insights || [];
+        const unread = insights.filter(i => !i.read).length;
+        setInsightsCount(unread);
+      })
+      .catch(() => {});
+
+    // Fetch notifications count
+    getNotifications()
+      .then((res) => {
+        const notifications = res.data.data?.notifications || res.data.notifications || [];
+        const unread = notifications.filter(n => !n.read).length;
+        setNotificationsCount(unread);
+      })
+      .catch(() => {});
   }, []);
 
   const filteredStats = getFilteredStats();
@@ -113,6 +136,41 @@ export default function Dashboard() {
         <p className="text-gray-400 text-xl md:text-2xl font-medium max-w-2xl leading-relaxed">
           Quantify your secondary consciousness. Track your neural coding progress across the global ecosystem.
         </p>
+        
+        {/* Quick Action Buttons */}
+        <div className="flex gap-4 mt-8">
+          <button
+            onClick={() => navigate("/insights")}
+            className="px-6 py-3 bg-purple-600/20 hover:bg-purple-600/30 text-purple-400 font-bold rounded-xl transition-all flex items-center gap-3 ring-1 ring-purple-500/20"
+          >
+            <FiTrendingUp className="w-5 h-5" />
+            Insights
+            {insightsCount > 0 && (
+              <span className="bg-purple-500 text-white text-xs font-black px-2 py-0.5 rounded-full">
+                {insightsCount}
+              </span>
+            )}
+          </button>
+          <button
+            onClick={() => navigate("/history")}
+            className="px-6 py-3 bg-cyan-600/20 hover:bg-cyan-600/30 text-cyan-400 font-bold rounded-xl transition-all flex items-center gap-3 ring-1 ring-cyan-500/20"
+          >
+            <FiClock className="w-5 h-5" />
+            History
+          </button>
+          <button
+            onClick={() => navigate("/notifications")}
+            className="px-6 py-3 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 font-bold rounded-xl transition-all flex items-center gap-3 ring-1 ring-blue-500/20"
+          >
+            <FiBell className="w-5 h-5" />
+            Feed
+            {notificationsCount > 0 && (
+              <span className="bg-blue-500 text-white text-xs font-black px-2 py-0.5 rounded-full">
+                {notificationsCount}
+              </span>
+            )}
+          </button>
+        </div>
       </div>
 
       {/* Summary Section */}
