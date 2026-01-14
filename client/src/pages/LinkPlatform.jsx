@@ -2,6 +2,46 @@ import { useState } from "react";
 import api from "../api/axios";
 import { useNavigate } from "react-router-dom";
 import { FiLink } from "react-icons/fi";
+import { SiLeetcode, SiCodeforces, SiGithub, SiCodechef } from "react-icons/si";
+
+// Platform configuration with icons and colors
+const platforms = [
+  { 
+    id: "leetcode", 
+    name: "LeetCode", 
+    icon: SiLeetcode, 
+    color: "#FFA116",
+    placeholder: "e.g. touring_machine" 
+  },
+  { 
+    id: "codeforces", 
+    name: "Codeforces", 
+    icon: SiCodeforces, 
+    color: "#1F8ACB",
+    placeholder: "e.g. tourist" 
+  },
+  { 
+    id: "github", 
+    name: "GitHub", 
+    icon: SiGithub, 
+    color: "#FFFFFF",
+    placeholder: "e.g. torvalds" 
+  },
+  { 
+    id: "codechef", 
+    name: "CodeChef", 
+    icon: SiCodechef, 
+    color: "#5B4638",
+    placeholder: "e.g. gennady.korotkevich" 
+  },
+  { 
+    id: "atcoder", 
+    name: "AtCoder", 
+    icon: null, // Will use text fallback
+    color: "#222222",
+    placeholder: "e.g. tourist" 
+  },
+];
 
 export default function LinkPlatform() {
   const navigate = useNavigate();
@@ -9,6 +49,8 @@ export default function LinkPlatform() {
   const [username, setUsername] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const selectedPlatform = platforms.find(p => p.id === platform);
 
   const submit = async (e) => {
     e.preventDefault();
@@ -53,36 +95,60 @@ export default function LinkPlatform() {
           )}
 
           <div className="space-y-8">
+            {/* Platform Selection Cards */}
             <div className="space-y-3">
-              <label htmlFor="platform" className="block text-sm font-bold text-gray-400 uppercase tracking-widest ml-1">
+              <label className="block text-sm font-bold text-gray-400 uppercase tracking-widest ml-1">
                 Select Platform
               </label>
-              <div className="relative">
-                <select
-                  id="platform"
-                  className="w-full px-6 py-4 bg-white/5 border border-white/10 rounded-2xl text-white appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-all font-bold cursor-pointer hover:bg-white/10"
-                  value={platform}
-                  onChange={(e) => setPlatform(e.target.value)}
-                >
-                  <option value="leetcode" className="bg-gray-900">LeetCode</option>
-                  <option value="codeforces" className="bg-gray-900">Codeforces</option>
-                  <option value="github" className="bg-gray-900">GitHub</option>
-                </select>
-                <div className="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500">
-                  ▼
-                </div>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                {platforms.map((p) => {
+                  const Icon = p.icon;
+                  const isSelected = platform === p.id;
+                  return (
+                    <button
+                      key={p.id}
+                      type="button"
+                      onClick={() => setPlatform(p.id)}
+                      className={`p-4 rounded-xl border transition-all flex flex-col items-center gap-2 ${
+                        isSelected
+                          ? "bg-white/10 border-blue-500/50 ring-2 ring-blue-500/30"
+                          : "bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20"
+                      }`}
+                    >
+                      {Icon ? (
+                        <Icon 
+                          className="w-6 h-6" 
+                          style={{ color: isSelected ? p.color : "#9CA3AF" }} 
+                        />
+                      ) : (
+                        <span 
+                          className="w-6 h-6 flex items-center justify-center font-black text-sm rounded"
+                          style={{ 
+                            backgroundColor: isSelected ? p.color : "#374151",
+                            color: isSelected ? "#FFFFFF" : "#9CA3AF"
+                          }}
+                        >
+                          AT
+                        </span>
+                      )}
+                      <span className={`text-sm font-semibold ${isSelected ? "text-white" : "text-gray-400"}`}>
+                        {p.name}
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
             <div className="space-y-3">
               <label htmlFor="username" className="block text-sm font-bold text-gray-400 uppercase tracking-widest ml-1">
-                Platform Alias / Username
+                {selectedPlatform?.name} Username
               </label>
               <input
                 id="username"
                 value={username}
                 type="text"
-                placeholder="e.g. touring_machine"
+                placeholder={selectedPlatform?.placeholder || "Enter your username"}
                 className="w-full px-6 py-4 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-all font-medium"
                 onChange={(e) => setUsername(e.target.value)}
                 required
@@ -100,7 +166,7 @@ export default function LinkPlatform() {
             ) : (
               <>
                 <FiLink className="group-hover:rotate-12 transition-transform" />
-                Initialize Link
+                Link {selectedPlatform?.name}
               </>
             )}
           </button>
@@ -112,7 +178,15 @@ export default function LinkPlatform() {
             Connection Protocol
           </h4>
           <p className="text-gray-500 text-sm leading-relaxed">
-            By linking your account, DevLog will track public statistics and activity history. Some platforms have sync cooldowns to prevent API rate limiting.
+            By linking your account, DevLog will track public statistics and activity history. 
+            Platform data is fetched from public APIs. Some platforms have sync cooldowns to prevent API rate limiting.
+          </p>
+        </div>
+
+        <div className="mt-4 p-4 bg-yellow-500/5 border border-yellow-500/10 rounded-xl fade-in-up delay-300">
+          <p className="text-yellow-500/80 text-xs">
+            <strong>Note:</strong> CodeChef and AtCoder use third-party APIs which may have occasional downtime. 
+            If linking fails, try again later.
           </p>
         </div>
       </div>
