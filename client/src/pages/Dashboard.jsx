@@ -25,6 +25,7 @@ export default function Dashboard() {
     open: false,
     title: "",
     message: "",
+    type: "info", // success, error, info, warning
   });
 
   // Filter change handler with localStorage persistence
@@ -57,9 +58,11 @@ export default function Dashboard() {
   const handleRefresh = async (platform) => {
     try {
       const res = await refreshPlatformStats(platform);
+      const updatedStat = res.data.data?.stat || res.data.stat;
+      
       // Update the stats with the refreshed data
       setStats((prevStats) =>
-        prevStats.map((s) => (s.platform === platform ? res.data.stat : s))
+        prevStats.map((s) => (s.platform === platform ? updatedStat : s))
       );
       // Refresh summary too
       fetchSummary();
@@ -67,11 +70,12 @@ export default function Dashboard() {
         open: true,
         title: "Stats Updated",
         message: `${platform} stats have been refreshed successfully.`,
+        type: "success",
       });
     } catch (err) {
       const msg =
         err?.response?.data?.message || err.message || "Error refreshing stats";
-      setMessageDialog({ open: true, title: "Refresh Failed", message: msg });
+      setMessageDialog({ open: true, title: "Refresh Failed", message: msg, type: "error" });
     }
   };
 
@@ -237,6 +241,7 @@ export default function Dashboard() {
         open={messageDialog.open}
         title={messageDialog.title}
         message={messageDialog.message}
+        type={messageDialog.type}
         confirmText="OK"
         cancelText=""
         onConfirm={() =>
