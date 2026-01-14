@@ -238,37 +238,50 @@ export const platformService = {
   extractMetrics(platform, platformStat) {
     const data = platformStat.data || {};
     
+    // Helper to sanitize numeric values (handles strings like "974?", "N/A", etc.)
+    const s = (val) => {
+      if (val === null || val === undefined || val === "") return null;
+      if (typeof val === 'number') return val;
+      const cleaned = String(val).replace(/[^0-9.-]/g, '');
+      if (cleaned === "" || cleaned === "-") return null;
+      const parsed = parseFloat(cleaned);
+      return isNaN(parsed) ? null : parsed;
+    };
+    
     switch (platform) {
       case "leetcode":
         return {
-          totalSolved: data.totalSolved || null,
-          easySolved: data.submissionsByDifficulty?.easy?.solved || null,
-          mediumSolved: data.submissionsByDifficulty?.medium?.solved || null,
-          hardSolved: data.submissionsByDifficulty?.hard?.solved || null
+          totalSolved: s(data.totalSolved),
+          easySolved: s(data.submissionsByDifficulty?.easy?.solved),
+          mediumSolved: s(data.submissionsByDifficulty?.medium?.solved),
+          hardSolved: s(data.submissionsByDifficulty?.hard?.solved)
         };
       case "codeforces":
         return {
-          rating: data.rating || null,
-          maxRating: data.maxRating || null,
-          problemsSolved: data.problemsSolved || null
+          rating: s(data.rating),
+          maxRating: s(data.maxRating),
+          problemsSolved: s(data.problemsSolved)
         };
       case "github":
         return {
-          totalRepos: data.publicRepos || null,
-          totalStars: data.totalStars || null,
-          contributions: data.contributions || null
+          totalRepos: s(data.publicRepos),
+          totalStars: s(data.totalStars),
+          contributions: s(data.totalEvents || data.contributions)
         };
       case "codechef":
         return {
-          rating: data.rating || null,
-          highestRating: data.highestRating || null,
-          totalSolved: data.totalSolved || null
+          rating: s(data.rating || data.currentRating),
+          highestRating: s(data.highestRating),
+          totalSolved: s(data.totalSolved),
+          stars: s(data.stars),
+          globalRank: s(data.globalRank),
+          countryRank: s(data.countryRank)
         };
       case "atcoder":
         return {
-          rating: data.rating || null,
-          highestRating: data.highestRating || null,
-          totalSolved: data.totalSolved || null
+          rating: s(data.rating),
+          highestRating: s(data.highestRating),
+          totalSolved: s(data.totalSolved || data.acCount)
         };
       default:
         return {};
