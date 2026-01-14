@@ -23,25 +23,10 @@ import logger from "./src/utils/logger.js";
 
 dotenv.config();
 
-const PORT = process.env.PORT || 5000;
 const app = express();
+const PORT = process.env.PORT || 5000;
 
-// Security middleware - helmet for HTTP headers
-app.use(helmet({
-  crossOriginResourcePolicy: { policy: "cross-origin" },
-  contentSecurityPolicy: process.env.NODE_ENV === "production" ? undefined : false,
-}));
-
-// Compression middleware for faster responses
-app.use(compression());
-
-// Rate limiting
-app.use("/api", apiLimiter);
-
-// Body parser with size limit (prevent DoS)
-app.use(express.json({ limit: "10kb" }));
-
-// CORS configuration for production
+// CORS configuration
 const allowedOrigins = [
   process.env.CLIENT_URL,
   // Production URLs
@@ -53,18 +38,9 @@ const allowedOrigins = [
   "http://localhost:3000",
 ].filter(Boolean);
 
-// Paths that allow no-origin requests (for cron jobs)
-const noOriginAllowedPaths = ["/api/cron", "/api/health", "/"];
-
-// Log CORS configuration for debugging
-logger.info("CORS Configuration", {
-  clientUrl: process.env.CLIENT_URL,
-  allowedOrigins,
-});
-
 const corsOptions = {
   origin: function (origin, callback) {
-    // Allow requests with no origin only for specific paths
+    // Allow requests with no origin only for specific paths (handled in custom middleware after this)
     if (!origin) {
       return callback(null, true);
     }
@@ -82,15 +58,41 @@ const corsOptions = {
   exposedHeaders: ["set-cookie"],
 };
 
+app.use(cors(corsOptions));
+
+// Body parser with size limit (prevent DoS)
+app.use(express.json({ limit: "10kb" }));
+
+// Security middleware - helmet for HTTP headers
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" },
+  contentSecurityPolicy: process.env.NODE_ENV === "production" ? undefined : false,
+}));
+
+// Compression middleware for faster responses
+app.use(compression());
+
+// Rate limiting
+app.use("/api", apiLimiter);
+
+// Paths that allow no-origin requests (for cron jobs)
+const noOriginAllowedPaths = ["/api/cron", "/api/health", "/"];
+
 // Custom CORS middleware to restrict no-origin requests
 app.use((req, res, next) => {
+  // Always allow preflight requests to pass through
+  if (req.method === 'OPTIONS') {
+    return next();
+  }
+
   const origin = req.headers.origin;
   const path = req.path;
   
   // If no origin, only allow specific paths
   if (!origin) {
-    const isAllowedPath = noOriginAllowedPaths.some(p => path.startsWith(p));
+    const isAllowedPath = noOriginAllowedPaths.some(p => path === p || path.startsWith(p + "/"));
     if (!isAllowedPath) {
+      logger.warn("Request blocked: No origin and not an allowed path", { path });
       return res.status(403).json({ 
         success: false, 
         message: "Origin required for this endpoint" 
@@ -99,8 +101,6 @@ app.use((req, res, next) => {
   }
   next();
 });
-
-app.use(cors(corsOptions));
 
 // Connect database
 connectDB();

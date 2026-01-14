@@ -194,50 +194,17 @@ export const platformService = {
    * Extract normalized stats from raw platform data
    */
   extractStats(platform, data) {
+    if (!data || Object.keys(data).length === 0) return {};
+    
+    // For now, return the full data as stats to ensure frontend compatibility
+    // but we can add platform-specific normalization if needed
     switch (platform) {
       case "leetcode":
-        return {
-          totalSolved: data.totalSolved || 0,
-          easySolved: data.submissionsByDifficulty?.easy?.solved || 0,
-          mediumSolved: data.submissionsByDifficulty?.medium?.solved || 0,
-          hardSolved: data.submissionsByDifficulty?.hard?.solved || 0,
-          ranking: data.ranking || null,
-          rating: data.contestRanking?.rating || null
-        };
       case "codeforces":
-        return {
-          rating: data.rating || 0,
-          maxRating: data.maxRating || 0,
-          rank: data.rank || "unrated",
-          problemsSolved: data.problemsSolved || 0,
-          contestsParticipated: data.totalContests || 0
-        };
       case "github":
-        return {
-          publicRepos: data.publicRepos || 0,
-          followers: data.followers || 0,
-          following: data.following || 0,
-          totalStars: data.totalStars || 0,
-          totalForks: data.totalForks || 0
-        };
       case "codechef":
-        return {
-          rating: data.rating || 0,
-          highestRating: data.highestRating || 0,
-          stars: data.stars || 0,
-          totalSolved: data.totalSolved || 0,
-          globalRank: data.globalRank || null,
-          countryRank: data.countryRank || null
-        };
       case "atcoder":
-        return {
-          rating: data.rating || 0,
-          highestRating: data.highestRating || 0,
-          rankColor: data.rankColor || "gray",
-          totalSolved: data.totalSolved || 0,
-          contestsParticipated: data.contestsParticipated || 0,
-          averagePerformance: data.averagePerformance || 0
-        };
+        return { ...data };
       default:
         return {};
     }

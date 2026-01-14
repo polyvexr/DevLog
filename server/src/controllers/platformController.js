@@ -5,6 +5,7 @@ import { fetchGithub } from "../utils/fetchGithub.js";
 import { fetchCodeforces } from "../utils/fetchCodeforces.js";
 import { fetchCodeChef } from "../utils/fetchCodeChef.js";
 import { fetchAtCoder } from "../utils/fetchAtCoder.js";
+import { platformService } from "../services/platformService.js";
 import logger from "../utils/logger.js";
 
 const FIFTEEN_DAYS_MS = 15 * 24 * 60 * 60 * 1000;
@@ -102,13 +103,15 @@ export const linkPlatform = async (req, res) => {
   // Fetch platform stats immediately for this user only
   try {
     const fetchFunction = platformFetchers[platform];
-    const fetched = await fetchFunction(username);
+    const freshData = await fetchFunction(username);
 
-    entry.stats = fetched || {};
+    // Use platformService to normalize data consistently
+    entry.data = freshData || {};
+    entry.stats = platformService.extractStats(platform, entry.data);
     entry.lastUpdated = new Date();
     await entry.save();
     
-    logger.info("Platform linked successfully", { 
+    logger.info("Platform linked and stats fetched", { 
       userId: req.user._id, 
       platform, 
       username 
@@ -216,10 +219,12 @@ export const refreshPlatform = async (req, res) => {
     }
 
     const fetchFunction = platformFetchers[platform];
-    const fetched = await fetchFunction(platformStat.username);
+    const freshData = await fetchFunction(platformStat.username);
 
-    platformStat.stats = fetched || {};
+    platformStat.data = freshData || {};
+    platformStat.stats = platformService.extractStats(platform, platformStat.data);
     platformStat.lastUpdated = new Date();
+    platformStat.lastManualRefresh = new Date();
     await platformStat.save();
 
     logger.info("Platform refreshed", { 
@@ -231,7 +236,7 @@ export const refreshPlatform = async (req, res) => {
     res.json({ 
       success: true, 
       message: "Platform stats refreshed successfully",
-      data: { platform: platformStat }
+      data: { stat: platformStat }
     });
   } catch (err) {
     logger.error("Platform refresh error", { error: err.message, platform });
