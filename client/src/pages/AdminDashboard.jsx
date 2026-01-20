@@ -33,7 +33,7 @@ export default function AdminDashboard() {
     try {
       setLoading(true);
       const res = await api.get("/admin/stats");
-      setStats(res.data.stats);
+      setStats(res.data.data);
     } catch (error) {
       console.error("Error fetching stats:", error);
       setNotification({
@@ -57,12 +57,28 @@ export default function AdminDashboard() {
       else if (platform === "github") endpoint = "/admin/sync/github";
 
       const res = await api.post(endpoint);
-      setSyncResults(res.data.results);
+      
+      let results;
+      if (platform === "all") {
+        results = res.data.data.totals;
+        // Collect all details from all platforms for the table
+        const allDetails = [];
+        if (res.data.data.platforms) {
+          Object.values(res.data.data.platforms).forEach(p => {
+            if (p.details) allDetails.push(...p.details);
+          });
+        }
+        results.details = allDetails;
+      } else {
+        results = res.data.data.results;
+      }
+
+      setSyncResults(results);
 
       await fetchStats();
       setNotification({
         type: "success",
-        message: `Neural Link Established: ${res.data.results.success} nodes updated successfully.`,
+        message: `Neural Link Established: ${results.success} nodes updated successfully.`,
       });
     } catch (error) {
       console.error("Error syncing:", error);
