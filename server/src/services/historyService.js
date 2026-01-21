@@ -119,6 +119,19 @@ export const historyService = {
           totalStars: (endMetrics.totalStars || 0) - (startMetrics.totalStars || 0),
           contributions: (endMetrics.contributions || 0) - (startMetrics.contributions || 0)
         };
+      case "codechef":
+        return {
+          rating: (endMetrics.rating || 0) - (startMetrics.rating || 0),
+          totalSolved: (endMetrics.totalSolved || 0) - (startMetrics.totalSolved || 0),
+          stars: (endMetrics.stars || 0) - (startMetrics.stars || 0),
+          globalRank: (startMetrics.globalRank || 0) - (endMetrics.globalRank || 0) // Lower is better
+        };
+      case "atcoder":
+        return {
+          rating: (endMetrics.rating || 0) - (startMetrics.rating || 0),
+          totalSolved: (endMetrics.totalSolved || 0) - (startMetrics.totalSolved || 0),
+          contestsParticipated: (endMetrics.contestsParticipated || 0) - (startMetrics.contestsParticipated || 0)
+        };
       default:
         return null;
     }
@@ -220,6 +233,24 @@ export const historyService = {
           totalRepos: data.publicRepos || null,
           totalStars: data.totalStars || null,
           contributions: data.contributions || null
+        };
+      case "codechef":
+        return {
+          rating: data.rating || null,
+          highestRating: data.highestRating || null,
+          totalSolved: data.totalSolved || null,
+          stars: data.stars || null,
+          globalRank: data.globalRank || null,
+          countryRank: data.countryRank || null
+        };
+      case "atcoder":
+        return {
+          rating: data.rating || null,
+          highestRating: data.highestRating || null,
+          totalSolved: data.totalSolved || data.acCount || null,
+          acCount: data.acCount || null,
+          contestsParticipated: data.contestsParticipated || null,
+          averagePerformance: data.averagePerformance || null
         };
       default:
         return {};

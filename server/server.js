@@ -18,6 +18,7 @@ import insightRoutes from "./src/routes/insights.js";
 import notificationRoutes from "./src/routes/notifications.js";
 import publicRoutes from "./src/routes/public.js";
 import cronRoutes from "./src/routes/cron.js";
+import dashboardRoutes from "./src/routes/dashboard.js";
 import { apiLimiter } from "./src/middleware/rateLimit.js";
 import logger from "./src/utils/logger.js";
 
@@ -137,6 +138,7 @@ app.use("/api/contests", contestRoutes);
 app.use("/api/insights", insightRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/cron", cronRoutes);
+app.use("/api/dashboard", dashboardRoutes);
 
 // Public profile route (no /api prefix for clean URLs)
 app.use("/u", publicRoutes);

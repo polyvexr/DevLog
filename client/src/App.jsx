@@ -1,96 +1,90 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { lazy, Suspense, useContext } from "react";
+import { AuthContext } from "./context/AuthContext";
+import { SidebarProvider } from "./context/SidebarProvider";
+import AuthenticatedLayout from "./components/AuthenticatedLayout";
+import FullPageLoader from "./components/FullPageLoader";
+
+// Eagerly loaded pages (critical path)
+import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
-import Landing from "./pages/Landing";
-import LinkPlatform from "./pages/LinkPlatform";
-import LeetCodeDetails from "./pages/LeetCodeDetails";
-import CodeforcesDetails from "./pages/CodeforcesDetails";
-import GitHubDetails from "./pages/GitHubDetails";
-import CodeChefDetails from "./pages/CodeChefDetails";
-import AtCoderDetails from "./pages/AtCoderDetails";
-import AdminDashboard from "./pages/AdminDashboard";
-import ForgotPassword from "./pages/ForgotPassword";
-import ResetPassword from "./pages/ResetPassword";
-import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
-// V2 Pages
-import Contests from "./pages/Contests";
-import Insights from "./pages/Insights";
-import History from "./pages/History";
-import Notifications from "./pages/Notifications";
-import PublicProfile from "./pages/PublicProfile";
-import AuthenticatedLayout from "./components/AuthenticatedLayout";
-import { AuthContext } from "./context/AuthContext";
-import { SidebarProvider } from "./context/SidebarProvider";
-import { useContext } from "react";
 
+// Lazy loaded pages (code splitting)
+const LinkPlatform = lazy(() => import("./pages/LinkPlatform"));
+const LeetCodeDetails = lazy(() => import("./pages/LeetCodeDetails"));
+const CodeforcesDetails = lazy(() => import("./pages/CodeforcesDetails"));
+const GitHubDetails = lazy(() => import("./pages/GitHubDetails"));
+const CodeChefDetails = lazy(() => import("./pages/CodeChefDetails"));
+const AtCoderDetails = lazy(() => import("./pages/AtCoderDetails"));
+const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
+const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
+const Profile = lazy(() => import("./pages/Profile"));
+const Contests = lazy(() => import("./pages/Contests"));
+const Insights = lazy(() => import("./pages/Insights"));
+const History = lazy(() => import("./pages/History"));
+const Notifications = lazy(() => import("./pages/Notifications"));
+const PublicProfile = lazy(() => import("./pages/PublicProfile"));
+
+// Private route wrapper with auth check and layout
 const PrivateRoute = ({ children }) => {
   const { token, loading } = useContext(AuthContext);
   
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-blue-500/30 border-t-blue-500 rounded-full animate-spin"></div>
-      </div>
-    );
-  }
+  if (loading) return <FullPageLoader />;
   
   return token ? (
     <SidebarProvider>
-      <AuthenticatedLayout>{children}</AuthenticatedLayout>
+      <AuthenticatedLayout>
+        <Suspense fallback={<FullPageLoader />}>
+          {children}
+        </Suspense>
+      </AuthenticatedLayout>
     </SidebarProvider>
   ) : (
     <Navigate to="/login" />
   );
 };
 
+// Admin route wrapper with role check
 const AdminRoute = ({ children }) => {
   const { token, isAdmin, loading } = useContext(AuthContext);
   
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-blue-500/30 border-t-blue-500 rounded-full animate-spin"></div>
-      </div>
-    );
-  }
-  
+  if (loading) return <FullPageLoader />;
   if (!token) return <Navigate to="/login" />;
   if (!isAdmin) return <Navigate to="/" />;
+  
   return (
     <SidebarProvider>
-      <AuthenticatedLayout>{children}</AuthenticatedLayout>
+      <AuthenticatedLayout>
+        <Suspense fallback={<FullPageLoader />}>
+          {children}
+        </Suspense>
+      </AuthenticatedLayout>
     </SidebarProvider>
   );
 };
 
-// PublicRoute: Redirect authenticated users away from public pages
+// Public route - redirects authenticated users
 const PublicRoute = ({ children }) => {
   const { token, loading } = useContext(AuthContext);
   
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-blue-500/30 border-t-blue-500 rounded-full animate-spin"></div>
-      </div>
-    );
-  }
+  if (loading) return <FullPageLoader />;
   
-  return token ? <Navigate to="/" replace /> : children;
+  return token ? <Navigate to="/" replace /> : (
+    <Suspense fallback={<FullPageLoader />}>
+      {children}
+    </Suspense>
+  );
 };
 
-// Context-aware home route: Landing for guests, Dashboard for authenticated users
+// Context-aware home route
 const HomeRoute = () => {
   const { token, loading } = useContext(AuthContext);
   
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-blue-500/30 border-t-blue-500 rounded-full animate-spin"></div>
-      </div>
-    );
-  }
+  if (loading) return <FullPageLoader />;
   
   return token ? (
     <SidebarProvider>
@@ -204,7 +198,7 @@ function App() {
           }
         />
         
-        {/* User profile (includes settings) */}
+        {/* User profile */}
         <Route
           path="/profile"
           element={
@@ -251,7 +245,14 @@ function App() {
         />
         
         {/* Public profile - NO AUTH REQUIRED */}
-        <Route path="/u/:username" element={<PublicProfile />} />
+        <Route 
+          path="/u/:username" 
+          element={
+            <Suspense fallback={<FullPageLoader />}>
+              <PublicProfile />
+            </Suspense>
+          } 
+        />
         
         {/* 404 */}
         <Route path="*" element={<NotFound />} />

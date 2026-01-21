@@ -30,6 +30,55 @@ export const fetchCodeChef = async (username) => {
 };
 
 /**
+ * Normalize CodeChef data from any API response to consistent format
+ */
+function normalizeCodeChefData(data, username) {
+  // Extract stars value (can be number or string like "3★")
+  const parseStars = (stars) => {
+    if (typeof stars === "number") return stars;
+    if (typeof stars === "string") return parseInt(stars.replace(/[★\s]/g, "")) || 0;
+    return 0;
+  };
+
+  // Extract rating history from various formats
+  const parseRatingHistory = (contests, ratingData) => {
+    const source = contests || ratingData || [];
+    return source.slice(-20).map(item => ({
+      contestCode: item.code || item.contestCode || item.name,
+      contestName: item.name || item.contestName,
+      rating: item.rating,
+      rank: item.rank,
+      date: item.date || item.end_date,
+    }));
+  };
+
+  return {
+    username: data.username || username,
+    name: data.name || "",
+    stars: parseStars(data.stars),
+    rating: data.rating || data.currentRating || 0,
+    highestRating: data.highestRating || data.rating || data.currentRating || 0,
+    countryName: data.country || data.countryName || "",
+    globalRank: data.globalRank || null,
+    countryRank: data.countryRank || null,
+    totalSolved: data.problemsSolved || data.fullySolved?.count || 0,
+    partialSolved: data.partialProblems || data.partiallySolved?.count || 0,
+    problemsSolved: {
+      easy: 0,
+      medium: 0,
+      hard: 0,
+      challenge: 0,
+      peer: 0,
+    },
+    contestsParticipated: (data.contests || data.ratingData || []).length,
+    ratingHistory: parseRatingHistory(data.contests, data.ratingData),
+    division: data.division || null,
+    badges: data.badges || [],
+    avatar: data.avatar || data.profile || null,
+  };
+}
+
+/**
  * CP Rating API - Most reliable
  * https://cp-rating-api.vercel.app/codechef/{username}
  */
@@ -44,44 +93,12 @@ async function fetchFromCPRatingAPI(username) {
     throw new Error("User not found");
   }
 
-  // Process contests array for rating history
-  const ratingHistory = (data.contests || []).slice(-20).map(contest => ({
-    contestCode: contest.code || contest.name,
-    contestName: contest.name,
-    rating: contest.rating,
-    rank: contest.rank,
-    date: contest.date,
-  }));
-
-  return {
-    username: data.username || username,
-    name: data.name || "",
-    stars: parseInt(data.stars) || 0,
-    rating: data.rating || 0,
-    highestRating: data.highestRating || data.rating || 0,
-    countryName: data.country || "",
-    globalRank: data.globalRank || null,
-    countryRank: data.countryRank || null,
-    totalSolved: data.problemsSolved || 0,
-    partialSolved: data.partialProblems || 0,
-    problemsSolved: {
-      easy: 0,
-      medium: 0,
-      hard: 0,
-      challenge: 0,
-      peer: 0,
-    },
-    contestsParticipated: (data.contests || []).length,
-    ratingHistory,
-    division: data.division || null,
-    badges: [],
-    avatar: data.avatar || null,
-  };
+  return normalizeCodeChefData(data, username);
 }
 
 /**
  * Yash2003Bisht CodeChef API
- * https://codechef-api.vercel.app/user-stats/{username}
+ * https://codechef-api.vercel.app/handle/{username}
  */
 async function fetchFromCodeChefAPIGitHub(username) {
   const response = await axios.get(
@@ -94,39 +111,25 @@ async function fetchFromCodeChefAPIGitHub(username) {
     throw new Error("User not found");
   }
 
-  // Process rating data
-  const ratingHistory = (data.ratingData || []).slice(-20).map(item => ({
-    contestCode: item.code,
-    contestName: item.name,
-    rating: item.rating,
-    rank: item.rank,
-    date: item.end_date,
-  }));
-
-  return {
-    username: data.username || username,
-    name: data.name || "",
-    stars: data.stars ? parseInt(data.stars.replace("★", "")) : 0,
-    rating: data.currentRating || data.rating || 0,
-    highestRating: data.highestRating || 0,
-    countryName: data.countryName || "",
-    globalRank: data.globalRank || null,
-    countryRank: data.countryRank || null,
-    totalSolved: data.fullySolved?.count || 0,
-    partialSolved: data.partiallySolved?.count || 0,
-    problemsSolved: {
-      easy: 0,
-      medium: 0,
-      hard: 0,
-      challenge: 0,
-      peer: 0,
-    },
-    contestsParticipated: ratingHistory.length,
-    ratingHistory,
-    division: data.division || null,
-    badges: data.badges || [],
-    avatar: data.profile || null,
+  // Map to consistent structure before normalizing
+  const mapped = {
+    username: data.username,
+    name: data.name,
+    stars: data.stars,
+    currentRating: data.currentRating || data.rating,
+    highestRating: data.highestRating,
+    countryName: data.countryName,
+    globalRank: data.globalRank,
+    countryRank: data.countryRank,
+    fullySolved: data.fullySolved,
+    partiallySolved: data.partiallySolved,
+    ratingData: data.ratingData,
+    division: data.division,
+    badges: data.badges,
+    profile: data.profile,
   };
+
+  return normalizeCodeChefData(mapped, username);
 }
 
 /**
@@ -143,37 +146,24 @@ async function fetchFromOriginalAPI(username) {
     throw new Error("User not found");
   }
 
-  const ratingHistory = (data.ratingData || []).slice(-20).map(item => ({
-    contestCode: item.code,
-    contestName: item.name,
-    rating: item.rating,
-    rank: item.rank,
-    date: item.end_date,
-  }));
-
-  return {
-    username: data.username || username,
-    name: data.name || "",
-    stars: data.stars || 0,
-    rating: data.currentRating || 0,
-    highestRating: data.highestRating || 0,
-    countryName: data.countryName || "",
-    globalRank: data.globalRank || null,
-    countryRank: data.countryRank || null,
-    totalSolved: data.fullySolved?.count || 0,
-    partialSolved: data.partiallySolved?.count || 0,
-    problemsSolved: {
-      easy: 0,
-      medium: 0,
-      hard: 0,
-      challenge: 0,
-      peer: 0,
-    },
-    contestsParticipated: ratingHistory.length,
-    ratingHistory,
+  // Map to consistent structure before normalizing
+  const mapped = {
+    username: data.username,
+    name: data.name,
+    stars: data.stars,
+    currentRating: data.currentRating,
+    highestRating: data.highestRating,
+    countryName: data.countryName,
+    globalRank: data.globalRank,
+    countryRank: data.countryRank,
+    fullySolved: data.fullySolved,
+    partiallySolved: data.partiallySolved,
+    ratingData: data.ratingData,
     division: null,
     badges: [],
   };
+
+  return normalizeCodeChefData(mapped, username);
 }
 
 export default fetchCodeChef;

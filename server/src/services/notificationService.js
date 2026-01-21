@@ -137,6 +137,90 @@ export const notificationService = {
   },
 
   /**
+   * Create sync complete notification
+   */
+  async createSyncCompleteNotification(userId, platform, stats) {
+    return this.createNotification({
+      userId,
+      type: "system",
+      title: `${platform.charAt(0).toUpperCase() + platform.slice(1)} Data Updated`,
+      message: `Your ${platform} statistics have been refreshed successfully.`,
+      data: {
+        platform,
+        syncedAt: new Date().toISOString(),
+        ...stats
+      }
+    });
+  },
+
+  /**
+   * Create weekly summary notification
+   */
+  async createWeeklySummaryNotification(userId, summary) {
+    const user = await User.findById(userId).select("settings");
+    
+    return this.createNotification({
+      userId,
+      type: "weekly_summary",
+      title: "Your Weekly DevLog Summary 📊",
+      message: `This week: ${summary.problemsSolved || 0} problems solved, ${summary.ratingChange >= 0 ? '+' : ''}${summary.ratingChange || 0} rating change.`,
+      data: {
+        ...summary,
+        weekOf: new Date().toISOString()
+      },
+      emailEnabled: user?.settings?.emailNotifications ?? false
+    });
+  },
+
+  /**
+   * Create achievement/milestone notification
+   */
+  async createAchievementNotification(userId, achievement) {
+    return this.createNotification({
+      userId,
+      type: "milestone_achieved",
+      title: `Achievement Unlocked: ${achievement.title} 🏆`,
+      message: achievement.message,
+      data: {
+        achievementType: achievement.type,
+        ...achievement.data
+      }
+    });
+  },
+
+  /**
+   * Create platform link reminder notification
+   */
+  async createPlatformLinkReminderNotification(userId, platforms) {
+    const platformList = platforms.join(", ");
+    return this.createNotification({
+      userId,
+      type: "system",
+      title: "Complete Your Profile",
+      message: `Link your ${platformList} account(s) to get comprehensive coding insights and track your progress across all platforms.`,
+      data: {
+        suggestedPlatforms: platforms
+      }
+    });
+  },
+
+  /**
+   * Create streak warning notification
+   */
+  async createStreakWarningNotification(userId, platform, currentStreak) {
+    return this.createNotification({
+      userId,
+      type: "streak_warning",
+      title: "Don't Break Your Streak! 🔥",
+      message: `Your ${currentStreak}-day ${platform} streak is at risk! Solve a problem today to keep it going.`,
+      data: {
+        platform,
+        currentStreak
+      }
+    });
+  },
+
+  /**
    * Dispatch pending notifications (cron job)
    */
   async dispatchPendingNotifications(options = {}) {

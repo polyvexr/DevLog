@@ -192,6 +192,34 @@ export const insightService = {
       }
     },
     {
+      name: "rating_improvement",
+      check: async ({ platformStats, history }) => {
+        for (const platform of ["codeforces", "codechef", "atcoder"]) {
+          const stat = platformStats.find(s => s.platform === platform);
+          if (!stat) continue;
+
+          const platformHistory = history.filter(h => h.platform === platform);
+          if (platformHistory.length < 7) continue;
+
+          const firstRating = platformHistory[0]?.metrics?.rating;
+          const lastRating = platformHistory[platformHistory.length - 1]?.metrics?.rating;
+
+          if (firstRating && lastRating && lastRating > firstRating + 50) {
+            const gain = lastRating - firstRating;
+            return {
+              type: "rating_improvement",
+              platform,
+              title: "Rating Surge! 📈",
+              message: `Your ${platform} rating increased by +${gain} points in the past 30 days. Keep up the great work!`,
+              data: { from: firstRating, to: lastRating, gain },
+              priority: "high"
+            };
+          }
+        }
+        return null;
+      }
+    },
+    {
       name: "topic_strength",
       check: async ({ platformStats }) => {
         const lcStat = platformStats.find(s => s.platform === "leetcode");
@@ -210,6 +238,34 @@ export const insightService = {
             data: { topic: topTopic.tagName, count: topTopic.problemsSolved },
             priority: "low"
           };
+        }
+        return null;
+      }
+    },
+    {
+      name: "topic_weakness",
+      check: async ({ platformStats }) => {
+        const lcStat = platformStats.find(s => s.platform === "leetcode");
+        if (!lcStat?.data?.tagStats) return null;
+
+        const totalSolved = lcStat.data?.totalSolved || 0;
+        if (totalSolved < 50) return null; // Need enough problems to identify weakness
+
+        const tags = lcStat.data.tagStats;
+        const importantTopics = ["Dynamic Programming", "Graph", "Binary Search", "Tree", "Backtracking"];
+        
+        for (const topicName of importantTopics) {
+          const topic = tags.find(t => t.tagName === topicName);
+          if (!topic || topic.problemsSolved < 5) {
+            return {
+              type: "topic_weakness",
+              platform: "leetcode",
+              title: "Topic to Improve",
+              message: `You've solved ${topic?.problemsSolved || 0} ${topicName} problems. This is a commonly tested topic - consider practicing more!`,
+              data: { topic: topicName, count: topic?.problemsSolved || 0 },
+              priority: "medium"
+            };
+          }
         }
         return null;
       }
@@ -266,6 +322,120 @@ export const insightService = {
             },
             priority: "high",
             expiresAt: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000) // 3 days
+          };
+        }
+        return null;
+      }
+    },
+    {
+      name: "consistency_bonus",
+      check: async ({ platformStats }) => {
+        const lcStat = platformStats.find(s => s.platform === "leetcode");
+        if (!lcStat?.data?.streakData) return null;
+
+        const streak = lcStat.data.streakData;
+        const milestones = [7, 14, 30, 60, 100];
+        
+        for (const milestone of milestones) {
+          if (streak.currentStreak === milestone) {
+            return {
+              type: "consistency_bonus",
+              platform: "leetcode",
+              title: `${milestone}-Day Streak! 🔥`,
+              message: `Amazing! You've maintained a ${milestone}-day LeetCode streak. Consistency is key to success!`,
+              data: { streak: milestone },
+              priority: "high"
+            };
+          }
+        }
+        return null;
+      }
+    },
+    {
+      name: "platform_diversity",
+      check: async ({ platformStats }) => {
+        const linkedPlatforms = platformStats.map(s => s.platform);
+        const allPlatforms = ["leetcode", "codeforces", "github", "codechef", "atcoder"];
+        const unlinked = allPlatforms.filter(p => !linkedPlatforms.includes(p));
+        
+        if (linkedPlatforms.length >= 1 && linkedPlatforms.length < 3 && unlinked.length > 0) {
+          const suggestions = {
+            leetcode: "great for interview prep",
+            codeforces: "excellent for competitive programming",
+            github: "showcase your projects",
+            codechef: "good for long contests",
+            atcoder: "quality algorithmic problems"
+          };
+          
+          const suggested = unlinked[0];
+          return {
+            type: "platform_diversity",
+            platform: null,
+            title: "Expand Your Reach",
+            message: `You've linked ${linkedPlatforms.length} platform(s). Consider adding ${suggested} - ${suggestions[suggested]}!`,
+            data: { linked: linkedPlatforms, suggested },
+            priority: "low"
+          };
+        }
+        return null;
+      }
+    },
+    {
+      name: "contest_participation",
+      check: async ({ platformStats }) => {
+        const cfStat = platformStats.find(s => s.platform === "codeforces");
+        if (!cfStat?.data) return null;
+
+        const totalContests = cfStat.data.totalContests || 0;
+        const rating = cfStat.data.rating || 0;
+        
+        // If high problem count but low contest count
+        const problemsSolved = cfStat.data.problemsSolved || 0;
+        if (problemsSolved > 100 && totalContests < 10) {
+          return {
+            type: "contest_participation",
+            platform: "codeforces",
+            title: "Try More Contests!",
+            message: `You've solved ${problemsSolved} problems but only participated in ${totalContests} contests. Contests are the best way to improve under pressure!`,
+            data: { problems: problemsSolved, contests: totalContests },
+            priority: "medium"
+          };
+        }
+        return null;
+      }
+    },
+    {
+      name: "difficulty_progression",
+      check: async ({ platformStats }) => {
+        const lcStat = platformStats.find(s => s.platform === "leetcode");
+        if (!lcStat?.data?.submissionsByDifficulty) return null;
+
+        const { easy, medium, hard } = lcStat.data.submissionsByDifficulty;
+        const easySolved = easy?.solved || 0;
+        const mediumSolved = medium?.solved || 0;
+        const hardSolved = hard?.solved || 0;
+        
+        // If many easy but few medium/hard
+        if (easySolved > 50 && mediumSolved < easySolved * 0.3) {
+          return {
+            type: "difficulty_progression",
+            platform: "leetcode",
+            title: "Level Up Your Practice",
+            message: `You've mastered ${easySolved} easy problems! Time to tackle more medium problems to grow your skills.`,
+            data: { easy: easySolved, medium: mediumSolved },
+            priority: "medium"
+          };
+        }
+        
+        // If good at medium, encourage hard
+        if (mediumSolved > 50 && hardSolved < mediumSolved * 0.2) {
+          return {
+            type: "difficulty_progression",
+            platform: "leetcode",
+            title: "Ready for Hard Problems?",
+            message: `With ${mediumSolved} medium problems solved, you're ready to challenge yourself with more hard problems!`,
+            data: { medium: mediumSolved, hard: hardSolved },
+            priority: "medium"
           };
         }
         return null;

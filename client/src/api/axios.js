@@ -77,6 +77,9 @@ export const deleteNotification = (id) => api.delete(`/notifications/${id}`);
 export const getContests = () => api.get("/contests");
 export const getContestsByPlatform = (platform) => api.get(`/contests/${platform}`);
 
+// Dashboard API (combined endpoint for performance)
+export const getDashboardData = () => api.get("/dashboard");
+
 // Admin API
 export const getAdminStats = () => api.get("/admin/stats");
 export const syncAllPlatforms = () => api.post("/admin/sync/all");
