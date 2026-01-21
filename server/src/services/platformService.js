@@ -191,6 +191,61 @@ export const platformService = {
   },
 
   /**
+   * Process multiple sync jobs in parallel (batch processing)
+   * @param {array} jobs - Array of sync jobs to process
+   * @param {number} concurrency - Max concurrent jobs (default: 5)
+   * @returns {object} Batch processing results
+   */
+  async processBatchSyncJobs(jobs, concurrency = 5) {
+    const results = {
+      total: jobs.length,
+      success: 0,
+      failed: 0,
+      processed: [],
+      startTime: Date.now(),
+    };
+
+    // Process in batches with concurrency limit
+    for (let i = 0; i < jobs.length; i += concurrency) {
+      const batch = jobs.slice(i, i + concurrency);
+      
+      const batchResults = await Promise.allSettled(
+        batch.map(job => this.processSyncJob(job))
+      );
+      
+      batchResults.forEach((result, idx) => {
+        if (result.status === "fulfilled" && result.value.success) {
+          results.success++;
+          results.processed.push({
+            jobId: batch[idx]._id,
+            platform: batch[idx].platform,
+            status: "success"
+          });
+        } else {
+          results.failed++;
+          results.processed.push({
+            jobId: batch[idx]._id,
+            platform: batch[idx].platform,
+            status: "failed",
+            error: result.reason?.message || result.value?.error
+          });
+        }
+      });
+    }
+
+    results.duration = Date.now() - results.startTime;
+    
+    logger.info("Batch sync completed", {
+      total: results.total,
+      success: results.success,
+      failed: results.failed,
+      duration: `${results.duration}ms`
+    });
+
+    return results;
+  },
+
+  /**
    * Extract normalized stats from raw platform data
    */
   extractStats(platform, data) {

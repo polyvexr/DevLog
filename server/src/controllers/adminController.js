@@ -16,18 +16,101 @@ const platformFetchers = {
   atcoder: fetchAtCoder,
 };
 
+// Concurrency configuration
+const PARALLEL_CONFIG = {
+  maxConcurrentUsers: 5,     // Max users to sync in parallel per platform
+  maxConcurrentPlatforms: 5, // Max platforms to sync in parallel
+};
+
 /**
- * Generic sync function for any platform
+ * Sync a single user's platform data
+ * @param {object} platformStat - Platform stat document
+ * @param {function} fetchFunction - Platform fetch function
+ * @returns {object} Sync result
+ */
+async function syncSingleUser(platformStat, fetchFunction) {
+  if (!platformStat.username || !platformStat.userId) {
+    return { status: "skipped", reason: "Missing username or userId" };
+  }
+
+  try {
+    const data = await fetchFunction(platformStat.username);
+    
+    // Only update if we got valid data
+    if (data && Object.keys(data).length > 0) {
+      platformStat.data = data;
+      platformStat.stats = data;
+      platformStat.lastUpdated = Date.now();
+      await platformStat.save();
+      
+      return {
+        status: "success",
+        user: platformStat.userId.email,
+        username: platformStat.username,
+      };
+    } else {
+      return {
+        status: "empty",
+        user: platformStat.userId?.email || "Unknown",
+        username: platformStat.username,
+        reason: "No data returned from API",
+      };
+    }
+  } catch (error) {
+    return {
+      status: "failed",
+      user: platformStat.userId?.email || "Unknown",
+      username: platformStat.username,
+      error: error.message,
+    };
+  }
+}
+
+/**
+ * Process items in parallel with concurrency limit
+ * @param {array} items - Items to process
+ * @param {function} processor - Async function to process each item
+ * @param {number} concurrency - Max concurrent operations
+ * @returns {array} Results
+ */
+async function parallelProcess(items, processor, concurrency) {
+  const results = [];
+  
+  // Process in batches
+  for (let i = 0; i < items.length; i += concurrency) {
+    const batch = items.slice(i, i + concurrency);
+    const batchResults = await Promise.allSettled(batch.map(processor));
+    
+    // Extract values from settled promises
+    batchResults.forEach((result, idx) => {
+      if (result.status === "fulfilled") {
+        results.push(result.value);
+      } else {
+        results.push({ 
+          status: "failed", 
+          error: result.reason?.message || "Unknown error",
+          item: batch[idx]
+        });
+      }
+    });
+  }
+  
+  return results;
+}
+
+/**
+ * Sync all users for a specific platform (with parallel processing)
  * @param {string} platform - Platform name
  * @returns {object} Sync results
  */
-async function syncPlatformStats(platform) {
+async function syncPlatformStatsParallel(platform) {
   const fetchFunction = platformFetchers[platform];
   
   if (!fetchFunction) {
     throw new Error(`Unknown platform: ${platform}`);
   }
 
+  const startTime = Date.now();
   const platformStats = await PlatformStat.find({ platform }).populate("userId", "email");
   
   const syncResults = {
@@ -35,64 +118,93 @@ async function syncPlatformStats(platform) {
     total: platformStats.length,
     success: 0,
     failed: 0,
+    empty: 0,
+    skipped: 0,
     details: [],
+    duration: 0,
   };
 
-  for (const platformStat of platformStats) {
-    if (!platformStat.username || !platformStat.userId) continue;
-
-    try {
-      const data = await fetchFunction(platformStat.username);
-      platformStat.stats = data;
-      platformStat.lastUpdated = Date.now();
-      await platformStat.save();
-
-      syncResults.success++;
-      syncResults.details.push({
-        user: platformStat.userId.email,
-        username: platformStat.username,
-        status: "success",
-      });
-    } catch (error) {
-      syncResults.failed++;
-      syncResults.details.push({
-        user: platformStat.userId?.email || "Unknown",
-        username: platformStat.username,
-        status: "failed",
-        error: error.message,
-      });
-    }
+  if (platformStats.length === 0) {
+    syncResults.duration = Date.now() - startTime;
+    return syncResults;
   }
+
+  // Process users in parallel with concurrency limit
+  const results = await parallelProcess(
+    platformStats,
+    (stat) => syncSingleUser(stat, fetchFunction),
+    PARALLEL_CONFIG.maxConcurrentUsers
+  );
+
+  // Aggregate results
+  results.forEach((result) => {
+    if (result.status === "success") {
+      syncResults.success++;
+    } else if (result.status === "failed") {
+      syncResults.failed++;
+    } else if (result.status === "empty") {
+      syncResults.empty++;
+    } else if (result.status === "skipped") {
+      syncResults.skipped++;
+    }
+    syncResults.details.push(result);
+  });
+
+  syncResults.duration = Date.now() - startTime;
 
   logger.info(`Sync completed for ${platform}`, {
     total: syncResults.total,
     success: syncResults.success,
     failed: syncResults.failed,
+    duration: `${syncResults.duration}ms`,
   });
 
   return syncResults;
 }
 
-// Sync all platforms for all users
+/**
+ * Sync all platforms for all users (PARALLEL - all platforms at once)
+ */
 export const syncAllPlatforms = async (req, res) => {
   try {
+    const startTime = Date.now();
     const allPlatforms = Object.keys(platformFetchers);
-    const results = {};
+    
+    logger.info("Starting parallel sync for all platforms", { 
+      platforms: allPlatforms,
+      concurrency: PARALLEL_CONFIG.maxConcurrentPlatforms
+    });
 
-    for (const platform of allPlatforms) {
-      try {
-        results[platform] = await syncPlatformStats(platform);
-      } catch (error) {
-        results[platform] = { error: error.message };
-        logger.error(`Sync failed for ${platform}`, { error: error.message });
+    // Sync ALL platforms in parallel using Promise.allSettled
+    const platformResults = await Promise.allSettled(
+      allPlatforms.map(platform => syncPlatformStatsParallel(platform))
+    );
+
+    // Process results
+    const results = {};
+    platformResults.forEach((result, idx) => {
+      const platform = allPlatforms[idx];
+      if (result.status === "fulfilled") {
+        results[platform] = result.value;
+      } else {
+        results[platform] = { 
+          platform,
+          error: result.reason?.message || "Unknown error",
+          total: 0,
+          success: 0,
+          failed: 0
+        };
+        logger.error(`Sync failed for ${platform}`, { error: result.reason?.message });
       }
-    }
+    });
 
     // Calculate totals
     const totals = {
       total: 0,
       success: 0,
       failed: 0,
+      empty: 0,
+      duration: Date.now() - startTime,
     };
 
     Object.values(results).forEach((result) => {
@@ -100,12 +212,18 @@ export const syncAllPlatforms = async (req, res) => {
         totals.total += result.total;
         totals.success += result.success || 0;
         totals.failed += result.failed || 0;
+        totals.empty += result.empty || 0;
       }
+    });
+
+    logger.info("Parallel sync completed for all platforms", {
+      ...totals,
+      durationSeconds: (totals.duration / 1000).toFixed(2)
     });
 
     res.json({
       success: true,
-      message: "Sync completed for all platforms",
+      message: `Sync completed for all platforms in ${(totals.duration / 1000).toFixed(2)}s`,
       data: {
         totals,
         platforms: results,
@@ -120,7 +238,9 @@ export const syncAllPlatforms = async (req, res) => {
   }
 };
 
-// Sync specific platform for all users
+/**
+ * Sync specific platform for all users (with parallel user processing)
+ */
 export const syncPlatform = async (req, res) => {
   const { platform } = req.params;
 
@@ -132,11 +252,11 @@ export const syncPlatform = async (req, res) => {
   }
 
   try {
-    const results = await syncPlatformStats(platform);
+    const results = await syncPlatformStatsParallel(platform);
 
     res.json({
       success: true,
-      message: `${platform} sync completed`,
+      message: `${platform} sync completed in ${(results.duration / 1000).toFixed(2)}s`,
       data: { results },
     });
   } catch (error) {
@@ -174,16 +294,24 @@ export const syncAtCoder = async (req, res) => {
   return syncPlatform(req, res);
 };
 
-// Get sync statistics
+/**
+ * Get sync statistics
+ */
 export const getSyncStats = async (req, res) => {
   try {
     const totalUsers = await User.countDocuments({});
     
-    // Get counts for all platforms dynamically
+    // Get counts for all platforms in parallel
+    const platformCountPromises = Object.keys(platformFetchers).map(async (platform) => ({
+      platform,
+      count: await PlatformStat.countDocuments({ platform })
+    }));
+    
+    const platformCountResults = await Promise.all(platformCountPromises);
     const platformCounts = {};
-    for (const platform of Object.keys(platformFetchers)) {
-      platformCounts[platform] = await PlatformStat.countDocuments({ platform });
-    }
+    platformCountResults.forEach(({ platform, count }) => {
+      platformCounts[platform] = count;
+    });
 
     const lastSyncedStats = await PlatformStat.find({})
       .sort({ lastUpdated: -1 })
@@ -196,6 +324,7 @@ export const getSyncStats = async (req, res) => {
         totalUsers,
         platformCounts,
         supportedPlatforms: Object.keys(platformFetchers),
+        parallelConfig: PARALLEL_CONFIG,
         recentSyncs: lastSyncedStats,
       },
     });

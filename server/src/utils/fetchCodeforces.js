@@ -4,7 +4,8 @@ export const fetchCodeforces = async (username) => {
   try {
     // Fetch user info
     const userInfoRes = await axios.get(
-      `https://codeforces.com/api/user.info?handles=${username}`
+      `https://codeforces.com/api/user.info?handles=${username}`,
+      { timeout: 15000 }
     );
 
     if (userInfoRes.data.status !== "OK") return {};

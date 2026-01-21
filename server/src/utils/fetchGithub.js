@@ -1,9 +1,29 @@
 import axios from "axios";
 
+// Get GitHub headers (with optional authentication)
+const getGitHubHeaders = () => {
+  const headers = {
+    "Accept": "application/vnd.github.v3+json",
+    "User-Agent": "DevLog-App"
+  };
+  
+  // Use token if available (increases rate limit from 60/hr to 5000/hr)
+  if (process.env.GITHUB_TOKEN) {
+    headers["Authorization"] = `Bearer ${process.env.GITHUB_TOKEN}`;
+  }
+  
+  return headers;
+};
+
 export const fetchGithub = async (username) => {
   try {
+    const headers = getGitHubHeaders();
+    
     // Fetch user info
-    const userRes = await axios.get(`https://api.github.com/users/${username}`);
+    const userRes = await axios.get(
+      `https://api.github.com/users/${username}`,
+      { timeout: 15000, headers }
+    );
     const user = userRes.data;
 
     // Fetch repositories with details
@@ -18,7 +38,8 @@ export const fetchGithub = async (username) => {
 
     try {
       const reposRes = await axios.get(
-        `https://api.github.com/users/${username}/repos?per_page=100&sort=updated`
+        `https://api.github.com/users/${username}/repos?per_page=100&sort=updated`,
+        { timeout: 20000, headers }
       );
       const repos = reposRes.data;
 
@@ -67,7 +88,8 @@ export const fetchGithub = async (username) => {
 
     try {
       const eventsRes = await axios.get(
-        `https://api.github.com/users/${username}/events/public?per_page=100`
+        `https://api.github.com/users/${username}/events/public?per_page=100`,
+        { timeout: 15000, headers }
       );
       const events = eventsRes.data;
 
@@ -91,7 +113,8 @@ export const fetchGithub = async (username) => {
     let organizations = [];
     try {
       const orgsRes = await axios.get(
-        `https://api.github.com/users/${username}/orgs`
+        `https://api.github.com/users/${username}/orgs`,
+        { timeout: 10000, headers }
       );
       organizations = orgsRes.data.map((org) => ({
         name: org.login,

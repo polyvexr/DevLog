@@ -41,11 +41,11 @@ export const fetchAtCoder = async (username) => {
       }
     });
 
-    // Get problem difficulties from AtCoder Problems API
+    // Get problem difficulties from AtCoder Problems API (can be slow)
     try {
       const difficultyRes = await axios.get(
         `https://kenkoooo.com/atcoder/resources/problem-models.json`,
-        { timeout: 15000 }
+        { timeout: 30000 } // 30s timeout for large JSON file
       );
       const difficulties = difficultyRes.data || {};
 

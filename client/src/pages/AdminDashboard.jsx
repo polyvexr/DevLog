@@ -56,7 +56,8 @@ export default function AdminDashboard() {
       else if (platform === "codeforces") endpoint = "/admin/sync/codeforces";
       else if (platform === "github") endpoint = "/admin/sync/github";
 
-      const res = await api.post(endpoint);
+      // Use longer timeout for sync operations (can take up to 2 minutes with slow APIs)
+      const res = await api.post(endpoint, {}, { timeout: 120000 });
       
       let results;
       if (platform === "all") {
