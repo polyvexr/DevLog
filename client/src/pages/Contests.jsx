@@ -3,7 +3,7 @@ import { FiCalendar, FiClock, FiExternalLink, FiRefreshCw, FiFilter, FiZap } fro
 import { FaCode } from "react-icons/fa";
 import { SiLeetcode, SiCodeforces, SiCodechef } from "react-icons/si";
 import ContestCard from "../components/ContestCard";
-import Loader from "../components/Loader";
+import FullPageLoader from "../components/FullPageLoader";
 import api from "../api/axios";
 
 /**
@@ -95,6 +95,8 @@ export default function Contests() {
     return { label: `In ${diffDays} days`, color: "bg-gray-500/20 text-gray-400 border-gray-500/30" };
   };
 
+  if (loading && contests.length === 0) return <FullPageLoader />;
+
   return (
     <>
       {/* Hero Header */}
@@ -150,11 +152,7 @@ export default function Contests() {
       </div>
 
       {/* Content */}
-      {loading ? (
-        <div className="flex justify-center py-20">
-          <Loader />
-        </div>
-      ) : error ? (
+      {error ? (
         <div className="glass-card-premium p-16 md:p-24 text-center fade-in-up">
           <div className="w-24 h-24 bg-red-600/10 border border-red-500/20 rounded-3xl flex items-center justify-center mx-auto mb-10 shadow-2xl">
             <FiCalendar className="text-5xl text-red-500" />

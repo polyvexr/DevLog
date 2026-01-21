@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from "react";
 import api from "../api/axios";
 import { AuthContext } from "../context/AuthContext";
-import Loader from "../components/Loader";
+import FullPageLoader from "../components/FullPageLoader";
 import Dialog from "../components/Dialog";
 import {
   FiUser,
@@ -162,7 +162,7 @@ export default function Profile() {
     }
   };
 
-  if (loading) return <Loader />;
+  if (loading) return <FullPageLoader />;
 
   const tabs = [
     { id: "profile", label: "Profile", icon: FiUser },

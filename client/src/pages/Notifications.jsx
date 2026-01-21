@@ -1,12 +1,7 @@
-import { useEffect, useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
-import Loader from "../components/Loader";
-import { 
-  getNotifications, 
-  markNotificationRead, 
-  markAllNotificationsRead, 
-  deleteNotification 
-} from "../api/axios";
+import { useNotifications } from "../hooks/useApi";
+import FullPageLoader from "../components/FullPageLoader";
 import { 
   FiBell, 
   FiCheck, 
@@ -41,107 +36,55 @@ const notificationColors = {
 };
 
 export default function Notifications() {
-  const [notifications, setNotifications] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const { notifications, loading, markRead, markAllRead, removeNotification } = useNotifications();
 
-  const fetchNotifications = async () => {
-    try {
-      const res = await getNotifications();
-      setNotifications(res.data.data?.notifications || res.data.notifications || []);
-    } catch {
-      setError("Failed to load notifications");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchNotifications();
-  }, []);
-
-  const handleMarkRead = async (id) => {
-    try {
-      await markNotificationRead(id);
-      setNotifications(notifications.map(n => n._id === id ? { ...n, read: true } : n));
-    } catch {
-      console.error("Failed to mark notification as read");
-    }
-  };
-
-  const handleMarkAllRead = async () => {
-    try {
-      await markAllNotificationsRead();
-      setNotifications(notifications.map(n => ({ ...n, read: true })));
-    } catch {
-      console.error("Failed to mark all notifications as read");
-    }
-  };
-
-  const handleDelete = async (id) => {
-    try {
-      await deleteNotification(id);
-      setNotifications(notifications.filter(n => n._id !== id));
-    } catch {
-      console.error("Failed to delete notification");
-    }
-  };
-
-  if (loading) return <Loader />;
+  if (loading) return <FullPageLoader />;
 
   const unreadCount = notifications.filter(n => !n.read).length;
 
   return (
-    <>
+    <div className="max-w-4xl mx-auto py-8 px-4">
       <button
         onClick={() => navigate("/")}
-        className="mb-10 text-gray-400 hover:text-white flex items-center gap-2 group transition-all fade-in-scale"
+        className="mb-10 text-gray-400 hover:text-white flex items-center gap-2 group transition-all"
       >
         <span className="group-hover:-translate-x-1 transition-transform">←</span>
-        <span className="font-bold uppercase tracking-widest text-xs">Return to Dashboard</span>
+        <span className="font-bold uppercase tracking-widest text-[10px]">Command Center</span>
       </button>
 
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 fade-in-scale">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16">
         <div>
-          <h1 className="text-5xl md:text-6xl font-black mb-4 tracking-tight">
-            <span className="text-white opacity-90">Attention</span>
-            <br />
-            <span className="animate-text-shine inline-block">Center</span>
+          <h1 className="text-6xl md:text-8xl font-black mb-6 tracking-tight italic">
+            Neural <span className="animate-text-shine">Logs</span>
           </h1>
-          <p className="text-gray-400 text-xl font-medium">Keep track of your neural link updates.</p>
+          <p className="text-gray-400 text-xl font-medium max-w-2xl leading-relaxed">
+             Real-time asynchronous updates from synchronized coding nodes.
+          </p>
         </div>
         
         {notifications.length > 0 && (
           <button
-            onClick={handleMarkAllRead}
+            onClick={markAllRead}
             disabled={unreadCount === 0}
-            className="px-6 py-3 bg-white/5 hover:bg-white/10 text-white font-bold rounded-xl transition-all flex items-center gap-3 border border-white/5 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
+            className="px-8 py-4 glass-card-premium hover:bg-white/10 text-white font-black rounded-2xl transition-all flex items-center gap-3 border-none disabled:opacity-20 disabled:cursor-not-allowed active:scale-95 uppercase tracking-widest text-xs"
           >
             <FiCheck className="text-lg" />
-            Mark all read
+            Clear Channels
           </button>
         )}
       </div>
 
-      {error && (
-        <div className="mb-8 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400">
-          {error}
-        </div>
-      )}
-
       {notifications.length === 0 ? (
-        <div className="glass-card-premium p-12 text-center fade-in-up">
-          <div className="w-20 h-20 bg-blue-500/10 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-inner">
-            <FiBell className="text-4xl text-blue-500/50" />
+        <div className="glass-card-premium p-24 text-center">
+          <div className="w-24 h-24 bg-blue-500/10 rounded-3xl flex items-center justify-center mx-auto mb-10 shadow-inner">
+            <FiBell className="text-5xl text-blue-500/50" />
           </div>
-          <h3 className="text-2xl font-bold text-white mb-4 italic">No Feed Items</h3>
-          <p className="text-gray-400 max-w-md mx-auto">
-            Your consciousness is currently quiet. New notifications will appear here when systems update.
-          </p>
+          <h3 className="text-3xl font-black text-white mb-4 italic uppercase">Silence</h3>
+          <p className="text-gray-500 max-w-md mx-auto font-medium">No signals are currently traversing your neural network.</p>
         </div>
       ) : (
-        <div className="space-y-4 fade-in-up">
+        <div className="space-y-6">
           {notifications.map((notification) => {
             const Icon = notificationIcons[notification.type] || FiInfo;
             const colorClass = notificationColors[notification.type] || notificationColors.system;
@@ -149,49 +92,45 @@ export default function Notifications() {
             return (
               <div 
                 key={notification._id} 
-                className={`glass-card-premium p-6 flex items-start gap-6 transition-all hover:bg-white/[0.03] ${
-                  !notification.read ? "ring-1 ring-blue-500/30" : "opacity-70"
+                className={`glass-card-premium p-8 flex items-start gap-8 transition-all group relative overflow-hidden border-none ring-1 ${
+                  !notification.read ? "ring-blue-500/40 bg-blue-500/5" : "ring-white/5 opacity-50"
                 }`}
               >
-                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 border ${colorClass}`}>
-                  <Icon className="text-xl" />
+                {!notification.read && <div className="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>}
+                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 border ${colorClass} shadow-lg`}>
+                  <Icon className="text-2xl" />
                 </div>
                 
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-start justify-between gap-4 mb-2">
+                  <div className="flex items-start justify-between gap-6 mb-4">
                     <div>
-                      <h3 className={`font-black text-lg ${!notification.read ? "text-white" : "text-gray-400"}`}>
+                      <h3 className={`font-black text-2xl italic ${!notification.read ? "text-white" : "text-gray-400"}`}>
                         {notification.title}
                       </h3>
-                      <p className="text-gray-500 text-sm font-medium">
-                        {new Date(notification.createdAt).toLocaleDateString("en-US", {
-                          month: "short",
-                          day: "numeric",
-                          hour: "2-digit",
-                          minute: "2-digit"
-                        })}
-                      </p>
+                      <div className="text-gray-600 text-[10px] font-black uppercase tracking-[0.2em]">
+                        {new Date(notification.createdAt).toLocaleDateString()} // {new Date(notification.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </div>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-3">
                        {!notification.read && (
                         <button
-                          onClick={() => handleMarkRead(notification._id)}
-                          className="p-2 rounded-lg bg-white/5 hover:bg-green-500/20 text-gray-500 hover:text-green-400 transition-all"
-                          title="Mark as read"
+                          onClick={() => markRead(notification._id)}
+                          className="p-3 glass-card-premium hover:bg-green-500/20 text-gray-500 hover:text-green-400 transition-all border-none"
+                          title="Acknowledge"
                         >
-                          <FiCheck size={16} />
+                          <FiCheck size={18} />
                         </button>
                       )}
                       <button
-                        onClick={() => handleDelete(notification._id)}
-                        className="p-2 rounded-lg bg-white/5 hover:bg-red-500/20 text-gray-500 hover:text-red-400 transition-all"
-                        title="Delete"
+                        onClick={() => removeNotification(notification._id)}
+                        className="p-3 glass-card-premium hover:bg-red-500/20 text-gray-500 hover:text-red-400 transition-all border-none"
+                        title="Purge"
                       >
-                        <FiTrash2 size={16} />
+                        <FiTrash2 size={18} />
                       </button>
                     </div>
                   </div>
-                  <p className={`${!notification.read ? "text-gray-300" : "text-gray-500"} leading-relaxed`}>
+                  <p className={`text-lg leading-relaxed ${!notification.read ? "text-gray-300" : "text-gray-500"}`}>
                     {notification.message}
                   </p>
                 </div>
@@ -200,6 +139,6 @@ export default function Notifications() {
           })}
         </div>
       )}
-    </>
+    </div>
   );
 }

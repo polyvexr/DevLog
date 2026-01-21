@@ -12,7 +12,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import api from "../api/axios";
-import Loader from "../components/Loader";
+import FullPageLoader from "../components/FullPageLoader";
 
 // AtCoder text icon component
 const AtCoderIcon = ({ className }) => (
@@ -72,7 +72,7 @@ export default function PublicProfile() {
     }
   };
 
-  if (loading) return <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center"><Loader /></div>;
+  if (loading) return <FullPageLoader />;
 
   if (error) {
     return (
