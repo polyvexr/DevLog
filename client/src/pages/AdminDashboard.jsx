@@ -13,7 +13,11 @@ import {
   FiX,
   FiCalendar
 } from "react-icons/fi";
-import { SiLeetcode, SiCodeforces, SiGithub } from "react-icons/si";
+import { SiLeetcode, SiCodeforces, SiGithub, SiCodechef } from "react-icons/si";
+
+const AtCoderIcon = ({ className }) => (
+  <span className={`font-black text-xs ${className}`}>AT</span>
+);
 
 export default function AdminDashboard() {
   const [loading, setLoading] = useState(false);
@@ -51,10 +55,7 @@ export default function AdminDashboard() {
       setActiveSync(platform);
       setSyncResults(null);
 
-      let endpoint = "/admin/sync/all";
-      if (platform === "leetcode") endpoint = "/admin/sync/leetcode";
-      else if (platform === "codeforces") endpoint = "/admin/sync/codeforces";
-      else if (platform === "github") endpoint = "/admin/sync/github";
+      const endpoint = platform === "all" ? "/admin/sync/all" : `/admin/sync/${platform}`;
 
       // Use longer timeout for sync operations (can take up to 2 minutes with slow APIs)
       const res = await api.post(endpoint, {}, { timeout: 120000 });
@@ -179,6 +180,18 @@ export default function AdminDashboard() {
             <div className="text-4xl font-black text-purple-400 mb-2">{stats.platformCounts.github}</div>
             <div className="text-xs font-black uppercase tracking-widest text-gray-500">GitHub Nodes</div>
           </div>
+          <div className="glass-card-premium p-10 relative overflow-hidden group">
+            <SiCodechef className="absolute -right-4 -top-4 text-7xl text-amber-500/5 group-hover:text-amber-500/10 transition-colors" />
+            <div className="text-4xl font-black text-amber-500 mb-2">{stats.platformCounts.codechef}</div>
+            <div className="text-xs font-black uppercase tracking-widest text-gray-500">CodeChef Nodes</div>
+          </div>
+          <div className="glass-card-premium p-10 relative overflow-hidden group">
+            <div className="absolute -right-4 -top-4 text-7xl text-cyan-500/5 group-hover:text-cyan-500/10 transition-colors">
+              <AtCoderIcon className="text-5xl" />
+            </div>
+            <div className="text-4xl font-black text-cyan-400 mb-2">{stats.platformCounts.atcoder}</div>
+            <div className="text-xs font-black uppercase tracking-widest text-gray-500">AtCoder Nodes</div>
+          </div>
         </div>
       )}
 
@@ -196,20 +209,22 @@ export default function AdminDashboard() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {[
-            { id: "all", label: "Global Sync", color: "blue", icon: FiActivity },
-            { id: "leetcode", label: "LeetCode", color: "yellow", icon: SiLeetcode },
-            { id: "codeforces", label: "Codeforces", color: "green", icon: SiCodeforces },
-            { id: "github", label: "GitHub", color: "purple", icon: SiGithub },
+            { id: "all", label: "Global Sync", icon: FiActivity, ring: "ring-blue-500/10", hover: "hover:ring-blue-500/40", text: "text-blue-500" },
+            { id: "leetcode", label: "LeetCode", icon: SiLeetcode, ring: "ring-yellow-500/10", hover: "hover:ring-yellow-500/40", text: "text-yellow-500" },
+            { id: "codeforces", label: "Codeforces", icon: SiCodeforces, ring: "ring-green-500/10", hover: "hover:ring-green-500/40", text: "text-green-500" },
+            { id: "github", label: "GitHub", icon: SiGithub, ring: "ring-purple-500/10", hover: "hover:ring-purple-500/40", text: "text-purple-500" },
+            { id: "codechef", label: "CodeChef", icon: SiCodechef, ring: "ring-amber-500/10", hover: "hover:ring-amber-500/40", text: "text-amber-500" },
+            { id: "atcoder", label: "AtCoder", icon: AtCoderIcon, ring: "ring-cyan-500/10", hover: "hover:ring-cyan-500/40", text: "text-cyan-500" },
           ].map((item) => (
             <button
               key={item.id}
               onClick={() => handleSync(item.id)}
               disabled={syncing}
               className={`group glass-card-premium p-6 border-none ring-1 text-left transition-all active:scale-95 ${
-                syncing && activeSync === item.id ? 'ring-blue-500 ring-2' : `ring-${item.color}-500/10 hover:ring-${item.color}-500/40`
+                syncing && activeSync === item.id ? 'ring-blue-500 ring-2' : `${item.ring} ${item.hover}`
               }`}
             >
-              <item.icon className={`text-3xl mb-4 text-${item.color}-500 group-hover:scale-110 transition-transform`} />
+              <item.icon className={`text-3xl mb-4 ${item.text} group-hover:scale-110 transition-transform`} />
               <div className="text-xl font-black text-white italic mb-1">{item.label}</div>
               <div className="text-[10px] font-black uppercase tracking-widest text-gray-500">
                 {syncing && activeSync === item.id ? 'Establishing link...' : 'Initialize stream'}
