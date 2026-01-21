@@ -19,7 +19,7 @@ const SummarySection = ({ summary, loading }) => {
   const stats = [
     {
       label: "Platforms Tracked",
-      value: summary?.platformsLinked || 0,
+      value: summary?.totalPlatforms || 0,
       icon: FiLayers,
       color: "from-blue-500 to-indigo-600",
       glow: "shadow-blue-500/20",

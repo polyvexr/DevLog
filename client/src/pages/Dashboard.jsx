@@ -3,21 +3,14 @@ import { useNavigate } from "react-router-dom";
 import { useDashboard, usePlatformRefresh } from "../hooks/useApi";
 import FullPageLoader from "../components/FullPageLoader";
 import Dialog from "../components/Dialog";
-import FilterButtons from "../components/FilterButtons";
 import PlatformCard from "../components/PlatformCard";
 import SummarySection from "../components/SummarySection";
-import { FiBarChart2, FiTrendingUp, FiClock, FiBell } from "react-icons/fi";
-
-const FILTER_STORAGE_KEY = "dashboardFilter";
+import { FiBarChart2 } from "react-icons/fi";
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const { data, loading, error, refresh } = useDashboard();
   const { refresh: triggerRefresh } = usePlatformRefresh();
-  
-  const [activeFilter, setActiveFilter] = useState(() => {
-    return localStorage.getItem(FILTER_STORAGE_KEY) || "all";
-  });
   
   const [messageDialog, setMessageDialog] = useState({
     open: false,
@@ -25,11 +18,6 @@ export default function Dashboard() {
     message: "",
     type: "info"
   });
-
-  const handleFilterChange = (filter) => {
-    setActiveFilter(filter);
-    localStorage.setItem(FILTER_STORAGE_KEY, filter);
-  };
 
   const handleRefresh = async (platform) => {
     const success = await triggerRefresh(platform, () => {
@@ -54,19 +42,8 @@ export default function Dashboard() {
 
   if (loading && !data) return <FullPageLoader />;
 
-  const stats = data?.stats || [];
+  const stats = data?.platforms || [];
   const summary = data?.summary || null;
-  const unreadInsights = data?.unreadInsights || 0;
-  const unreadNotifications = data?.unreadNotifications || 0;
-
-  const filteredStats = stats.filter((item) => {
-    if (activeFilter === "all") return true;
-    const progress = item.progress || 0;
-    if (activeFilter === "high") return progress > 66;
-    if (activeFilter === "medium") return progress >= 33 && progress <= 66;
-    if (activeFilter === "low") return progress < 33;
-    return true;
-  });
 
   return (
     <>
@@ -79,24 +56,6 @@ export default function Dashboard() {
         <p className="text-gray-400 text-xl md:text-2xl font-medium max-w-2xl leading-relaxed">
           Quantify your secondary consciousness. Track your neural coding progress across the global ecosystem.
         </p>
-        
-        <div className="flex flex-wrap gap-4 mt-8">
-          {[
-            { id: "insights", icon: FiTrendingUp, label: "Insights", count: unreadInsights, color: "purple" },
-            { id: "history", icon: FiClock, label: "History", color: "cyan" },
-            { id: "notifications", icon: FiBell, label: "Feed", count: unreadNotifications, color: "blue" }
-          ].map(btn => (
-            <button
-              key={btn.id}
-              onClick={() => navigate(`/${btn.id}`)}
-              className={`px-6 py-3 bg-${btn.color}-600/10 hover:bg-${btn.color}-600/20 text-${btn.color}-400 font-bold rounded-xl transition-all flex items-center gap-3 ring-1 ring-${btn.color}-500/20`}
-            >
-              <btn.icon className="w-5 h-5" />
-              {btn.label}
-              {btn.count > 0 && <span className={`bg-${btn.color}-500 text-white text-xs font-black px-2 py-0.5 rounded-full`}>{btn.count}</span>}
-            </button>
-          ))}
-        </div>
       </div>
 
       <SummarySection summary={summary} loading={false} />
@@ -118,32 +77,21 @@ export default function Dashboard() {
           </button>
         </div>
       ) : (
-        <>
-          <div className="mb-6">
-            <FilterButtons activeFilter={activeFilter} onFilterChange={handleFilterChange} />
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-            {filteredStats.map((item) => (
-              <PlatformCard
-                key={item._id}
-                platform={item.platform}
-                stats={item.stats}
-                username={item.username}
-                progress={item.progress || 0}
-                canRefresh={item.canRefresh}
-                nextRefreshAvailable={item.nextRefreshAvailable}
-                onRefresh={handleRefresh}
-                onClick={() => navigate(`/${item.platform}`)}
-              />
-            ))}
-            {filteredStats.length === 0 && (
-              <div className="col-span-full glass-card-premium p-12 text-center text-gray-500 font-bold uppercase tracking-widest">
-                No signals detected matching current filter
-              </div>
-            )}
-          </div>
-        </>
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+          {stats.map((item) => (
+            <PlatformCard
+              key={item._id}
+              platform={item.platform}
+              stats={item.stats}
+              username={item.username}
+              progress={item.progress || 0}
+              canRefresh={item.canRefresh}
+              nextRefreshAvailable={item.nextRefreshAvailable}
+              onRefresh={handleRefresh}
+              onClick={() => navigate(`/${item.platform}`)}
+            />
+          ))}
+        </div>
       )}
 
       <Dialog
