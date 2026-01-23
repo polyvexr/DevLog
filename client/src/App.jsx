@@ -24,17 +24,14 @@ const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const Profile = lazy(() => import("./pages/Profile"));
 const Contests = lazy(() => import("./pages/Contests"));
-const Insights = lazy(() => import("./pages/Insights"));
-const History = lazy(() => import("./pages/History"));
-const Notifications = lazy(() => import("./pages/Notifications"));
 const PublicProfile = lazy(() => import("./pages/PublicProfile"));
 
 // Private route wrapper with auth check and layout
 const PrivateRoute = ({ children }) => {
   const { token, loading } = useContext(AuthContext);
-  
+
   if (loading) return <FullPageLoader />;
-  
+
   return token ? (
     <SidebarProvider>
       <AuthenticatedLayout>
@@ -51,11 +48,11 @@ const PrivateRoute = ({ children }) => {
 // Admin route wrapper with role check
 const AdminRoute = ({ children }) => {
   const { token, isAdmin, loading } = useContext(AuthContext);
-  
+
   if (loading) return <FullPageLoader />;
   if (!token) return <Navigate to="/login" />;
   if (!isAdmin) return <Navigate to="/" />;
-  
+
   return (
     <SidebarProvider>
       <AuthenticatedLayout>
@@ -70,9 +67,9 @@ const AdminRoute = ({ children }) => {
 // Public route - redirects authenticated users
 const PublicRoute = ({ children }) => {
   const { token, loading } = useContext(AuthContext);
-  
+
   if (loading) return <FullPageLoader />;
-  
+
   return token ? <Navigate to="/" replace /> : (
     <Suspense fallback={<FullPageLoader />}>
       {children}
@@ -83,9 +80,9 @@ const PublicRoute = ({ children }) => {
 // Context-aware home route
 const HomeRoute = () => {
   const { token, loading } = useContext(AuthContext);
-  
+
   if (loading) return <FullPageLoader />;
-  
+
   return token ? (
     <SidebarProvider>
       <AuthenticatedLayout>
@@ -102,7 +99,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<HomeRoute />} />
-        
+
         {/* Admin route */}
         <Route
           path="/admin"
@@ -112,7 +109,7 @@ function App() {
             </AdminRoute>
           }
         />
-        
+
         {/* Platform routes */}
         <Route
           path="/link"
@@ -162,7 +159,7 @@ function App() {
             </PrivateRoute>
           }
         />
-        
+
         {/* V2 Routes */}
         <Route
           path="/contests"
@@ -172,32 +169,7 @@ function App() {
             </PrivateRoute>
           }
         />
-        <Route
-          path="/insights"
-          element={
-            <PrivateRoute>
-              <Insights />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/history"
-          element={
-            <PrivateRoute>
-              <History />
-            </PrivateRoute>
-          }
-        />
-        
-        <Route
-          path="/notifications"
-          element={
-            <PrivateRoute>
-              <Notifications />
-            </PrivateRoute>
-          }
-        />
-        
+
         {/* User profile */}
         <Route
           path="/profile"
@@ -209,7 +181,7 @@ function App() {
         />
         {/* Redirect /settings to /profile */}
         <Route path="/settings" element={<Navigate to="/profile" replace />} />
-        
+
         {/* Auth routes */}
         <Route
           path="/register"
@@ -243,17 +215,17 @@ function App() {
             </PublicRoute>
           }
         />
-        
+
         {/* Public profile - NO AUTH REQUIRED */}
-        <Route 
-          path="/u/:username" 
+        <Route
+          path="/u/:username"
           element={
             <Suspense fallback={<FullPageLoader />}>
               <PublicProfile />
             </Suspense>
-          } 
+          }
         />
-        
+
         {/* 404 */}
         <Route path="*" element={<NotFound />} />
       </Routes>

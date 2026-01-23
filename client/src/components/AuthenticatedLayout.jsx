@@ -1,6 +1,5 @@
 import { useSidebar } from "../hooks/useSidebar";
 import Sidebar from "./Sidebar";
-import NotificationBell from "./NotificationBell";
 import { FiZap, FiMenu } from "react-icons/fi";
 
 export default function AuthenticatedLayout({ children }) {
@@ -42,8 +41,8 @@ export default function AuthenticatedLayout({ children }) {
               <FiZap className="text-blue-500 animate-pulse" /> DevLog
             </span>
 
-            {/* Notification Bell */}
-            <NotificationBell />
+            {/* Placeholder for balance/alignment if needed, otherwise empty */}
+            <div className="w-11" />
           </div>
         </header>
 

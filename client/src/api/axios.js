@@ -27,12 +27,12 @@ api.interceptors.response.use(
       // Token expired or invalid - clear auth and redirect
       localStorage.removeItem("token");
       localStorage.removeItem("isAdmin");
-      
+
       // Only redirect if not already on auth pages
       const currentPath = window.location.pathname;
       const authPages = ["/login", "/register", "/forgot-password", "/reset-password"];
       const isAuthPage = authPages.some(page => currentPath.startsWith(page));
-      
+
       if (!isAuthPage) {
         window.location.href = "/login";
       }
@@ -57,21 +57,6 @@ export const refreshPlatformStats = (platform) =>
 export const getPlatforms = () => api.get("/platforms");
 export const linkPlatform = (data) => api.post("/platforms/link", data);
 export const unlinkPlatform = (platform) => api.delete(`/platforms/${platform}`);
-
-// History API
-export const getHistory = (platform) => api.get(`/history/${platform}`);
-export const getAllHistory = () => api.get("/history");
-
-// Insights API
-export const getInsights = () => api.get("/insights");
-export const markInsightRead = (id) => api.patch(`/insights/${id}/read`);
-export const dismissInsight = (id) => api.patch(`/insights/${id}/dismiss`);
-
-// Notifications API
-export const getNotifications = () => api.get("/notifications");
-export const markNotificationRead = (id) => api.patch(`/notifications/${id}/read`);
-export const markAllNotificationsRead = () => api.patch("/notifications/read-all");
-export const deleteNotification = (id) => api.delete(`/notifications/${id}`);
 
 // Contests API
 export const getContests = () => api.get("/contests");
