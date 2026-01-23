@@ -69,6 +69,25 @@ export const telegramService = {
     `.trim();
 
         return this.sendMessage(message);
+    },
+
+    /**
+     * Send a failure alert
+     * @param {string} error - Error message
+     */
+    async sendFailureNotification(error) {
+        const timeStr = new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });
+        const message = `
+<b>⚠️ DevLog Sync FAILED</b>
+📅 <i>${timeStr}</i>
+
+❌ <b>Error:</b> 
+<code>${error}</code>
+
+<i>Please check server logs for details.</i>
+        `.trim();
+
+        return this.sendMessage(message);
     }
 };
 

@@ -107,6 +107,11 @@ export const handleUnifiedCron = async (req, res) => {
 
     res.json(finalResult);
   } catch (error) {
+    // Send failure notification to Telegram
+    telegramService.sendFailureNotification(error.message).catch(err => {
+      console.error("Telegram failure notification failed:", err.message);
+    });
+
     res.status(500).json({ error: error.message });
   }
 };

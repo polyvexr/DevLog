@@ -126,13 +126,13 @@ export const fetchLeetCode = async (username) => {
       timeout: 20000 // 20 second timeout for slow API
     });
 
-    if (res.data.errors) {
-      console.log("LeetCode GraphQL Errors:", JSON.stringify(res.data.errors));
+    const data = res.data.data;
+    const matchedUser = data?.matchedUser;
+
+    if (res.data.errors && !matchedUser) {
+      console.log("LeetCode GraphQL Errors (No data):", JSON.stringify(res.data.errors));
       return {};
     }
-
-    const data = res.data.data;
-    const matchedUser = data.matchedUser;
 
     if (!matchedUser) {
       return {};
@@ -186,10 +186,10 @@ export const fetchLeetCode = async (username) => {
       submissionsByDifficulty,
       totalSolved: submissionsByDifficulty.all.solved,
       totalSubmissions: submissionsByDifficulty.all.submissions,
-      
+
       tagStats: matchedUser.tagProblemCounts || {},
       languageStats: matchedUser.languageProblemCount || [],
-      
+
       streakData: {
         currentStreak: calendar.streak || 0,
         totalActiveDays: calendar.totalActiveDays || 0,
