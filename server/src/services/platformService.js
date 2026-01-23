@@ -75,7 +75,7 @@ export const platformService = {
       };
     }
 
-    // Create new job
+    // Create new job or find existing one for today
     const job = await SyncJob.findOneAndUpdate(
       { idempotencyKey },
       {
@@ -89,6 +89,15 @@ export const platformService = {
       },
       { upsert: true, new: true }
     );
+
+    // If the job found/created is already completed, it's not "newly queued"
+    if (job.status === "completed" || job.status === "failed") {
+      return {
+        queued: false,
+        message: `Job already ${job.status} for today`,
+        jobId: job._id
+      };
+    }
 
     // Update user cooldown
     if (triggeredBy === "user") {

@@ -82,6 +82,12 @@ function normalizeCodeChefData(data, username) {
     return 0;
   };
 
+  const parseRating = (r) => {
+    if (typeof r === "number") return r;
+    if (typeof r === "string") return parseInt(r.replace(/\?/g, "")) || 0;
+    return 0;
+  };
+
   // Extract rating history from various formats
   const parseRatingHistory = (contests, ratingData) => {
     const source = contests || ratingData || [];
@@ -98,8 +104,8 @@ function normalizeCodeChefData(data, username) {
     username: data.username || username,
     name: data.name || "",
     stars: parseStars(data.stars),
-    rating: data.rating || data.currentRating || 0,
-    highestRating: data.highestRating || data.rating || data.currentRating || 0,
+    rating: parseRating(data.rating || data.currentRating),
+    highestRating: parseRating(data.highestRating || data.rating || data.currentRating),
     countryName: data.country || data.countryName || "",
     globalRank: data.globalRank || null,
     countryRank: data.countryRank || null,

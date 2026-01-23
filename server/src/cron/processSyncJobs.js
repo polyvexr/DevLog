@@ -27,8 +27,19 @@ export async function processSyncJobs(options = {}) {
   };
 
   try {
-    // Find pending jobs (including retry-ready failed jobs)
     const now = new Date();
+
+    // 0. Cleanup "Zombie" jobs (stuck in processing for > 5 mins)
+    const fiveMinsAgo = new Date(now.getTime() - 5 * 60 * 1000);
+    const zombies = await SyncJob.updateMany(
+      { status: "processing", updatedAt: { $lt: fiveMinsAgo } },
+      { $set: { status: "pending", updatedAt: now } }
+    );
+    if (zombies.modifiedCount > 0) {
+      console.log(`Cleaned up ${zombies.modifiedCount} zombie jobs`);
+    }
+
+    // Find pending jobs (including retry-ready failed jobs)
     const pendingJobs = await SyncJob.find({
       $or: [
         { status: "pending", nextRetryAt: null },
