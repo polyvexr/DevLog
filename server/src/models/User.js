@@ -53,6 +53,14 @@ const userSchema = new mongoose.Schema({
     github: {
       lastRefresh: { type: Date, default: null },
       nextAvailable: { type: Date, default: null }
+    },
+    codechef: {
+      lastRefresh: { type: Date, default: null },
+      nextAvailable: { type: Date, default: null }
+    },
+    atcoder: {
+      lastRefresh: { type: Date, default: null },
+      nextAvailable: { type: Date, default: null }
     }
   },
 

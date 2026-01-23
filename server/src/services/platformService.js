@@ -149,10 +149,14 @@ export const platformService = {
       const freshData = await fetchFunction(platformStat.username);
 
       // Update platform stat
-      platformStat.data = freshData;
+      platformStat.data = freshData || {};
       platformStat.stats = this.extractStats(job.platform, freshData);
       platformStat.lastUpdated = new Date();
-      platformStat.lastManualRefresh = new Date();
+
+      // Tell Mongoose these Mixed fields have changed
+      platformStat.markModified("data");
+      platformStat.markModified("stats");
+
       await platformStat.save();
 
       // Mark job as completed
@@ -161,8 +165,9 @@ export const platformService = {
       job.executionDurationMs = Date.now() - startTime;
       await job.save();
 
-      logger.info("Sync job completed", {
+      logger.info(`Sync job completed for ${job.platform}`, {
         jobId: job._id,
+        userId: job.userId,
         platform: job.platform,
         duration: job.executionDurationMs,
       });

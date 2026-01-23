@@ -109,6 +109,11 @@ export const linkPlatform = async (req, res) => {
     entry.data = freshData || {};
     entry.stats = platformService.extractStats(platform, entry.data);
     entry.lastUpdated = new Date();
+
+    // Explicitly mark Mixed types as modified
+    entry.markModified("data");
+    entry.markModified("stats");
+
     await entry.save();
 
     logger.info("Platform linked and stats fetched", {
@@ -225,6 +230,11 @@ export const refreshPlatform = async (req, res) => {
     platformStat.stats = platformService.extractStats(platform, platformStat.data);
     platformStat.lastUpdated = new Date();
     platformStat.lastManualRefresh = new Date();
+
+    // Explicitly mark Mixed types as modified
+    platformStat.markModified("data");
+    platformStat.markModified("stats");
+
     await platformStat.save();
 
     logger.info("Platform refreshed", {
