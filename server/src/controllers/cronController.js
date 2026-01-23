@@ -2,6 +2,7 @@ import {
   processSyncJobs,
   fetchContests
 } from "../cron/index.js";
+import { platformService } from "../services/platformService.js";
 import connectDB from "../config/db.js";
 
 /**
@@ -81,13 +82,19 @@ export const handleUnifiedCron = async (req, res) => {
 
     const startTime = Date.now();
 
-    // Run both tasks
-    const syncResult = await processSyncJobs();
+    // 1. Schedule jobs for everyone (adds to queue if not already there today)
+    const scheduleResult = await platformService.scheduleGlobalSync();
+
+    // 2. Process a batch of sync jobs from the queue
+    const syncResult = await processSyncJobs({ batchSize: 15 });
+
+    // 3. Fetch upcoming contests
     const contestsResult = await fetchContests();
 
     res.json({
       success: true,
       executionMs: Date.now() - startTime,
+      schedule: scheduleResult,
       sync: syncResult,
       contests: contestsResult
     });

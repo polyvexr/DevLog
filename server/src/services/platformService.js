@@ -259,6 +259,43 @@ export const platformService = {
       default:
         return {};
     }
+  },
+
+  /**
+   * Schedule sync jobs for ALL linked platforms across ALL users
+   * Used by the daily cron to populate the queue
+   */
+  async scheduleGlobalSync() {
+    const startTime = Date.now();
+    try {
+      // Find all linked platform stats
+      const platformStats = await PlatformStat.find({}, "userId platform");
+
+      let queued = 0;
+      let alreadyQueued = 0;
+
+      // Group by user/platform to avoid unnecessary calls if duplicates exist
+      for (const stat of platformStats) {
+        const result = await this.enqueueSyncJob(stat.userId, stat.platform, "cron");
+        if (result.queued) {
+          queued++;
+        } else {
+          alreadyQueued++;
+        }
+      }
+
+      logger.info("Global sync scheduling completed", {
+        total: platformStats.length,
+        queued,
+        alreadyQueued,
+        duration: Date.now() - startTime
+      });
+
+      return { total: platformStats.length, queued, alreadyQueued };
+    } catch (error) {
+      logger.error("Global sync scheduling failed", { error: error.message });
+      throw error;
+    }
   }
 };
 
