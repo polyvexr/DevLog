@@ -90,11 +90,24 @@ export const platformService = {
       { upsert: true, new: true }
     );
 
-    // If the job found/created is already completed, it's not "newly queued"
-    if (job.status === "completed" || job.status === "failed") {
+    // If it was already completed today, skip. 
+    // BUT! If it failed today, and this is a cron/admin trigger, we allow it to retry (reset to pending)
+    if (job.status === "completed") {
       return {
         queued: false,
-        message: `Job already ${job.status} for today`,
+        message: "Job already completed for today",
+        jobId: job._id
+      };
+    }
+
+    if (job.status === "failed") {
+      job.status = "pending";
+      job.nextRetryAt = null;
+      job.retryCount = 0;
+      await job.save();
+      return {
+        queued: true,
+        message: "Retrying previously failed job",
         jobId: job._id
       };
     }
