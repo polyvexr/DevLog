@@ -28,7 +28,7 @@ export default function Landing() {
           &lt;/&gt;
         </div>
         <div className="absolute top-1/3 right-1/3 text-purple-500/20 text-4xl font-mono animate-float-slow animation-delay-1000">
-          {}
+          { }
         </div>
         <div className="absolute bottom-1/3 left-1/5 text-cyan-500/20 text-5xl font-mono animate-float-slow animation-delay-2000">
           ( )
@@ -233,27 +233,20 @@ export default function Landing() {
       {/* Features Grid */}
       <section className="py-24 md:py-32 px-4 md:px-8 relative bg-white/[0.01]">
         <div className="app-container">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="space-y-4 fade-in-up">
               <div className="w-12 h-12 rounded-xl bg-blue-600 flex items-center justify-center text-xl shadow-lg shadow-blue-600/20">
                 <FiBarChart2 />
               </div>
-              <h3 className="text-xl font-bold">Unified Insights</h3>
+              <h3 className="text-xl font-bold">Unified Dashboard</h3>
               <p className="text-gray-500 text-sm leading-relaxed">Holistic overview of your performance across all platforms in real-time.</p>
-            </div>
-            <div className="space-y-4 fade-in-up delay-100">
-              <div className="w-12 h-12 rounded-xl bg-purple-600 flex items-center justify-center text-xl shadow-lg shadow-purple-600/20">
-                <FiTrendingUp />
-              </div>
-              <h3 className="text-xl font-bold">Meta-Growth</h3>
-              <p className="text-gray-500 text-sm leading-relaxed">Track trends and identify patterns in your solved problems and rating history.</p>
             </div>
             <div className="space-y-4 fade-in-up delay-200">
               <div className="w-12 h-12 rounded-xl bg-pink-600 flex items-center justify-center text-xl shadow-lg shadow-pink-600/20">
                 <FiAward />
               </div>
-              <h3 className="text-xl font-bold">Milestone Radar</h3>
-              <p className="text-gray-500 text-sm leading-relaxed">Visualize your progress towards top-tier rankings and competitive goals.</p>
+              <h3 className="text-xl font-bold">Platform Stats</h3>
+              <p className="text-gray-500 text-sm leading-relaxed">Visualize your problem counts, ratings, and rankings from major sites.</p>
             </div>
             <div className="space-y-4 fade-in-up delay-300">
               <div className="w-12 h-12 rounded-xl bg-cyan-600 flex items-center justify-center text-xl shadow-lg shadow-cyan-600/20">

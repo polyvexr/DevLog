@@ -2,17 +2,9 @@ import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { FiArrowLeft, FiShare2, FiExternalLink, FiAward, FiCheckCircle, FiTarget, FiZap, FiActivity } from "react-icons/fi";
 import { SiLeetcode, SiCodeforces, SiGithub, SiCodechef } from "react-icons/si";
-import {
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
 import api from "../api/axios";
 import FullPageLoader from "../components/FullPageLoader";
+import { FiLayers } from "react-icons/fi";
 
 // AtCoder text icon component
 const AtCoderIcon = ({ className }) => (
@@ -95,7 +87,7 @@ export default function PublicProfile() {
     );
   }
 
-  const { profile: userProfile, aggregateStats, platforms, history } = profile;
+  const { profile: userProfile, aggregateStats, platforms } = profile;
 
   return (
     <div className="min-h-screen bg-[#0a0a0f] text-gray-300 selection:bg-blue-500/30">
@@ -103,7 +95,7 @@ export default function PublicProfile() {
       <div className="relative overflow-hidden pt-20 pb-16 px-6">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-gradient-to-b from-blue-600/10 via-transparent to-transparent opacity-50 pointer-events-none" />
         <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_20%_20%,_rgba(60,80,255,0.05),_transparent_25%)]" />
-        
+
         <div className="max-w-6xl mx-auto relative z-10">
           <div className="flex flex-col md:flex-row items-start justify-between gap-10">
             <div className="flex-1 flex flex-col md:flex-row items-center md:items-start gap-8">
@@ -132,13 +124,13 @@ export default function PublicProfile() {
                   <span className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
                   @{userProfile.username}
                 </p>
-                
+
                 {userProfile.bio && (
                   <p className="text-gray-400 text-lg font-medium max-w-xl mb-8 leading-relaxed italic">
                     "{userProfile.bio}"
                   </p>
                 )}
-                
+
                 <div className="flex flex-wrap justify-center md:justify-start gap-6 text-sm">
                   {userProfile.location && (
                     <div className="flex items-center gap-2 text-gray-500">
@@ -189,16 +181,14 @@ export default function PublicProfile() {
           {platforms.map((platform) => {
             const config = platformConfig[platform.platform] || { icon: FiActivity, color: "#666", label: platform.platform, metric: "metrics.totalSolved" };
             const Icon = config.icon;
-            const platformHistory = history[platform.platform] || [];
-            
             return (
-              <div 
+              <div
                 key={platform.platform}
                 className="glass-card-premium p-8 group transition-all hover:bg-white/[0.03]"
               >
                 <div className="flex items-center justify-between mb-8">
                   <div className="flex items-center gap-5">
-                    <div 
+                    <div
                       className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg transition-transform group-hover:scale-110"
                       style={{ backgroundColor: `${config.color}15`, border: `1px solid ${config.color}30` }}
                     >
@@ -215,7 +205,7 @@ export default function PublicProfile() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-3 gap-4 mb-8">
+                <div className="grid grid-cols-3 gap-4">
                   {Object.entries(platform.stats).slice(0, 3).map(([key, value]) => (
                     <div key={key} className="bg-white/5 border border-white/5 rounded-2xl p-4">
                       <p className="text-xs font-black uppercase tracking-widest text-gray-600 mb-1 line-clamp-1">
@@ -225,42 +215,6 @@ export default function PublicProfile() {
                     </div>
                   ))}
                 </div>
-
-                {platformHistory.length > 1 && (
-                  <div className="h-40 mt-10">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <AreaChart data={platformHistory}>
-                        <defs>
-                          <linearGradient id={`grad-${platform.platform}`} x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor={config.color} stopOpacity={0.3} />
-                            <stop offset="95%" stopColor={config.color} stopOpacity={0} />
-                          </linearGradient>
-                        </defs>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#ffffff05" vertical={false} />
-                        <XAxis 
-                          dataKey="snapshotDate" 
-                          hide 
-                        />
-                        <YAxis hide domain={['auto', 'auto']} />
-                        <Tooltip 
-                          contentStyle={{ 
-                            background: '#0a111b', 
-                            border: '1px solid rgba(255,255,255,0.1)',
-                            borderRadius: '12px',
-                            color: '#fff'
-                          }}
-                        />
-                        <Area
-                          type="monotone"
-                          dataKey={config.metric}
-                          stroke={config.color}
-                          strokeWidth={3}
-                          fill={`url(#grad-${platform.platform})`}
-                        />
-                      </AreaChart>
-                    </ResponsiveContainer>
-                  </div>
-                )}
               </div>
             );
           })}

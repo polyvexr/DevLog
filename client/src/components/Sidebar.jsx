@@ -13,17 +13,11 @@ import {
   FiChevronRight,
   FiX,
   FiLayers,
-  FiTrendingUp,
-  FiClock,
-  FiBell,
 } from "react-icons/fi";
 import { SiLeetcode, SiCodeforces, SiGithub, SiCodechef } from "react-icons/si";
-import { getNotifications } from "../api/axios";
-import { useEffect, useState } from "react";
 
 export default function Sidebar() {
   const { logout, isAdmin } = useContext(AuthContext);
-  const [unreadNotifications, setUnreadNotifications] = useState(0);
   const {
     isCollapsed,
     isMobileOpen,
@@ -52,29 +46,11 @@ export default function Sidebar() {
   const navItems = [
     { path: "/", icon: FiBarChart2, label: "Dashboard", exact: true },
     { path: "/link", icon: FiLink, label: "Connect Hub" },
-    { path: "/insights", icon: FiTrendingUp, label: "Insights" },
-    { path: "/history", icon: FiClock, label: "History" },
     { path: "/contests", icon: FiTarget, label: "Contests" },
-    { path: "/notifications", icon: FiBell, label: "Notifications", count: unreadNotifications },
     { path: "/profile", icon: FiUser, label: "Profile" },
   ];
 
-  useEffect(() => {
-    const fetchUnreadCount = async () => {
-      try {
-        const res = await getNotifications();
-        const notifications = res.data.data?.notifications || res.data.notifications || [];
-        setUnreadNotifications(notifications.filter(n => !n.read).length);
-      } catch {
-        console.error("Failed to fetch notification count");
-      }
-    };
-    fetchUnreadCount();
-    
-    // Refresh count每 2 分钟 or when location changes
-    const interval = setInterval(fetchUnreadCount, 120000);
-    return () => clearInterval(interval);
-  }, [location.pathname]);
+
 
   const platformItems = [
     {
@@ -165,12 +141,12 @@ export default function Sidebar() {
           </NavLink>
 
           {isMobileOpen && (
-             <button
-                onClick={closeMobile}
-                className="lg:hidden w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-gray-400 hover:text-white"
-             >
-                <FiX />
-             </button>
+            <button
+              onClick={closeMobile}
+              className="lg:hidden w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-gray-400 hover:text-white"
+            >
+              <FiX />
+            </button>
           )}
         </div>
 
@@ -191,10 +167,9 @@ export default function Sidebar() {
                 onClick={handleNavClick}
                 className={({ isActive }) => `
                   flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all relative group
-                  ${
-                    isActive
-                      ? "bg-blue-600 text-white shadow-lg shadow-blue-500/25 scale-[1.02]"
-                      : "text-gray-500 hover:text-gray-300 hover:bg-white/5"
+                  ${isActive
+                    ? "bg-blue-600 text-white shadow-lg shadow-blue-500/25 scale-[1.02]"
+                    : "text-gray-500 hover:text-gray-300 hover:bg-white/5"
                   }
                 `}
               >
@@ -220,52 +195,51 @@ export default function Sidebar() {
 
           {/* Platforms Sub-section */}
           <div className="space-y-2">
-             <button
-                onClick={togglePlatforms}
-                className={`
+            <button
+              onClick={togglePlatforms}
+              className={`
                    w-full flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all group
                    ${isPlatformRoute ? "text-white bg-white/5 border border-white/10" : "text-gray-500 hover:text-gray-300 hover:bg-white/5"}
                 `}
-             >
-                <FiLayers className={`text-xl ${isCollapsed ? "mx-auto" : ""}`} />
-                {!isCollapsed && (
-                   <>
-                      <span className="font-black text-xs uppercase tracking-widest flex-1 text-left">Ecosystems</span>
-                      <FiChevronRight className={`transition-transform duration-300 ${isPlatformsExpanded ? "rotate-90" : ""}`} />
-                   </>
-                )}
-             </button>
+            >
+              <FiLayers className={`text-xl ${isCollapsed ? "mx-auto" : ""}`} />
+              {!isCollapsed && (
+                <>
+                  <span className="font-black text-xs uppercase tracking-widest flex-1 text-left">Ecosystems</span>
+                  <FiChevronRight className={`transition-transform duration-300 ${isPlatformsExpanded ? "rotate-90" : ""}`} />
+                </>
+              )}
+            </button>
 
-             {(isPlatformsExpanded || isCollapsed) && (
-                <div className={`space-y-1 ${isCollapsed ? "mt-2" : "mt-2 ml-4 border-l border-white/5 pl-4"} animate-fade-in`}>
-                   {platformItems.map((item) => (
-                      <NavLink
-                         key={item.path}
-                         to={item.path}
-                         onClick={handleNavClick}
-                         className={({ isActive }) => `
+            {(isPlatformsExpanded || isCollapsed) && (
+              <div className={`space-y-1 ${isCollapsed ? "mt-2" : "mt-2 ml-4 border-l border-white/5 pl-4"} animate-fade-in`}>
+                {platformItems.map((item) => (
+                  <NavLink
+                    key={item.path}
+                    to={item.path}
+                    onClick={handleNavClick}
+                    className={({ isActive }) => `
                             flex items-center gap-4 px-4 py-3 rounded-xl transition-all relative group
-                            ${
-                               isActive
-                                 ? `${item.bg} ${item.color} ${item.border} border`
-                                 : "text-gray-600 hover:text-gray-400 hover:bg-white/5"
-                            }
+                            ${isActive
+                        ? `${item.bg} ${item.color} ${item.border} border`
+                        : "text-gray-600 hover:text-gray-400 hover:bg-white/5"
+                      }
                          `}
-                      >
-                         {item.icon ? (
-                           <item.icon className="text-lg" />
-                         ) : (
-                           <span className="text-xs font-black w-5 h-5 flex items-center justify-center bg-gray-700 rounded text-white">
-                             AT
-                           </span>
-                         )}
-                         {!isCollapsed && (
-                            <span className="font-bold text-[11px] uppercase tracking-wider">{item.label}</span>
-                         )}
-                      </NavLink>
-                   ))}
-                </div>
-             )}
+                  >
+                    {item.icon ? (
+                      <item.icon className="text-lg" />
+                    ) : (
+                      <span className="text-xs font-black w-5 h-5 flex items-center justify-center bg-gray-700 rounded text-white">
+                        AT
+                      </span>
+                    )}
+                    {!isCollapsed && (
+                      <span className="font-bold text-[11px] uppercase tracking-wider">{item.label}</span>
+                    )}
+                  </NavLink>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Admin Sub-section */}
@@ -281,10 +255,9 @@ export default function Sidebar() {
                 onClick={handleNavClick}
                 className={({ isActive }) => `
                   flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all group
-                  ${
-                    isActive
-                      ? "bg-amber-500 text-white shadow-lg shadow-amber-500/25 scale-[1.02]"
-                      : "text-gray-500 hover:text-gray-300 hover:bg-white/5"
+                  ${isActive
+                    ? "bg-amber-500 text-white shadow-lg shadow-amber-500/25 scale-[1.02]"
+                    : "text-gray-500 hover:text-gray-300 hover:bg-white/5"
                   }
                 `}
               >

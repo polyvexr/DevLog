@@ -48,8 +48,8 @@ export default function Profile() {
 
   // Settings states
   const [theme, setTheme] = useState("dark");
-  const [emailNotifications, setEmailNotifications] = useState(true);
-  
+
+
   // Public profile states
   const [publicProfileEnabled, setPublicProfileEnabled] = useState(false);
   const [publicUsername, setPublicUsername] = useState("");
@@ -76,7 +76,7 @@ export default function Profile() {
       setLocation(userData.profile?.location || "");
       setWebsite(userData.profile?.website || "");
       setTheme(userData.settings?.theme || "dark");
-      setEmailNotifications(userData.settings?.emailNotifications ?? true);
+
       setPublicProfileEnabled(userData.publicProfile?.enabled || false);
       setPublicUsername(userData.publicProfile?.username || "");
       setShowLeetCode(userData.publicProfile?.showLeetCode ?? true);
@@ -111,7 +111,7 @@ export default function Profile() {
     setSuccess("");
     setError("");
     try {
-      await api.put("/user/settings", { theme, emailNotifications });
+      await api.put("/user/settings", { theme });
       setSuccess("Settings updated successfully");
     } catch (err) {
       setError(err.response?.data?.message || "Failed to update settings");
@@ -183,13 +183,12 @@ export default function Profile() {
       </div>
 
       {(error || success) && (
-        <div className={`mb-10 p-6 rounded-2xl flex items-center gap-4 animate-fade-in glass-card-premium ${
-          error ? "ring-1 ring-red-500/50 text-red-400" : "ring-1 ring-green-500/50 text-green-400"
-        }`}>
+        <div className={`mb-10 p-6 rounded-2xl flex items-center gap-4 animate-fade-in glass-card-premium ${error ? "ring-1 ring-red-500/50 text-red-400" : "ring-1 ring-green-500/50 text-green-400"
+          }`}>
           <div className={`w-3 h-3 rounded-full animate-pulse ${error ? "bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]" : "bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)]"}`} />
           <span className="font-bold tracking-wide">{error || success}</span>
-          <button 
-            onClick={() => { setError(""); setSuccess(""); }} 
+          <button
+            onClick={() => { setError(""); setSuccess(""); }}
             className="ml-auto text-gray-500 hover:text-white"
           >
             <FiX />
@@ -205,11 +204,10 @@ export default function Profile() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`px-5 py-3 rounded-xl flex items-center gap-3 transition-all ${
-                activeTab === tab.id
+              className={`px-5 py-3 rounded-xl flex items-center gap-3 transition-all ${activeTab === tab.id
                   ? "bg-white/10 ring-2 ring-blue-500/30 text-white"
                   : "bg-white/5 hover:bg-white/10 text-gray-400"
-              }`}
+                }`}
             >
               <Icon className="w-5 h-5" />
               <span className="font-bold">{tab.label}</span>
@@ -355,11 +353,10 @@ export default function Profile() {
                       key={option.id}
                       type="button"
                       onClick={() => setTheme(option.id)}
-                      className={`p-4 rounded-xl flex flex-col items-center gap-2 transition-all ${
-                        theme === option.id
+                      className={`p-4 rounded-xl flex flex-col items-center gap-2 transition-all ${theme === option.id
                           ? "bg-purple-500/20 ring-2 ring-purple-500/50"
                           : "bg-white/5 hover:bg-white/10"
-                      }`}
+                        }`}
                     >
                       <Icon className={`w-6 h-6 ${theme === option.id ? "text-purple-400" : "text-gray-500"}`} />
                       <span className={`text-sm font-bold ${theme === option.id ? "text-white" : "text-gray-400"}`}>
@@ -371,29 +368,7 @@ export default function Profile() {
               </div>
             </div>
 
-            {/* Email Notifications */}
-            <div className="flex items-center justify-between p-6 bg-white/5 rounded-2xl">
-              <div className="flex items-center gap-4">
-                <FiBell className="w-6 h-6 text-purple-400" />
-                <div>
-                  <div className="font-bold text-white">Email Notifications</div>
-                  <div className="text-sm text-gray-500">Receive insights and milestone alerts</div>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setEmailNotifications(!emailNotifications)}
-                className={`w-14 h-8 rounded-full transition-all ${
-                  emailNotifications ? "bg-purple-500" : "bg-white/20"
-                }`}
-              >
-                <div 
-                  className={`w-6 h-6 rounded-full bg-white shadow-lg transition-transform ${
-                    emailNotifications ? "translate-x-7" : "translate-x-1"
-                  }`}
-                />
-              </button>
-            </div>
+
 
             <button
               type="button"
@@ -432,14 +407,12 @@ export default function Profile() {
               <button
                 type="button"
                 onClick={() => setPublicProfileEnabled(!publicProfileEnabled)}
-                className={`w-14 h-8 rounded-full transition-all ${
-                  publicProfileEnabled ? "bg-cyan-500" : "bg-white/20"
-                }`}
-              >
-                <div 
-                  className={`w-6 h-6 rounded-full bg-white shadow-lg transition-transform ${
-                    publicProfileEnabled ? "translate-x-7" : "translate-x-1"
+                className={`w-14 h-8 rounded-full transition-all ${publicProfileEnabled ? "bg-cyan-500" : "bg-white/20"
                   }`}
+              >
+                <div
+                  className={`w-6 h-6 rounded-full bg-white shadow-lg transition-transform ${publicProfileEnabled ? "translate-x-7" : "translate-x-1"
+                    }`}
                 />
               </button>
             </div>
@@ -480,11 +453,10 @@ export default function Profile() {
                         key={platform.id}
                         type="button"
                         onClick={() => platform.setter(!platform.state)}
-                        className={`p-4 rounded-xl flex items-center gap-3 transition-all ${
-                          platform.state
+                        className={`p-4 rounded-xl flex items-center gap-3 transition-all ${platform.state
                             ? "bg-cyan-500/20 ring-2 ring-cyan-500/50"
                             : "bg-white/5 hover:bg-white/10"
-                        }`}
+                          }`}
                       >
                         <div className={`w-4 h-4 rounded ${platform.state ? "bg-cyan-500" : "bg-gray-600"}`} />
                         <span className={`font-bold ${platform.state ? "text-white" : "text-gray-400"}`}>

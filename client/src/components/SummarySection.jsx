@@ -4,8 +4,8 @@ import { FiLayers, FiCode, FiTrendingUp, FiZap } from "react-icons/fi";
 const SummarySection = ({ summary, loading }) => {
   if (loading) {
     return (
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
-        {[...Array(4)].map((_, i) => (
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        {[...Array(3)].map((_, i) => (
           <div key={i} className="glass-card-premium p-8 animate-pulse border-none ring-1 ring-white/5">
             <div className="w-12 h-12 bg-white/5 rounded-2xl mb-4" />
             <div className="h-6 bg-white/5 rounded-lg w-1/2 mb-2" />
@@ -38,17 +38,10 @@ const SummarySection = ({ summary, loading }) => {
       color: "from-purple-500 to-violet-600",
       glow: "shadow-purple-500/20",
     },
-    {
-      label: "Active Streak",
-      value: summary?.activeStreak || 0,
-      icon: FiZap,
-      color: "from-amber-500 to-orange-600",
-      glow: "shadow-amber-500/20",
-    },
   ];
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
       {stats.map((stat, index) => {
         const Icon = stat.icon;
         return (
@@ -58,7 +51,7 @@ const SummarySection = ({ summary, loading }) => {
             </div>
             <div className="text-3xl font-black text-white mb-1 group-hover:scale-105 transition-transform origin-left">{stat.value}</div>
             <div className="text-xs font-black uppercase tracking-widest text-gray-500">{stat.label}</div>
-            
+
             {/* Subtle background glow on hover */}
             <div className={`absolute -bottom-10 -right-10 w-24 h-24 bg-gradient-to-br ${stat.color} opacity-0 group-hover:opacity-10 blur-2xl transition-opacity duration-500`}></div>
           </div>
