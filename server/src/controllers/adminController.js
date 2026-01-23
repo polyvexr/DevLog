@@ -16,6 +16,35 @@ const platformFetchers = {
   atcoder: fetchAtCoder,
 };
 
+/**
+ * Get all users with their platform details
+ */
+export const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find({}, "name email role publicProfile createdAt").lean();
+
+    // For each user, find their platform stats
+    const usersWithStats = await Promise.all(users.map(async (user) => {
+      const platforms = await PlatformStat.find({ userId: user._id }, "platform username stats lastUpdated").lean();
+      return {
+        ...user,
+        platforms
+      };
+    }));
+
+    res.json({
+      success: true,
+      data: usersWithStats
+    });
+  } catch (error) {
+    logger.error("Get all users error", { error: error.message });
+    res.status(500).json({
+      success: false,
+      message: "Failed to get all users"
+    });
+  }
+};
+
 // Concurrency configuration
 const PARALLEL_CONFIG = {
   maxConcurrentUsers: 5,     // Max users to sync in parallel per platform
@@ -35,14 +64,14 @@ async function syncSingleUser(platformStat, fetchFunction) {
 
   try {
     const data = await fetchFunction(platformStat.username);
-    
+
     // Only update if we got valid data
     if (data && Object.keys(data).length > 0) {
       platformStat.data = data;
       platformStat.stats = data;
       platformStat.lastUpdated = Date.now();
       await platformStat.save();
-      
+
       return {
         status: "success",
         user: platformStat.userId.email,
@@ -75,26 +104,26 @@ async function syncSingleUser(platformStat, fetchFunction) {
  */
 async function parallelProcess(items, processor, concurrency) {
   const results = [];
-  
+
   // Process in batches
   for (let i = 0; i < items.length; i += concurrency) {
     const batch = items.slice(i, i + concurrency);
     const batchResults = await Promise.allSettled(batch.map(processor));
-    
+
     // Extract values from settled promises
     batchResults.forEach((result, idx) => {
       if (result.status === "fulfilled") {
         results.push(result.value);
       } else {
-        results.push({ 
-          status: "failed", 
+        results.push({
+          status: "failed",
           error: result.reason?.message || "Unknown error",
           item: batch[idx]
         });
       }
     });
   }
-  
+
   return results;
 }
 
@@ -105,14 +134,14 @@ async function parallelProcess(items, processor, concurrency) {
  */
 async function syncPlatformStatsParallel(platform) {
   const fetchFunction = platformFetchers[platform];
-  
+
   if (!fetchFunction) {
     throw new Error(`Unknown platform: ${platform}`);
   }
 
   const startTime = Date.now();
   const platformStats = await PlatformStat.find({ platform }).populate("userId", "email");
-  
+
   const syncResults = {
     platform,
     total: platformStats.length,
@@ -169,8 +198,8 @@ export const syncAllPlatforms = async (req, res) => {
   try {
     const startTime = Date.now();
     const allPlatforms = Object.keys(platformFetchers);
-    
-    logger.info("Starting parallel sync for all platforms", { 
+
+    logger.info("Starting parallel sync for all platforms", {
       platforms: allPlatforms,
       concurrency: PARALLEL_CONFIG.maxConcurrentPlatforms
     });
@@ -187,7 +216,7 @@ export const syncAllPlatforms = async (req, res) => {
       if (result.status === "fulfilled") {
         results[platform] = result.value;
       } else {
-        results[platform] = { 
+        results[platform] = {
           platform,
           error: result.reason?.message || "Unknown error",
           total: 0,
@@ -300,13 +329,13 @@ export const syncAtCoder = async (req, res) => {
 export const getSyncStats = async (req, res) => {
   try {
     const totalUsers = await User.countDocuments({});
-    
+
     // Get counts for all platforms in parallel
     const platformCountPromises = Object.keys(platformFetchers).map(async (platform) => ({
       platform,
       count: await PlatformStat.countDocuments({ platform })
     }));
-    
+
     const platformCountResults = await Promise.all(platformCountPromises);
     const platformCounts = {};
     platformCountResults.forEach(({ platform, count }) => {

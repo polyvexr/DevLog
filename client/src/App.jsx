@@ -20,6 +20,7 @@ const GitHubDetails = lazy(() => import("./pages/GitHubDetails"));
 const CodeChefDetails = lazy(() => import("./pages/CodeChefDetails"));
 const AtCoderDetails = lazy(() => import("./pages/AtCoderDetails"));
 const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
+const AdminUsers = lazy(() => import("./pages/AdminUsers"));
 const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const Profile = lazy(() => import("./pages/Profile"));
@@ -106,6 +107,14 @@ function App() {
           element={
             <AdminRoute>
               <AdminDashboard />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/admin/users"
+          element={
+            <AdminRoute>
+              <AdminUsers />
             </AdminRoute>
           }
         />

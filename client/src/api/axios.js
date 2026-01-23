@@ -67,6 +67,7 @@ export const getDashboardData = () => api.get("/dashboard");
 
 // Admin API
 export const getAdminStats = () => api.get("/admin/stats");
+export const getAdminUsers = () => api.get("/admin/users");
 export const syncAllPlatforms = () => api.post("/admin/sync/all");
 export const syncPlatform = (platform) => api.post(`/admin/sync/${platform}`);
 export const triggerContestFetch = () => api.post("/cron/contests");

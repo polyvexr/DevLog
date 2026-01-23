@@ -10,6 +10,7 @@ import {
   syncCodeChef,
   syncAtCoder,
   getSyncStats,
+  getAllUsers,
 } from "../controllers/adminController.js";
 
 const router = express.Router();
@@ -17,6 +18,9 @@ const router = express.Router();
 // All admin routes require authentication and admin privileges
 router.use(protect);
 router.use(adminAuth);
+
+// User management
+router.get("/users", getAllUsers);
 
 // Sync routes - new generic endpoint
 router.post("/sync/all", syncAllPlatforms);

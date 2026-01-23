@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import api from "../api/axios";
+import { useNavigate } from "react-router-dom";
 import Loader from "../components/Loader";
 import {
   FiUsers,
@@ -20,6 +21,7 @@ const AtCoderIcon = ({ className }) => (
 );
 
 export default function AdminDashboard() {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const [stats, setStats] = useState(null);
@@ -162,7 +164,13 @@ export default function AdminDashboard() {
           <div className="glass-card-premium p-10 relative overflow-hidden group">
             <FiUsers className="absolute -right-4 -top-4 text-7xl text-blue-500/5 group-hover:text-blue-500/10 transition-colors" />
             <div className="text-4xl font-black text-white mb-2">{stats.totalUsers}</div>
-            <div className="text-xs font-black uppercase tracking-widest text-gray-500">Total Users</div>
+            <div className="text-xs font-black uppercase tracking-widest text-gray-500 mb-6">Total Users</div>
+            <button
+              onClick={() => navigate("/admin/users")}
+              className="relative z-10 w-full py-3 bg-blue-600/10 border border-blue-500/20 text-blue-400 text-[10px] font-black uppercase tracking-[0.2em] rounded-xl hover:bg-blue-600 hover:text-white transition-all active:scale-95 flex items-center justify-center gap-2"
+            >
+              See All Users <span className="group-hover:translate-x-1 transition-transform">→</span>
+            </button>
           </div>
           <div className="glass-card-premium p-10 relative overflow-hidden group">
             <SiLeetcode className="absolute -right-4 -top-4 text-7xl text-yellow-500/5 group-hover:text-yellow-500/10 transition-colors" />
@@ -328,8 +336,8 @@ export default function AdminDashboard() {
                           <td className="py-4 px-4 text-sm font-medium text-gray-500">{detail.platform || detail.username || "-"}</td>
                           <td className="py-4 px-4 text-center">
                             <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${detail.status === "success"
-                                ? "bg-green-500/5 text-green-500 border-green-500/20"
-                                : "bg-red-500/5 text-red-500 border-red-500/20"
+                              ? "bg-green-500/5 text-green-500 border-green-500/20"
+                              : "bg-red-500/5 text-red-500 border-red-500/20"
                               }`}>
                               {detail.status}
                             </span>
