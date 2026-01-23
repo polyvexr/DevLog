@@ -308,10 +308,10 @@ export default function Landing() {
                 3
               </div>
               <h3 className="text-xl font-bold text-white mb-2 group-hover:text-pink-400 transition-colors">
-                Track Progress
+                View Stats
               </h3>
               <p className="text-gray-400">
-                View your unified stats and watch your skills grow
+                View your unified stats and monitor your coding activity
               </p>
             </div>
           </div>

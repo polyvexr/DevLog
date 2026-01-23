@@ -27,7 +27,6 @@ const platformConfig = {
     color: "#ffa116",
     gradient: "linear-gradient(135deg, #ffa116, #ffb84d)",
     url: (username) => `https://leetcode.com/u/${username}`,
-    progressClass: "progress-fill-leetcode",
   },
   codeforces: {
     name: "Codeforces",
@@ -35,7 +34,6 @@ const platformConfig = {
     color: "#1f8acb",
     gradient: "linear-gradient(135deg, #1f8acb, #4cb3f0)",
     url: (username) => `https://codeforces.com/profile/${username}`,
-    progressClass: "progress-fill-codeforces",
   },
   github: {
     name: "GitHub",
@@ -43,7 +41,6 @@ const platformConfig = {
     color: "#6e5494",
     gradient: "linear-gradient(135deg, #6e5494, #9575cd)",
     url: (username) => `https://github.com/${username}`,
-    progressClass: "progress-fill-github",
   },
   codechef: {
     name: "CodeChef",
@@ -51,7 +48,6 @@ const platformConfig = {
     color: "#5B4638",
     gradient: "linear-gradient(135deg, #5B4638, #8B7355)",
     url: (username) => `https://www.codechef.com/users/${username}`,
-    progressClass: "progress-fill-codechef",
   },
   atcoder: {
     name: "AtCoder",
@@ -59,7 +55,6 @@ const platformConfig = {
     color: "#222222",
     gradient: "linear-gradient(135deg, #333333, #666666)",
     url: (username) => `https://atcoder.jp/users/${username}`,
-    progressClass: "progress-fill-atcoder",
     isTextIcon: true,
   },
 };
@@ -149,7 +144,6 @@ const PlatformCard = ({
   platform,
   stats,
   username,
-  progress = 0,
   canRefresh = true,
   nextRefreshAvailable,
   onRefresh,
@@ -182,7 +176,7 @@ const PlatformCard = ({
   };
 
   return (
-    <div 
+    <div
       className="glass-card-premium p-8 cursor-pointer group hover:-translate-y-2"
       onClick={onClick}
     >
@@ -222,28 +216,11 @@ const PlatformCard = ({
         })}
       </div>
 
-      {/* Progress */}
-      <div className="mb-8 space-y-3">
-        <div className="flex items-center justify-between px-1">
-          <span className="text-xs font-black uppercase tracking-widest text-gray-500">Mastery Progress</span>
-          <span className="text-sm font-black text-white">
-            {progress}%
-          </span>
-        </div>
-        <div className="h-2.5 bg-white/5 rounded-full overflow-hidden border border-white/5">
-          <div
-            className={`h-full rounded-full transition-all duration-1000 ease-out shadow-[0_0_15px_rgba(255,255,255,0.2)]`}
-            style={{ 
-              width: `${progress}%`,
-              background: config.gradient
-            }}
-          />
-        </div>
-      </div>
+
 
       {/* Actions */}
       <div className="flex gap-4">
-        <button 
+        <button
           className="flex-1 py-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl text-xs font-black uppercase tracking-widest text-white transition-all active:scale-[0.98] flex items-center justify-center gap-2"
           onClick={handleVisit}
         >

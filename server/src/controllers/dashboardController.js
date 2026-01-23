@@ -40,7 +40,6 @@ export const getDashboardData = async (req, res) => {
           data: stat.data,
           lastUpdated: stat.lastUpdated,
           lastManualRefresh: stat.lastManualRefresh,
-          progress: calculateProgress(stat.platform, stat.data),
           canRefresh: canRefresh(stat.lastManualRefresh),
           nextRefreshAvailable: getNextRefreshTime(stat.lastManualRefresh)
         })),
@@ -73,18 +72,15 @@ function calculateSummary(platformStats) {
     totalPlatforms: platformStats.length,
     linkedPlatforms: [],
     totalProblemsSolved: 0,
-    averageProgress: 0,
     highlights: []
   };
 
-  let totalProgress = 0;
+
 
   for (const stat of platformStats) {
     summary.linkedPlatforms.push(stat.platform);
 
     const data = stat.data || {};
-    const progress = calculateProgress(stat.platform, data);
-    totalProgress += progress;
 
     switch (stat.platform) {
       case "leetcode":
@@ -136,47 +132,12 @@ function calculateSummary(platformStats) {
     }
   }
 
-  summary.averageProgress = platformStats.length > 0
-    ? Math.round(totalProgress / platformStats.length)
-    : 0;
+
 
   return summary;
 }
 
-/**
- * Calculate progress percentage for a platform
- */
-function calculateProgress(platform, data) {
-  if (!data) return 0;
 
-  switch (platform) {
-    case "leetcode":
-      const lcSolved = data.totalSolved || 0;
-      return Math.min(Math.round((lcSolved / 500) * 100), 100);
-
-    case "codeforces":
-      const cfRating = data.rating || 0;
-      return Math.min(Math.round((cfRating / 2400) * 100), 100);
-
-    case "github":
-      const repos = data.publicRepos || 0;
-      const stars = data.totalStars || 0;
-      const contributions = data.contributions || 0;
-      const ghScore = (repos * 5) + (stars * 2) + Math.min(contributions, 500);
-      return Math.min(Math.round((ghScore / 500) * 100), 100);
-
-    case "codechef":
-      const ccRating = data.rating || 0;
-      return Math.min(Math.round((ccRating / 2500) * 100), 100);
-
-    case "atcoder":
-      const atRating = data.rating || 0;
-      return Math.min(Math.round((atRating / 2800) * 100), 100);
-
-    default:
-      return 0;
-  }
-}
 
 /**
  * Check if manual refresh is available (2-hour cooldown)

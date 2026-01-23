@@ -6,35 +6,12 @@ import { platformService } from "../services/platformService.js";
 // Cooldown duration (6 hours for V2)
 const COOLDOWN_MS = 6 * 60 * 60 * 1000;
 
-// Calculate progress percentage for a platform
-const calculateProgress = (platform, stats) => {
-  if (!stats) return 0;
-
-  switch (platform) {
-    case "leetcode": {
-      const totalSolved = stats.totalSolved || 0;
-      const allQuestions = stats.allQuestionsCount || 3250;
-      return Math.min(Math.round((totalSolved / allQuestions) * 100), 100);
-    }
-    case "codeforces": {
-      const rating = stats.rating || 0;
-      return Math.min(Math.round((rating / 3000) * 100), 100);
-    }
-    case "github": {
-      const recentActivity = stats.totalEvents || 0;
-      return Math.min(Math.round((recentActivity / 100) * 100), 100);
-    }
-    default:
-      return 0;
-  }
-};
-
 // Get next refresh available time from user cooldowns
 const getNextRefreshTime = (user, platform) => {
   const cooldown = user?.cooldowns?.[platform];
   if (!cooldown?.nextAvailable) return null;
-  return new Date(cooldown.nextAvailable) > new Date() 
-    ? new Date(cooldown.nextAvailable) 
+  return new Date(cooldown.nextAvailable) > new Date()
+    ? new Date(cooldown.nextAvailable)
     : null;
 };
 
@@ -43,14 +20,11 @@ export const getAllStats = async (req, res) => {
     const stats = await PlatformStat.find({ userId: req.user._id });
     const user = await User.findById(req.user._id).select("cooldowns");
 
-    // Add progress and refresh info to each platform
     const enrichedStats = stats.map((stat) => {
-      const progress = calculateProgress(stat.platform, stat.stats);
       const nextRefreshAvailable = getNextRefreshTime(user, stat.platform);
 
       return {
         ...stat.toObject(),
-        progress,
         nextRefreshAvailable,
         canRefresh: !nextRefreshAvailable,
       };
@@ -68,8 +42,6 @@ export const getStatsSummary = async (req, res) => {
     const stats = await PlatformStat.find({ userId: req.user._id });
 
     let totalProblemsSolved = 0;
-    let totalProgress = 0;
-    let activeStreak = 0;
     let lastUpdated = null;
 
     stats.forEach((stat) => {
@@ -77,35 +49,30 @@ export const getStatsSummary = async (req, res) => {
         lastUpdated = stat.lastUpdated;
       }
 
-      const progress = calculateProgress(stat.platform, stat.stats);
-      totalProgress += progress;
-
       if (stat.platform === "leetcode") {
         totalProblemsSolved += stat.stats?.totalSolved || 0;
-        const leetcodeStreak = stat.stats?.streakData?.currentStreak || stat.stats?.streak || 0;
-        if (leetcodeStreak > activeStreak) activeStreak = leetcodeStreak;
       }
 
       if (stat.platform === "codeforces") {
         totalProblemsSolved += stat.stats?.problemsSolved || 0;
       }
 
-      if (stat.platform === "github") {
-        const githubActivity = stat.stats?.totalEvents || 0;
-        if (githubActivity > activeStreak) activeStreak = githubActivity;
+      if (stat.platform === "codechef") {
+        totalProblemsSolved += stat.stats?.totalSolved || 0;
+      }
+
+      if (stat.platform === "atcoder") {
+        totalProblemsSolved += stat.stats?.totalSolved || stat.stats?.acCount || 0;
       }
     });
 
     const platformsLinked = stats.length;
-    const averageProgress = platformsLinked > 0 ? Math.round(totalProgress / platformsLinked) : 0;
 
     res.json({
       success: true,
       summary: {
         platformsLinked,
         totalProblemsSolved,
-        averageProgress,
-        activeStreak,
         lastUpdated,
       },
     });
@@ -139,7 +106,7 @@ export const refreshPlatformStats = async (req, res) => {
 
     // Check cooldown from user document
     const canRefresh = await platformService.canRefresh(req.user._id, platform);
-    
+
     if (!canRefresh.allowed) {
       const remainingMinutes = Math.ceil(canRefresh.remainingMs / (60 * 1000));
       return res.status(429).json({
@@ -153,15 +120,15 @@ export const refreshPlatformStats = async (req, res) => {
     const job = {
       userId: req.user._id,
       platform,
-      save: async () => {}, // Mock save
+      save: async () => { }, // Mock save
     };
 
     const result = await platformService.processSyncJob(job);
 
     if (!result.success) {
-      return res.status(500).json({ 
-        success: false, 
-        message: `Failed to refresh ${platform}: ${result.error}` 
+      return res.status(500).json({
+        success: false,
+        message: `Failed to refresh ${platform}: ${result.error}`
       });
     }
 
@@ -171,16 +138,12 @@ export const refreshPlatformStats = async (req, res) => {
       platform,
     });
 
-    // Determine progress
-    const progress = calculateProgress(platform, updatedStat.stats);
-
     res.json({
       success: true,
       message: "Platform stats refreshed successfully",
-      data: { 
+      data: {
         stat: {
           ...updatedStat.toObject(),
-          progress,
           canRefresh: false,
           nextRefreshAvailable: new Date(Date.now() + COOLDOWN_MS)
         }

@@ -4,8 +4,8 @@ import { FiLayers, FiCode, FiTrendingUp, FiZap } from "react-icons/fi";
 const SummarySection = ({ summary, loading }) => {
   if (loading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-        {[...Array(3)].map((_, i) => (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+        {[...Array(2)].map((_, i) => (
           <div key={i} className="glass-card-premium p-8 animate-pulse border-none ring-1 ring-white/5">
             <div className="w-12 h-12 bg-white/5 rounded-2xl mb-4" />
             <div className="h-6 bg-white/5 rounded-lg w-1/2 mb-2" />
@@ -31,17 +31,11 @@ const SummarySection = ({ summary, loading }) => {
       color: "from-emerald-500 to-teal-600",
       glow: "shadow-emerald-500/20",
     },
-    {
-      label: "Average Progress",
-      value: `${summary?.averageProgress || 0}%`,
-      icon: FiTrendingUp,
-      color: "from-purple-500 to-violet-600",
-      glow: "shadow-purple-500/20",
-    },
+
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
       {stats.map((stat, index) => {
         const Icon = stat.icon;
         return (

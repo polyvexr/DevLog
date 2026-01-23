@@ -54,7 +54,7 @@ export default function Dashboard() {
           <span className="animate-text-shine inline-block italic">Command Center</span>
         </h1>
         <p className="text-gray-400 text-xl md:text-2xl font-medium max-w-2xl leading-relaxed">
-          Quantify your secondary consciousness. Track your neural coding progress across the global ecosystem.
+          Quantify your secondary consciousness. View your neural coding activity across the global ecosystem.
         </p>
       </div>
 
@@ -84,7 +84,7 @@ export default function Dashboard() {
               platform={item.platform}
               stats={item.stats}
               username={item.username}
-              progress={item.progress || 0}
+
               canRefresh={item.canRefresh}
               nextRefreshAvailable={item.nextRefreshAvailable}
               onRefresh={handleRefresh}
