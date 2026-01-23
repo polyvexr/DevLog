@@ -1,4 +1,4 @@
-import { FiClock, FiExternalLink, FiZap } from "react-icons/fi";
+import { FiClock, FiExternalLink, FiZap, FiCalendar } from "react-icons/fi";
 import { FaCode } from "react-icons/fa";
 import { SiLeetcode, SiCodeforces, SiCodechef } from "react-icons/si";
 
@@ -86,9 +86,24 @@ export default function ContestCard({ contest }) {
   // Format duration
   const hours = Math.floor(contest.duration / 60);
   const minutes = contest.duration % 60;
-  const durationStr = hours > 0 
+  const durationStr = hours > 0
     ? minutes > 0 ? `${hours}h ${minutes}m` : `${hours}h`
     : `${minutes}m`;
+
+  // Create Google Calendar URL
+  const getGoogleCalendarUrl = () => {
+    const start = new Date(contest.startTime);
+    const duration = contest.duration || 120; // Default to 2 hours if missing
+    const end = new Date(start.getTime() + (duration * 60000));
+
+    const formatDate = (date) => date.toISOString().replace(/-|:|\.\d\d\d/g, "");
+
+    const title = encodeURIComponent(`${config.name}: ${contest.name}`);
+    const details = encodeURIComponent(`Platform: ${config.name}\nDuration: ${durationStr}\nContest URL: ${contest.url}\n\nTracked via DevLog Arena`);
+    const dates = `${formatDate(start)}/${formatDate(end)}`;
+
+    return `https://www.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${dates}&details=${details}&location=${encodeURIComponent(contest.url)}`;
+  };
 
   return (
     <div
@@ -96,7 +111,7 @@ export default function ContestCard({ contest }) {
     >
       {/* Background gradient */}
       <div className={`absolute inset-0 bg-gradient-to-br ${config.bgGradient} opacity-50 group-hover:opacity-100 transition-opacity`} />
-      
+
       {/* Content */}
       <div className="relative z-10">
         {/* Header */}
@@ -155,18 +170,27 @@ export default function ContestCard({ contest }) {
         </div>
       </div>
 
-      {/* Hover overlay - Link */}
-      <a
-        href={contest.url}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 bg-black/70 backdrop-blur-sm transition-all duration-300 z-20"
-      >
-        <span className="flex items-center gap-3 text-white font-black text-lg px-8 py-4 bg-white/10 rounded-2xl border border-white/20 hover:bg-white/20 transition-colors">
-          <FiExternalLink className="text-xl" />
+      {/* Hover overlay - Actions */}
+      <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 opacity-0 group-hover:opacity-100 bg-black/80 backdrop-blur-sm transition-all duration-300 z-20 p-6">
+        <a
+          href={contest.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-full flex items-center justify-center gap-3 text-white font-black text-sm px-6 py-4 bg-white/10 rounded-2xl border border-white/10 hover:bg-white/20 transition-all active:scale-95"
+        >
+          <FiExternalLink className="text-lg" />
           Open Contest
-        </span>
-      </a>
+        </a>
+        <a
+          href={getGoogleCalendarUrl()}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-full flex items-center justify-center gap-3 text-white font-black text-sm px-6 py-4 bg-blue-600/20 rounded-2xl border border-blue-500/30 hover:bg-blue-600 hover:scale-105 transition-all active:scale-95 text-blue-400 hover:text-white shadow-lg shadow-blue-500/10"
+        >
+          <FiCalendar className="text-lg" />
+          Add to Calendar
+        </a>
+      </div>
     </div>
   );
 }
