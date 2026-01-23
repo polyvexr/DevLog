@@ -3,6 +3,7 @@ import {
   fetchContests
 } from "../cron/index.js";
 import { platformService } from "../services/platformService.js";
+import { telegramService } from "../services/telegramService.js";
 import connectDB from "../config/db.js";
 
 /**
@@ -91,13 +92,20 @@ export const handleUnifiedCron = async (req, res) => {
     // 3. Fetch upcoming contests
     const contestsResult = await fetchContests();
 
-    res.json({
+    const finalResult = {
       success: true,
       executionMs: Date.now() - startTime,
       schedule: scheduleResult,
       sync: syncResult,
       contests: contestsResult
+    };
+
+    // 4. Send Telegram notification (don't await or catch to avoid blocking response)
+    telegramService.sendSyncReport(finalResult).catch(err => {
+      console.error("Telegram notification failed:", err.message);
     });
+
+    res.json(finalResult);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
