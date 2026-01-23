@@ -10,10 +10,13 @@ const router = express.Router();
 // Cron routes - protected by CRON_SECRET header
 // Contests route also accepts admin authentication
 
-// POST /api/cron/sync - Process sync jobs (every 1 min)
-router.post("/sync", handleSyncCron);
+// POST/GET /api/cron/sync - Process sync jobs
+router.route("/sync").get(handleSyncCron).post(handleSyncCron);
 
-// POST /api/cron/contests - Fetch contests (hourly or admin-triggered)
-router.post("/contests", optionalAuth, handleContestsCron);
+// POST/GET /api/cron/contests - Fetch contests
+router.route("/contests").get(optionalAuth, handleContestsCron).post(optionalAuth, handleContestsCron);
+
+// POST/GET /api/cron/all - Unified sync and contests (Hobby plan)
+router.route("/all").get(handleUnifiedCron).post(handleUnifiedCron);
 
 export default router;

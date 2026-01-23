@@ -9,14 +9,26 @@ import {
  */
 
 /**
- * POST /api/cron/sync
- * Process pending sync jobs (every 1 minute)
+ * Common authorization helper for cron jobs
+ */
+const authorizeCron = (req) => {
+  const cronSecret = req.headers["x-cron-secret"] || req.query["x-cron-secret"];
+  const authHeader = req.headers["authorization"];
+  const bearerToken = authHeader?.startsWith("Bearer ") ? authHeader.split(" ")[1] : null;
+
+  // Check if either X-Cron-Secret, Authorization: Bearer, or ?x-cron-secret matches
+  if (!process.env.CRON_SECRET) return true; // Don't block if secret not configured (dev)
+
+  return cronSecret === process.env.CRON_SECRET || bearerToken === process.env.CRON_SECRET;
+};
+
+/**
+ * POST/GET /api/cron/sync
+ * Process pending sync jobs (every 1 minute on Pro, daily on Hobby)
  */
 export const handleSyncCron = async (req, res) => {
   try {
-    // Verify cron secret (for security)
-    const cronSecret = req.headers["x-cron-secret"];
-    if (process.env.CRON_SECRET && cronSecret !== process.env.CRON_SECRET) {
+    if (!authorizeCron(req)) {
       return res.status(401).json({ error: "Unauthorized" });
     }
 
@@ -28,22 +40,47 @@ export const handleSyncCron = async (req, res) => {
 };
 
 /**
- * POST /api/cron/contests
- * Fetch contests from all platforms (hourly)
- * Can be triggered by cron (with secret) or by admin users
+ * POST/GET /api/cron/contests
+ * Fetch contests from all platforms (hourly or admin-triggered)
  */
 export const handleContestsCron = async (req, res) => {
   try {
-    const cronSecret = req.headers["x-cron-secret"];
     const isAuthenticated = req.user && req.user.role === "admin";
 
     // Allow access if: valid cron secret OR authenticated admin
-    if (process.env.CRON_SECRET && cronSecret !== process.env.CRON_SECRET && !isAuthenticated) {
+    if (!authorizeCron(req) && !isAuthenticated) {
       return res.status(401).json({ error: "Unauthorized" });
     }
 
     const result = await fetchContests();
     res.json({ success: true, ...result });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+/**
+ * POST/GET /api/cron/all
+ * Unified endpoint for Hobby plan - runs both sync and contests
+ */
+export const handleUnifiedCron = async (req, res) => {
+  try {
+    if (!authorizeCron(req)) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    const startTime = Date.now();
+
+    // Run both tasks
+    const syncResult = await processSyncJobs();
+    const contestsResult = await fetchContests();
+
+    res.json({
+      success: true,
+      executionMs: Date.now() - startTime,
+      sync: syncResult,
+      contests: contestsResult
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
