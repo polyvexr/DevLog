@@ -11,7 +11,7 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const { data, loading, error, refresh } = useDashboard();
   const { refresh: triggerRefresh } = usePlatformRefresh();
-  
+
   const [messageDialog, setMessageDialog] = useState({
     open: false,
     title: "",
@@ -31,11 +31,11 @@ export default function Dashboard() {
     });
 
     if (!success) {
-      setMessageDialog({ 
-        open: true, 
-        title: "Refresh Refused", 
-        message: "This node is currently on a cooldown cycle. Please try again later.", 
-        type: "warning" 
+      setMessageDialog({
+        open: true,
+        title: "Refresh Refused",
+        message: "This node is currently on a cooldown cycle. Please try again later.",
+        type: "warning"
       });
     }
   };
@@ -69,7 +69,7 @@ export default function Dashboard() {
           <p className="text-gray-500 text-xl max-w-md mx-auto mb-12 font-medium leading-relaxed">
             No neural nodes are currently synchronized. Initialize your ecosystems to begin data aggregation.
           </p>
-          <button 
+          <button
             onClick={() => navigate('/link')}
             className="px-10 py-5 bg-blue-600 hover:bg-blue-500 text-white font-black text-lg rounded-2xl transition-all shadow-2xl shadow-blue-500/30 active:scale-95 group uppercase tracking-widest"
           >
@@ -80,7 +80,7 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
           {stats.map((item) => (
             <PlatformCard
-              key={item._id}
+              key={item.platform}
               platform={item.platform}
               stats={item.stats}
               username={item.username}
