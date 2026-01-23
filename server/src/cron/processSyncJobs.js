@@ -5,7 +5,9 @@ import { platformService } from "../services/platformService.js";
 const RATE_LIMITS = {
   leetcode: { maxPerMinute: 30, delayMs: 2000 },
   codeforces: { maxPerMinute: 30, delayMs: 2000 },
-  github: { maxPerMinute: 60, delayMs: 1000 }
+  github: { maxPerMinute: 60, delayMs: 1000 },
+  codechef: { maxPerMinute: 15, delayMs: 4000 }, // Slower due to scraping fallback
+  atcoder: { maxPerMinute: 20, delayMs: 3000 }
 };
 
 /**
@@ -52,7 +54,7 @@ export async function processSyncJobs(options = {}) {
     // Process jobs with rate limiting
     for (const [platform, jobs] of Object.entries(jobsByPlatform)) {
       const rateLimit = RATE_LIMITS[platform] || { maxPerMinute: 10, delayMs: 3000 };
-      
+
       // Check how many calls we've made in the last minute
       const recentCalls = await SyncJob.countDocuments({
         platform,
@@ -71,7 +73,7 @@ export async function processSyncJobs(options = {}) {
       for (const job of jobsToProcess) {
         try {
           const result = await platformService.processSyncJob(job);
-          
+
           if (result.success) {
             results.succeeded++;
           } else {
