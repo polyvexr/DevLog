@@ -2,6 +2,7 @@ import {
   processSyncJobs,
   fetchContests
 } from "../cron/index.js";
+import connectDB from "../config/db.js";
 
 /**
  * Cron Controller - Endpoints for Lambda/serverless cron triggers
@@ -32,6 +33,9 @@ export const handleSyncCron = async (req, res) => {
       return res.status(401).json({ error: "Unauthorized" });
     }
 
+    // Ensure DB is connected before processing
+    await connectDB();
+
     const result = await processSyncJobs();
     res.json({ success: true, ...result });
   } catch (error) {
@@ -52,6 +56,9 @@ export const handleContestsCron = async (req, res) => {
       return res.status(401).json({ error: "Unauthorized" });
     }
 
+    // Ensure DB is connected before processing
+    await connectDB();
+
     const result = await fetchContests();
     res.json({ success: true, ...result });
   } catch (error) {
@@ -68,6 +75,9 @@ export const handleUnifiedCron = async (req, res) => {
     if (!authorizeCron(req)) {
       return res.status(401).json({ error: "Unauthorized" });
     }
+
+    // Ensure DB is connected before processing
+    await connectDB();
 
     const startTime = Date.now();
 

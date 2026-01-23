@@ -14,7 +14,6 @@ const connectDB = async () => {
 
   try {
     const opts = {
-      bufferCommands: false,
       serverSelectionTimeoutMS: 10000, // Wait 10s before failing
       socketTimeoutMS: 45000,
     };
