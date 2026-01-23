@@ -108,8 +108,8 @@ export async function processSyncJobs(options = {}) {
           });
         }
 
-        // Time guard: exit 5s before Lambda timeout (assume 60s)
-        if (Date.now() - startTime > 55000) {
+        // Time guard: exit 10s before max timeout (e.g. 300s)
+        if (Date.now() - startTime > 290000) {
           return {
             ...results,
             message: "Exited early due to timeout guard",

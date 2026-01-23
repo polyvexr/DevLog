@@ -45,7 +45,7 @@ export const fetchAtCoder = async (username) => {
     try {
       const difficultyRes = await axios.get(
         `https://kenkoooo.com/atcoder/resources/problem-models.json`,
-        { timeout: 30000 } // 30s timeout for large JSON file
+        { timeout: 5000 } // Reduced to 5s to avoid sync timeouts
       );
       const difficulties = difficultyRes.data || {};
 
@@ -93,21 +93,21 @@ export const fetchAtCoder = async (username) => {
       rating: currentRating,
       highestRating,
       rankColor: getRankColor(currentRating),
-      
+
       // Ranking
       acRank: acRank?.rank || null,
       acCount: acRank?.count || solvedProblems.size,
-      
+
       // Problem solving stats
       totalSolved: solvedProblems.size,
       solvedByDifficulty,
-      
+
       // Contest participation
       contestsParticipated: contestHistory.length,
       ratingHistory,
-      
+
       // Performance stats
-      averagePerformance: contestHistory.length > 0 
+      averagePerformance: contestHistory.length > 0
         ? Math.round(contestHistory.reduce((sum, c) => sum + (c.Performance || 0), 0) / contestHistory.length)
         : 0,
       bestPerformance: contestHistory.length > 0

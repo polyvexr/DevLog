@@ -1,4 +1,12 @@
 {
+  "functions": {
+    "api/cron/all.js": {
+      "maxDuration": 300
+    },
+    "api/cron/sync.js": {
+      "maxDuration": 300
+    }
+  },
   "crons": [
     {
       "path": "/api/cron/all",
