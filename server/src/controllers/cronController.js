@@ -100,15 +100,15 @@ export const handleUnifiedCron = async (req, res) => {
       contests: contestsResult
     };
 
-    // 4. Send Telegram notification (don't await or catch to avoid blocking response)
-    telegramService.sendSyncReport(finalResult).catch(err => {
+    // 4. Send Telegram notification (MUST await on Vercel or it will be killed)
+    await telegramService.sendSyncReport(finalResult).catch(err => {
       console.error("Telegram notification failed:", err.message);
     });
 
     res.json(finalResult);
   } catch (error) {
     // Send failure notification to Telegram
-    telegramService.sendFailureNotification(error.message).catch(err => {
+    await telegramService.sendFailureNotification(error.message).catch(err => {
       console.error("Telegram failure notification failed:", err.message);
     });
 

@@ -66,12 +66,6 @@ export const fetchLeetCode = async (username) => {
                 problemsSolved
               }
             }
-            userCalendar {
-              activeYears
-              streak
-              totalActiveDays
-              submissionCalendar
-            }
             languageProblemCount {
               languageName
               problemsSolved
@@ -167,7 +161,6 @@ export const fetchLeetCode = async (username) => {
 
     // Profile information
     const profile = matchedUser.profile || {};
-    const calendar = matchedUser.userCalendar || {};
 
     return {
       username: matchedUser.username,
@@ -191,9 +184,9 @@ export const fetchLeetCode = async (username) => {
       languageStats: matchedUser.languageProblemCount || [],
 
       streakData: {
-        currentStreak: calendar.streak || 0,
-        totalActiveDays: calendar.totalActiveDays || 0,
-        activeYears: calendar.activeYears || [],
+        currentStreak: 0,
+        totalActiveDays: 0,
+        activeYears: [],
       },
 
       contestRanking: data.userContestRanking || {},

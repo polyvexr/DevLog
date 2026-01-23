@@ -13,6 +13,12 @@ export const telegramService = {
         const token = process.env.TELEGRAM_BOT_TOKEN;
         const chatId = process.env.TELEGRAM_CHAT_ID;
 
+        logger.info("Telegram configuration check", {
+            hasToken: !!token,
+            hasChatId: !!chatId,
+            chatId: chatId ? `${chatId.substring(0, 3)}***` : "none"
+        });
+
         if (!token || !chatId) {
             logger.warn("Telegram notifications skipped: TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID not set");
             return false;
