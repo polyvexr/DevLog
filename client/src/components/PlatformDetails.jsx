@@ -4,14 +4,14 @@ import { useNavigate } from "react-router-dom";
 /**
  * PlatformDetailsHeader - Reusable header component for platform detail pages
  */
-export function PlatformDetailsHeader({ 
-  platform, 
-  username, 
-  icon: Icon, 
-  iconColor, 
+export function PlatformDetailsHeader({
+  platform,
+  username,
+  icon: Icon,
+  iconColor,
   iconBgColor,
   title,
-  isTextIcon = false 
+  isTextIcon = false
 }) {
   const navigate = useNavigate();
 
@@ -22,16 +22,16 @@ export function PlatformDetailsHeader({
         className="mb-10 text-gray-400 hover:text-white flex items-center gap-2 group transition-all fade-in-scale"
       >
         <span className="group-hover:-translate-x-1 transition-transform">←</span>
-        <span className="font-bold uppercase tracking-widest text-xs">Return to Command Center</span>
+        <span className="font-bold uppercase tracking-widest text-xs">Back to Dashboard</span>
       </button>
 
       <div className="mb-12 fade-in-scale">
         <div className="flex items-center gap-8">
-          <div 
+          <div
             className="w-24 h-24 rounded-3xl flex items-center justify-center text-4xl shadow-2xl group-hover:scale-110 transition-transform"
-            style={{ 
-              backgroundColor: iconBgColor, 
-              boxShadow: `0 20px 40px ${iconBgColor}50` 
+            style={{
+              backgroundColor: iconBgColor,
+              boxShadow: `0 20px 40px ${iconBgColor}50`
             }}
           >
             {isTextIcon ? (
@@ -42,7 +42,7 @@ export function PlatformDetailsHeader({
           </div>
           <div>
             <h1 className="text-5xl md:text-7xl font-black tracking-tight text-white mb-2">
-              {title} <span className="animate-text-shine">Intelligence</span>
+              {title} <span className="animate-text-shine">Profile</span>
             </h1>
             <p className="text-xl font-black tracking-widest uppercase" style={{ color: iconColor }}>
               @{username}
@@ -57,11 +57,11 @@ export function PlatformDetailsHeader({
 /**
  * StatBox - Reusable stat display box
  */
-export function StatBox({ 
-  label, 
-  value, 
-  valueColor = "text-white", 
-  subValue, 
+export function StatBox({
+  label,
+  value,
+  valueColor = "text-white",
+  subValue,
   subValueColor = "text-gray-500",
   colSpan = 1,
   className = ""
@@ -100,11 +100,11 @@ export function SectionHeader({ title, dotColor = "bg-blue-500" }) {
 /**
  * ContestHistoryList - Reusable contest history component
  */
-export function ContestHistoryList({ 
-  contests, 
+export function ContestHistoryList({
+  contests,
   platform,
   accentColor = "#3B82F6",
-  maxItems = 10 
+  maxItems = 10
 }) {
   if (!contests || contests.length === 0) return null;
 
@@ -114,20 +114,20 @@ export function ContestHistoryList({
       <div className="glass-card-premium p-6">
         <div className="space-y-2">
           {contests.slice(0, maxItems).map((contest, idx) => {
-            const ratingChange = contest.newRating !== undefined 
+            const ratingChange = contest.newRating !== undefined
               ? contest.newRating - (contest.oldRating || 0)
               : null;
             const changeColor = ratingChange >= 0 ? "#22C55E" : "#EF4444";
-            
+
             return (
-              <div 
-                key={idx} 
+              <div
+                key={idx}
                 className="flex items-center justify-between p-5 hover:bg-white/5 rounded-2xl transition-all group"
               >
                 <div className="flex items-center gap-4">
-                  <div 
+                  <div
                     className="w-10 h-10 rounded-xl flex items-center justify-center text-xs font-black"
-                    style={{ 
+                    style={{
                       backgroundColor: `${accentColor}15`,
                       color: accentColor
                     }}
@@ -153,7 +153,7 @@ export function ContestHistoryList({
                     {contest.newRating || contest.rating}
                   </div>
                   {ratingChange !== null && (
-                    <div 
+                    <div
                       className="text-sm font-bold"
                       style={{ color: changeColor }}
                     >
@@ -189,18 +189,18 @@ export function DifficultyGrid({ title, difficulties, dotColor = "bg-blue-500" }
         {Object.entries(difficulties).map(([key, value]) => {
           const config = difficultyConfig[key] || { color: "#6B7280", label: key };
           return (
-            <div 
+            <div
               key={key}
               className="glass-card-premium p-8"
               style={{ borderColor: `${config.color}20` }}
             >
-              <div 
+              <div
                 className="text-xs font-black uppercase tracking-widest mb-6"
                 style={{ color: `${config.color}80` }}
               >
                 {config.label}
               </div>
-              <div 
+              <div
                 className="text-5xl font-black italic"
                 style={{ color: config.color }}
               >
@@ -238,7 +238,7 @@ export function LanguageStats({ languages, title = "Languages Used", dotColor = 
                 <span className="text-gray-400">{count}</span>
               </div>
               <div className="h-2 bg-white/10 rounded-full overflow-hidden">
-                <div 
+                <div
                   className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full transition-all group-hover:opacity-80"
                   style={{ width: `${(count / maxCount) * 100}%` }}
                 />

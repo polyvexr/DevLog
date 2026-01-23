@@ -1,11 +1,11 @@
 import React from "react";
 import { usePlatformStats } from "../hooks/useApi";
 import FullPageLoader from "../components/FullPageLoader";
-import { 
-  PlatformDetailsHeader, 
-  StatBox, 
-  SectionHeader, 
-  ContestHistoryList 
+import {
+  PlatformDetailsHeader,
+  StatBox,
+  SectionHeader,
+  ContestHistoryList
 } from "../components/PlatformDetails";
 
 export default function AtCoderDetails() {
@@ -14,9 +14,9 @@ export default function AtCoderDetails() {
   if (loading) return <FullPageLoader />;
   if (error || !data) return (
     <div className="text-center py-20 px-4">
-       <h2 className="text-3xl font-black text-white mb-4 italic uppercase">Nodes Offline</h2>
-       <p className="text-gray-400 mb-8 max-w-md mx-auto">Neural access to AtCoder lattice denied. Please initialize your identity in the command center.</p>
-       <button onClick={() => window.location.href='/link'} className="glass-card-premium px-8 py-3 text-cyan-400 font-black tracking-widest uppercase hover:scale-105 transition-transform active:scale-95">Link AtCoder</button>
+      <h2 className="text-3xl font-black text-white mb-4 italic uppercase">Not Connected</h2>
+      <p className="text-gray-400 mb-8 max-w-md mx-auto">This account is not yet linked. Please connect your AtCoder profile to see your stats here.</p>
+      <button onClick={() => window.location.href = '/link'} className="glass-card-premium px-8 py-3 text-cyan-400 font-black tracking-widest uppercase hover:scale-105 transition-transform active:scale-95">Connect Now</button>
     </div>
   );
 
@@ -28,7 +28,7 @@ export default function AtCoderDetails() {
 
   return (
     <div className="max-w-7xl mx-auto py-8 px-4">
-      <PlatformDetailsHeader 
+      <PlatformDetailsHeader
         platform="atcoder"
         username={data.username}
         icon="AT"
@@ -39,11 +39,11 @@ export default function AtCoderDetails() {
       />
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
-        <StatBox 
-          label="Current Rating" 
-          value={stats.rating || 0} 
-          subValue={`/ ${stats.highestRating || 0} Peak`} 
-          colSpan={2} 
+        <StatBox
+          label="Current Rating"
+          value={stats.rating || 0}
+          subValue={`/ ${stats.highestRating || 0} Peak`}
+          colSpan={2}
           valueColor=""
           className="relative"
         >
@@ -56,13 +56,13 @@ export default function AtCoderDetails() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
-        <StatBox label="Contests" value={stats.contestsParticipated || 0} />
+        <StatBox label="Contests Played" value={stats.contestsParticipated || 0} />
         <StatBox label="Avg Performance" value={stats.averagePerformance || 0} valueColor="text-cyan-400" />
         <StatBox label="Best Performance" value={stats.bestPerformance || 0} valueColor="text-green-400" />
       </div>
 
       <div className="mb-16">
-        <SectionHeader title="Difficulty Matrix" dotColor="bg-cyan-500" />
+        <SectionHeader title="Solved Problems" dotColor="bg-cyan-500" />
         <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
           <StatBox label="Total Solved" value={stats.totalSolved || stats.acCount || 0} />
           {Object.entries(stats.solvedByDifficulty || {}).map(([color, count]) => (
@@ -74,8 +74,8 @@ export default function AtCoderDetails() {
         </div>
       </div>
 
-      <ContestHistoryList 
-        contests={stats.ratingHistory?.slice().reverse()} 
+      <ContestHistoryList
+        contests={stats.ratingHistory?.slice().reverse()}
         platform="atcoder"
         accentColor="#222"
       />

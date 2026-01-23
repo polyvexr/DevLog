@@ -2,12 +2,12 @@ import React from "react";
 import { SiCodechef } from "react-icons/si";
 import { usePlatformStats } from "../hooks/useApi";
 import FullPageLoader from "../components/FullPageLoader";
-import { 
-  PlatformDetailsHeader, 
-  StatBox, 
-  SectionHeader, 
+import {
+  PlatformDetailsHeader,
+  StatBox,
+  SectionHeader,
   ContestHistoryList,
-  DifficultyGrid 
+  DifficultyGrid
 } from "../components/PlatformDetails";
 
 export default function CodeChefDetails() {
@@ -16,9 +16,9 @@ export default function CodeChefDetails() {
   if (loading) return <FullPageLoader />;
   if (error || !data) return (
     <div className="text-center py-20 px-4">
-       <h2 className="text-3xl font-black text-white mb-4 italic uppercase">Chef Unavailable</h2>
-       <p className="text-gray-400 mb-8 max-w-md mx-auto">Neural link to CodeChef nodes failed. Please initialize your identity in the command center.</p>
-       <button onClick={() => window.location.href='/link'} className="glass-card-premium px-8 py-3 text-amber-400 font-black tracking-widest uppercase hover:scale-105 transition-transform active:scale-95">Link CodeChef</button>
+      <h2 className="text-3xl font-black text-white mb-4 italic uppercase">Not Connected</h2>
+      <p className="text-gray-400 mb-8 max-w-md mx-auto">This account is not yet linked. Please connect your CodeChef profile to see your stats here.</p>
+      <button onClick={() => window.location.href = '/link'} className="glass-card-premium px-8 py-3 text-amber-400 font-black tracking-widest uppercase hover:scale-105 transition-transform active:scale-95">Connect Now</button>
     </div>
   );
 
@@ -29,7 +29,7 @@ export default function CodeChefDetails() {
 
   return (
     <div className="max-w-7xl mx-auto py-8 px-4">
-      <PlatformDetailsHeader 
+      <PlatformDetailsHeader
         platform="codechef"
         username={data.username}
         icon={SiCodechef}
@@ -39,18 +39,18 @@ export default function CodeChefDetails() {
       />
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
-        <StatBox 
-          label="Current Rating" 
-          value={stats.rating || 0} 
-          subValue={`/ ${stats.highestRating || 0} Peak`} 
-          colSpan={2} 
+        <StatBox
+          label="Current Rating"
+          value={stats.rating || 0}
+          subValue={`/ ${stats.highestRating || 0} Peak`}
+          colSpan={2}
           valueColor="text-white"
         />
         <div className="glass-card-premium p-8">
-           <div className="text-xs font-black uppercase tracking-[0.2em] text-gray-500 mb-4">Star Rating</div>
-           <div className="text-4xl font-black" style={{ color: getStarColor(stats.stars) }}>
-              {"★".repeat(stats.stars || 1)}
-           </div>
+          <div className="text-xs font-black uppercase tracking-[0.2em] text-gray-500 mb-4">Star Rating</div>
+          <div className="text-4xl font-black" style={{ color: getStarColor(stats.stars) }}>
+            {"★".repeat(stats.stars || 1)}
+          </div>
         </div>
         <StatBox label="Division" value={stats.division || "—"} />
       </div>
@@ -60,8 +60,8 @@ export default function CodeChefDetails() {
         <StatBox label="Country Rank" value={`#${stats.countryRank?.toLocaleString() || "—"}`} subValue={stats.countryName} />
       </div>
 
-      <DifficultyGrid 
-        title="Problem Solving Matrix"
+      <DifficultyGrid
+        title="Solved Problems"
         dotColor="bg-amber-500"
         difficulties={{
           total: stats.totalSolved || 0,
@@ -72,13 +72,13 @@ export default function CodeChefDetails() {
         }}
       />
 
-      <ContestHistoryList 
+      <ContestHistoryList
         contests={stats.ratingHistory?.slice().map(c => ({
           contestName: c.contestName || c.contestCode,
           rank: c.rank,
           rating: c.rating,
           date: c.date
-        }))} 
+        }))}
         platform="codechef"
         accentColor="#5B4638"
       />

@@ -42,7 +42,7 @@ export default function AdminDashboard() {
       console.error("Error fetching stats:", error);
       setNotification({
         type: "error",
-        message: error.response?.data?.message || "Internal System Error: Data retrieval failed.",
+        message: error.response?.data?.message || "System error: Failed to fetch dashboard data.",
       });
     } finally {
       setLoading(false);
@@ -59,7 +59,7 @@ export default function AdminDashboard() {
 
       // Use longer timeout for sync operations (can take up to 2 minutes with slow APIs)
       const res = await api.post(endpoint, {}, { timeout: 120000 });
-      
+
       let results;
       if (platform === "all") {
         results = res.data.data.totals;
@@ -80,13 +80,13 @@ export default function AdminDashboard() {
       await fetchStats();
       setNotification({
         type: "success",
-        message: `Neural Link Established: ${results.success} nodes updated successfully.`,
+        message: `Sync Completed: ${results.success} accounts updated successfully.`,
       });
     } catch (error) {
       console.error("Error syncing:", error);
       setNotification({
         type: "error",
-        message: error.response?.data?.message || "Synchronization Interrupted: Network anomaly detected.",
+        message: error.response?.data?.message || "Sync Error: Could not complete synchronization.",
       });
     } finally {
       setSyncing(false);
@@ -103,18 +103,18 @@ export default function AdminDashboard() {
       const platforms = res.data.platforms;
       setContestResults(platforms);
 
-      const totalFetched = res.data.totalFetched || 
+      const totalFetched = res.data.totalFetched ||
         (platforms ? Object.values(platforms).reduce((sum, r) => sum + (r.fetched || 0), 0) : 0);
 
       setNotification({
         type: "success",
-        message: `Contest Data Synchronized: ${totalFetched} contests fetched.`,
+        message: `Contests Updated: ${totalFetched} items fetched successfully.`,
       });
     } catch (error) {
       console.error("Error syncing contests:", error);
       setNotification({
         type: "error",
-        message: error.response?.data?.message || error.response?.data?.error || "Contest Sync Failed: Unable to fetch contest data.",
+        message: error.response?.data?.message || error.response?.data?.error || "Update Failed: Unable to fetch contest lists.",
       });
     } finally {
       setContestSyncing(false);
@@ -134,9 +134,8 @@ export default function AdminDashboard() {
 
       {notification && (
         <div className="fixed top-24 right-6 z-50 animate-fade-in-scale">
-          <div className={`glass-card-premium p-5 flex items-center gap-4 border-none ring-1 ${
-            notification.type === "error" ? "ring-red-500/30 text-red-400" : "ring-green-500/30 text-green-400"
-          }`}>
+          <div className={`glass-card-premium p-5 flex items-center gap-4 border-none ring-1 ${notification.type === "error" ? "ring-red-500/30 text-red-400" : "ring-green-500/30 text-green-400"
+            }`}>
             <div className={`w-3 h-3 rounded-full animate-pulse ${notification.type === "error" ? "bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]" : "bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)]"}`} />
             <span className="font-bold tracking-wide">{notification.message}</span>
             <button onClick={() => setNotification(null)} className="ml-4 opacity-50 hover:opacity-100 transition-opacity">
@@ -149,12 +148,12 @@ export default function AdminDashboard() {
       {/* Header */}
       <div className="mb-16 fade-in-scale text-center md:text-left">
         <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-black uppercase tracking-[0.3em] mb-6">
-          <FiShield className="animate-pulse" /> Sentinel Mode Activated
+          <FiShield className="animate-pulse" /> Admin Mode Active
         </div>
         <h1 className="text-6xl md:text-8xl font-black mb-6 tracking-tight leading-none italic">
-          Power <span className="animate-text-shine">Overlord</span>
+          System <span className="animate-text-shine">Admin</span>
         </h1>
-        <p className="text-gray-400 text-xl font-medium max-w-2xl">Global control center for multi-platform intelligence synchronization and neural node management.</p>
+        <p className="text-gray-400 text-xl font-medium max-w-2xl">Manage users, synchronize platform data, and update contest schedules across the entire system.</p>
       </div>
 
       {/* Stats Grid */}
@@ -163,34 +162,34 @@ export default function AdminDashboard() {
           <div className="glass-card-premium p-10 relative overflow-hidden group">
             <FiUsers className="absolute -right-4 -top-4 text-7xl text-blue-500/5 group-hover:text-blue-500/10 transition-colors" />
             <div className="text-4xl font-black text-white mb-2">{stats.totalUsers}</div>
-            <div className="text-xs font-black uppercase tracking-widest text-gray-500">Total Consciousnesses</div>
+            <div className="text-xs font-black uppercase tracking-widest text-gray-500">Total Users</div>
           </div>
           <div className="glass-card-premium p-10 relative overflow-hidden group">
             <SiLeetcode className="absolute -right-4 -top-4 text-7xl text-yellow-500/5 group-hover:text-yellow-500/10 transition-colors" />
             <div className="text-4xl font-black text-yellow-500 mb-2">{stats.platformCounts.leetcode}</div>
-            <div className="text-xs font-black uppercase tracking-widest text-gray-500">LeetCode Nodes</div>
+            <div className="text-xs font-black uppercase tracking-widest text-gray-500">LeetCode Accounts</div>
           </div>
           <div className="glass-card-premium p-10 relative overflow-hidden group">
             <SiCodeforces className="absolute -right-4 -top-4 text-7xl text-green-500/5 group-hover:text-green-500/10 transition-colors" />
             <div className="text-4xl font-black text-green-400 mb-2">{stats.platformCounts.codeforces}</div>
-            <div className="text-xs font-black uppercase tracking-widest text-gray-500">Codeforces Nodes</div>
+            <div className="text-xs font-black uppercase tracking-widest text-gray-500">Codeforces Accounts</div>
           </div>
           <div className="glass-card-premium p-10 relative overflow-hidden group">
             <SiGithub className="absolute -right-4 -top-4 text-7xl text-purple-500/5 group-hover:text-purple-500/10 transition-colors" />
             <div className="text-4xl font-black text-purple-400 mb-2">{stats.platformCounts.github}</div>
-            <div className="text-xs font-black uppercase tracking-widest text-gray-500">GitHub Nodes</div>
+            <div className="text-xs font-black uppercase tracking-widest text-gray-500">GitHub Accounts</div>
           </div>
           <div className="glass-card-premium p-10 relative overflow-hidden group">
             <SiCodechef className="absolute -right-4 -top-4 text-7xl text-amber-500/5 group-hover:text-amber-500/10 transition-colors" />
             <div className="text-4xl font-black text-amber-500 mb-2">{stats.platformCounts.codechef}</div>
-            <div className="text-xs font-black uppercase tracking-widest text-gray-500">CodeChef Nodes</div>
+            <div className="text-xs font-black uppercase tracking-widest text-gray-500">CodeChef Accounts</div>
           </div>
           <div className="glass-card-premium p-10 relative overflow-hidden group">
             <div className="absolute -right-4 -top-4 text-7xl text-cyan-500/5 group-hover:text-cyan-500/10 transition-colors">
               <AtCoderIcon className="text-5xl" />
             </div>
             <div className="text-4xl font-black text-cyan-400 mb-2">{stats.platformCounts.atcoder}</div>
-            <div className="text-xs font-black uppercase tracking-widest text-gray-500">AtCoder Nodes</div>
+            <div className="text-xs font-black uppercase tracking-widest text-gray-500">AtCoder Accounts</div>
           </div>
         </div>
       )}
@@ -202,8 +201,8 @@ export default function AdminDashboard() {
             <FiRefreshCw className={`text-3xl text-blue-500 ${syncing ? 'animate-spin' : ''}`} />
           </div>
           <div>
-            <h2 className="text-3xl font-black text-white italic">Protocol Synchronization</h2>
-            <p className="text-xs font-black uppercase tracking-widest text-gray-500">Neural Stream Alignment</p>
+            <h2 className="text-3xl font-black text-white italic">Platform Sync</h2>
+            <p className="text-xs font-black uppercase tracking-widest text-gray-500">Refresh data for all users</p>
           </div>
         </div>
 
@@ -220,14 +219,13 @@ export default function AdminDashboard() {
               key={item.id}
               onClick={() => handleSync(item.id)}
               disabled={syncing}
-              className={`group glass-card-premium p-6 border-none ring-1 text-left transition-all active:scale-95 ${
-                syncing && activeSync === item.id ? 'ring-blue-500 ring-2' : `${item.ring} ${item.hover}`
-              }`}
+              className={`group glass-card-premium p-6 border-none ring-1 text-left transition-all active:scale-95 ${syncing && activeSync === item.id ? 'ring-blue-500 ring-2' : `${item.ring} ${item.hover}`
+                }`}
             >
               <item.icon className={`text-3xl mb-4 ${item.text} group-hover:scale-110 transition-transform`} />
               <div className="text-xl font-black text-white italic mb-1">{item.label}</div>
               <div className="text-[10px] font-black uppercase tracking-widest text-gray-500">
-                {syncing && activeSync === item.id ? 'Establishing link...' : 'Initialize stream'}
+                {syncing && activeSync === item.id ? 'Connecting...' : 'Start Sync'}
               </div>
             </button>
           ))}
@@ -241,8 +239,8 @@ export default function AdminDashboard() {
             <FiCalendar className={`text-3xl text-purple-500 ${contestSyncing ? 'animate-pulse' : ''}`} />
           </div>
           <div>
-            <h2 className="text-3xl font-black text-white italic">Contest Data Synchronization</h2>
-            <p className="text-xs font-black uppercase tracking-widest text-gray-500">Fetch Upcoming Contests from All Platforms</p>
+            <h2 className="text-3xl font-black text-white italic">Contest Schedule Update</h2>
+            <p className="text-xs font-black uppercase tracking-widest text-gray-500">Fetch Latest Contests from Supported Platforms</p>
           </div>
         </div>
 
@@ -250,9 +248,8 @@ export default function AdminDashboard() {
           <button
             onClick={handleContestSync}
             disabled={contestSyncing}
-            className={`group glass-card-premium px-8 py-6 border-none ring-1 text-left transition-all active:scale-95 ${
-              contestSyncing ? 'ring-purple-500 ring-2' : 'ring-purple-500/10 hover:ring-purple-500/40'
-            }`}
+            className={`group glass-card-premium px-8 py-6 border-none ring-1 text-left transition-all active:scale-95 ${contestSyncing ? 'ring-purple-500 ring-2' : 'ring-purple-500/10 hover:ring-purple-500/40'
+              }`}
           >
             <div className="flex items-center gap-4">
               <FiRefreshCw className={`text-2xl text-purple-500 ${contestSyncing ? 'animate-spin' : 'group-hover:rotate-180 transition-transform duration-500'}`} />
@@ -296,20 +293,20 @@ export default function AdminDashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16 fade-in-up">
           <div className="lg:col-span-2 glass-card-premium p-10 border-none ring-1 ring-white/5 h-full">
             <h3 className="text-2xl font-black text-white mb-10 flex items-center gap-4 italic uppercase tracking-wider">
-               <FiDatabase className="text-blue-500" /> Neural Impact Analysis
+              <FiDatabase className="text-blue-500" /> Sync Summary
             </h3>
             <div className="grid grid-cols-3 gap-8">
               <div className="text-center">
                 <div className="text-5xl font-black text-white mb-2">{syncResults.total}</div>
-                <div className="text-[10px] font-black uppercase tracking-widest text-gray-500">Total Pulses</div>
+                <div className="text-[10px] font-black uppercase tracking-widest text-gray-500">Total Attempts</div>
               </div>
               <div className="text-center">
                 <div className="text-5xl font-black text-green-500 mb-2">{syncResults.success}</div>
-                <div className="text-[10px] font-black uppercase tracking-widest text-gray-500">Successful Links</div>
+                <div className="text-[10px] font-black uppercase tracking-widest text-gray-500">Success</div>
               </div>
               <div className="text-center">
                 <div className="text-5xl font-black text-red-500 mb-2">{syncResults.failed}</div>
-                <div className="text-[10px] font-black uppercase tracking-widest text-gray-500">Lost Signals</div>
+                <div className="text-[10px] font-black uppercase tracking-widest text-gray-500">Failed</div>
               </div>
             </div>
 
@@ -319,8 +316,8 @@ export default function AdminDashboard() {
                   <table className="w-full">
                     <thead className="sticky top-0 bg-slate-900/50 backdrop-blur-xl z-10 border-b border-white/5">
                       <tr className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">
-                        <th className="py-4 text-left px-4">Subject</th>
-                        <th className="py-4 text-left px-4">Node</th>
+                        <th className="py-4 text-left px-4">User</th>
+                        <th className="py-4 text-left px-4">Platform</th>
                         <th className="py-4 text-center px-4">Status</th>
                       </tr>
                     </thead>
@@ -330,11 +327,10 @@ export default function AdminDashboard() {
                           <td className="py-4 px-4 font-bold text-gray-300">{detail.user}</td>
                           <td className="py-4 px-4 text-sm font-medium text-gray-500">{detail.platform || detail.username || "-"}</td>
                           <td className="py-4 px-4 text-center">
-                            <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${
-                              detail.status === "success"
+                            <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${detail.status === "success"
                                 ? "bg-green-500/5 text-green-500 border-green-500/20"
                                 : "bg-red-500/5 text-red-500 border-red-500/20"
-                            }`}>
+                              }`}>
                               {detail.status}
                             </span>
                           </td>
@@ -348,13 +344,13 @@ export default function AdminDashboard() {
           </div>
 
           <div className="glass-card-premium p-10 border-none ring-1 ring-white/5 flex flex-col items-center justify-center text-center">
-             <div className="w-24 h-24 bg-blue-500/10 rounded-full flex items-center justify-center mb-8 pulse-ring">
-               <FiTerminal className="text-4xl text-blue-500" />
-             </div>
-             <h3 className="text-2xl font-black text-white mb-4 italic">Neural Integrity</h3>
-             <p className="text-sm text-gray-500 font-medium leading-relaxed">
-               Current system state: 100% stable. Autonomous synchronization protocols are standing by for next instruction cycle.
-             </p>
+            <div className="w-24 h-24 bg-blue-500/10 rounded-full flex items-center justify-center mb-8 pulse-ring">
+              <FiTerminal className="text-4xl text-blue-500" />
+            </div>
+            <h3 className="text-2xl font-black text-white mb-4 italic">System Health</h3>
+            <p className="text-sm text-gray-500 font-medium leading-relaxed">
+              Current system state is stable. All synchronization protocols are active and ready.
+            </p>
           </div>
         </div>
       )}
@@ -362,35 +358,35 @@ export default function AdminDashboard() {
       {/* Recent Activity Table */}
       {stats?.recentSyncs && stats.recentSyncs.length > 0 && (
         <div className="glass-card-premium p-10 border-none ring-1 ring-white/5 fade-in-up delay-200">
-           <h3 className="text-2xl font-black text-white mb-10 italic uppercase tracking-wider flex items-center gap-4">
-             <FiActivity className="text-purple-500" /> Historical Pulse Log
-           </h3>
-           <div className="overflow-x-auto">
-             <table className="w-full text-left">
-               <thead>
-                 <tr className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 border-b border-white/5">
-                   <th className="py-6 px-4">Source Identity</th>
-                   <th className="py-6 px-4">Neural Hub</th>
-                   <th className="py-6 px-4">Temporal Point</th>
-                 </tr>
-               </thead>
-               <tbody className="divide-y divide-white/5">
-                 {stats.recentSyncs.map((sync, index) => (
-                   <tr key={index} className="group hover:bg-white/5 transition-colors">
-                     <td className="py-6 px-4 font-black text-white italic">{sync.userId?.email || "Ghost Node"}</td>
-                     <td className="py-6 px-4">
-                       <span className="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest bg-blue-500/5 text-blue-400 border border-blue-500/10">
-                         {sync.platform}
-                       </span>
-                     </td>
-                     <td className="py-6 px-4 text-xs font-bold text-gray-500">
-                       {new Date(sync.lastUpdated).toLocaleString()}
-                     </td>
-                   </tr>
-                 ))}
-               </tbody>
-             </table>
-           </div>
+          <h3 className="text-2xl font-black text-white mb-10 italic uppercase tracking-wider flex items-center gap-4">
+            <FiActivity className="text-purple-500" /> Recent Activity Log
+          </h3>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left">
+              <thead>
+                <tr className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 border-b border-white/5">
+                  <th className="py-6 px-4">User Email</th>
+                  <th className="py-6 px-4">Platform</th>
+                  <th className="py-6 px-4">Time</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-white/5">
+                {stats.recentSyncs.map((sync, index) => (
+                  <tr key={index} className="group hover:bg-white/5 transition-colors">
+                    <td className="py-6 px-4 font-black text-white italic">{sync.userId?.email || "Ghost Node"}</td>
+                    <td className="py-6 px-4">
+                      <span className="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest bg-blue-500/5 text-blue-400 border border-blue-500/10">
+                        {sync.platform}
+                      </span>
+                    </td>
+                    <td className="py-6 px-4 text-xs font-bold text-gray-500">
+                      {new Date(sync.lastUpdated).toLocaleString()}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>

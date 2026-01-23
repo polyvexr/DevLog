@@ -36,9 +36,9 @@ export default function PublicProfile() {
         setError(null);
       } catch (err) {
         if (err.response?.status === 404) {
-          setError("Neural link not found for this profile.");
+          setError("This profile could not be found.");
         } else {
-          setError("Failed to synchronize with public node.");
+          setError("Failed to load profile data.");
         }
       } finally {
         setLoading(false);
@@ -159,7 +159,7 @@ export default function PublicProfile() {
                 className="px-6 py-4 bg-white/5 hover:bg-white/10 text-white font-black rounded-2xl transition-all border border-white/5 flex items-center gap-3 backdrop-blur-xl group active:scale-95"
               >
                 <FiShare2 className="text-lg group-hover:scale-110 transition-transform" />
-                Transmission
+                Share Profile
               </button>
             </div>
           </div>
@@ -171,9 +171,9 @@ export default function PublicProfile() {
         {/* Aggregate Stats Section */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
           <StatCard label="Platforms Linked" value={aggregateStats.platforms} icon={<FiLayers className="text-blue-500" />} />
-          <StatCard label="Codons Synthesized" value={aggregateStats.totalProblemsSolved} icon={<FiCheckCircle className="text-green-500" />} />
-          <StatCard label="Contests Survived" value={aggregateStats.totalContests} icon={<FiActivity className="text-red-500" />} />
-          <StatCard label="Engrams unlocked" value={aggregateStats.badges.length} icon={<FiAward className="text-purple-500" />} />
+          <StatCard label="Problems Solved" value={aggregateStats.totalProblemsSolved} icon={<FiCheckCircle className="text-green-500" />} />
+          <StatCard label="Contests Played" value={aggregateStats.totalContests} icon={<FiActivity className="text-red-500" />} />
+          <StatCard label="Badges Earned" value={aggregateStats.badges.length} icon={<FiAward className="text-purple-500" />} />
         </div>
 
         {/* Platforms Grid */}
@@ -225,7 +225,7 @@ export default function PublicProfile() {
           <div className="mt-20">
             <h2 className="text-2xl font-black mb-10 text-white uppercase tracking-[0.3em] flex items-center gap-4">
               <span className="w-10 h-[1px] bg-blue-500/30" />
-              Engram Archives
+              Achievements
             </h2>
             <div className="flex flex-wrap gap-4">
               {aggregateStats.badges.map((badge, idx) => (
@@ -248,7 +248,7 @@ export default function PublicProfile() {
 
         {/* Footer */}
         <div className="mt-40 text-center border-t border-white/5 pt-12">
-          <p className="text-gray-600 font-black text-xs uppercase tracking-[0.5em] mb-4">Neural Signal by</p>
+          <p className="text-gray-600 font-black text-xs uppercase tracking-[0.5em] mb-4">Profile tracking by</p>
           <Link to="/" className="text-3xl font-black text-white italic tracking-tighter hover:text-blue-500 transition-colors">
             DEVLOG<span className="text-blue-500">_</span>
           </Link>

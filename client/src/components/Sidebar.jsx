@@ -45,7 +45,7 @@ export default function Sidebar() {
 
   const navItems = [
     { path: "/", icon: FiBarChart2, label: "Dashboard", exact: true },
-    { path: "/link", icon: FiLink, label: "Connect Hub" },
+    { path: "/link", icon: FiLink, label: "Connect Platforms" },
     { path: "/contests", icon: FiTarget, label: "Contests" },
     { path: "/profile", icon: FiUser, label: "Profile" },
   ];
@@ -156,7 +156,7 @@ export default function Sidebar() {
           <div className="space-y-2">
             {!isCollapsed && (
               <div className="px-4 mb-4">
-                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-600">Main Console</span>
+                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-600">Navigation</span>
               </div>
             )}
             {navItems.map((item) => (
@@ -205,7 +205,7 @@ export default function Sidebar() {
               <FiLayers className={`text-xl ${isCollapsed ? "mx-auto" : ""}`} />
               {!isCollapsed && (
                 <>
-                  <span className="font-black text-xs uppercase tracking-widest flex-1 text-left">Ecosystems</span>
+                  <span className="font-black text-xs uppercase tracking-widest flex-1 text-left">Your Platforms</span>
                   <FiChevronRight className={`transition-transform duration-300 ${isPlatformsExpanded ? "rotate-90" : ""}`} />
                 </>
               )}
@@ -247,7 +247,7 @@ export default function Sidebar() {
             <div className="space-y-2 pt-4 border-t border-white/5">
               {!isCollapsed && (
                 <div className="px-4 mb-4">
-                  <span className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-600">Core Engine</span>
+                  <span className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-600">System Admin</span>
                 </div>
               )}
               <NavLink
@@ -263,7 +263,7 @@ export default function Sidebar() {
               >
                 <FiSettings className={`text-xl ${isCollapsed ? "mx-auto" : ""}`} />
                 {!isCollapsed && (
-                  <span className="font-black text-xs uppercase tracking-widest animate-fade-in">Sentinel Mode</span>
+                  <span className="font-black text-xs uppercase tracking-widest animate-fade-in">Admin Dashboard</span>
                 )}
               </NavLink>
             </div>
@@ -278,7 +278,7 @@ export default function Sidebar() {
           >
             <FiLogOut className={`text-xl ${isCollapsed ? "mx-auto" : ""}`} />
             {!isCollapsed && (
-              <span className="font-black text-xs uppercase tracking-widest">Terminate Session</span>
+              <span className="font-black text-xs uppercase tracking-widest">Sign Out</span>
             )}
           </button>
         </div>

@@ -2,12 +2,12 @@ import React from "react";
 import { SiLeetcode } from "react-icons/si";
 import { usePlatformStats } from "../hooks/useApi";
 import FullPageLoader from "../components/FullPageLoader";
-import { 
-  PlatformDetailsHeader, 
-  StatBox, 
-  SectionHeader, 
+import {
+  PlatformDetailsHeader,
+  StatBox,
+  SectionHeader,
   DifficultyGrid,
-  LanguageStats 
+  LanguageStats
 } from "../components/PlatformDetails";
 
 export default function LeetCodeDetails() {
@@ -16,9 +16,9 @@ export default function LeetCodeDetails() {
   if (loading) return <FullPageLoader />;
   if (error || !data) return (
     <div className="text-center py-20 px-4">
-      <h2 className="text-3xl font-black text-white mb-4 italic uppercase">Identity Required</h2>
-      <p className="text-gray-400 mb-8 max-w-md mx-auto">Neural node connection failed. Please link your LeetCode identity in the command center.</p>
-      <button onClick={() => window.location.href='/link'} className="glass-card-premium px-8 py-3 text-blue-400 font-black tracking-widest uppercase hover:scale-105 transition-transform active:scale-95">Link LeetCode</button>
+      <h2 className="text-3xl font-black text-white mb-4 italic uppercase">Not Connected</h2>
+      <p className="text-gray-400 mb-8 max-w-md mx-auto">This account is not yet linked. Please connect your LeetCode account to see your stats here.</p>
+      <button onClick={() => window.location.href = '/link'} className="glass-card-premium px-8 py-3 text-blue-400 font-black tracking-widest uppercase hover:scale-105 transition-transform active:scale-95">Connect Now</button>
     </div>
   );
 
@@ -31,7 +31,7 @@ export default function LeetCodeDetails() {
 
   return (
     <div className="max-w-7xl mx-auto py-8 px-4">
-      <PlatformDetailsHeader 
+      <PlatformDetailsHeader
         platform="leetcode"
         username={data.username}
         icon={SiLeetcode}
@@ -41,13 +41,13 @@ export default function LeetCodeDetails() {
       />
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
-        <StatBox label="Rank Intelligence" value={`#${stats.ranking?.toLocaleString() || "—"}`} subValue="Global" colSpan={2} />
+        <StatBox label="Global Rank" value={`#${stats.ranking?.toLocaleString() || "—"}`} subValue="Rank" colSpan={2} />
         <StatBox label="Reputation" value={stats.reputation?.toLocaleString() || 0} valueColor="text-purple-400" />
-        <StatBox label="Identity" value={stats.realName || "Anonymous"} />
+        <StatBox label="Profile Name" value={stats.realName || "Anonymous"} />
       </div>
 
-      <DifficultyGrid 
-        title="Problem Solving Matrix"
+      <DifficultyGrid
+        title="Solved Problems"
         dotColor="bg-orange-500"
         difficulties={{
           easy: easy,
@@ -59,7 +59,7 @@ export default function LeetCodeDetails() {
 
       {stats.contestRanking && (
         <div className="mb-16">
-          <SectionHeader title="Competitive Trajectory" dotColor="bg-purple-500" />
+          <SectionHeader title="Contest Performance" dotColor="bg-purple-500" />
           <div className="glass-card-premium p-10 bg-gradient-to-br from-white/[0.03] to-purple-500/[0.03]">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-10">
               <div className="space-y-1">
@@ -85,11 +85,11 @@ export default function LeetCodeDetails() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
         <div>
-          <SectionHeader title="Skill Mastery" dotColor="bg-blue-500" />
+          <SectionHeader title="Skills and Topics" dotColor="bg-blue-500" />
           <div className="glass-card-premium p-8 space-y-8">
             {stats.tagStats?.advanced && (
               <div className="space-y-4">
-                <h3 className="text-xs font-black uppercase tracking-widest text-purple-400">Advanced Matrix</h3>
+                <h3 className="text-xs font-black uppercase tracking-widest text-purple-400">Advanced Topics</h3>
                 <div className="flex flex-wrap gap-2">
                   {stats.tagStats.advanced.slice(0, 8).map(tag => (
                     <div key={tag.tagSlug} className="px-4 py-2 bg-purple-500/10 border border-purple-500/20 rounded-xl text-xs font-bold text-white">
@@ -99,9 +99,9 @@ export default function LeetCodeDetails() {
                 </div>
               </div>
             )}
-            <LanguageStats 
-              languages={stats.languageStats?.reduce((acc, curr) => ({ ...acc, [curr.languageName]: curr.problemsSolved }), {})} 
-              title="Syntax Preference"
+            <LanguageStats
+              languages={stats.languageStats?.reduce((acc, curr) => ({ ...acc, [curr.languageName]: curr.problemsSolved }), {})}
+              title="Languages Used"
             />
           </div>
         </div>
@@ -109,17 +109,17 @@ export default function LeetCodeDetails() {
         <div>
           <SectionHeader title="Recent Activity" dotColor="bg-green-500" />
           <div className="glass-card-premium p-4 min-h-[400px]">
-             {stats.recentSubmissions?.slice(0, 8).map((sub, idx) => (
-               <div key={idx} className="flex items-center justify-between p-5 hover:bg-white/5 rounded-2xl transition-all group">
-                 <div className="flex items-center gap-4">
-                   <div className="w-2 h-2 rounded-full bg-green-500 opacity-50 group-hover:scale-150 transition-transform"></div>
-                   <div className="font-bold text-white group-hover:text-blue-400 transition-colors truncate max-w-[220px]">{sub.title}</div>
-                 </div>
-                 <div className="text-[10px] font-black uppercase text-gray-500 tracking-widest">
-                   {new Date(parseInt(sub.timestamp) * 1000).toLocaleDateString()}
-                 </div>
-               </div>
-             ))}
+            {stats.recentSubmissions?.slice(0, 8).map((sub, idx) => (
+              <div key={idx} className="flex items-center justify-between p-5 hover:bg-white/5 rounded-2xl transition-all group">
+                <div className="flex items-center gap-4">
+                  <div className="w-2 h-2 rounded-full bg-green-500 opacity-50 group-hover:scale-150 transition-transform"></div>
+                  <div className="font-bold text-white group-hover:text-blue-400 transition-colors truncate max-w-[220px]">{sub.title}</div>
+                </div>
+                <div className="text-[10px] font-black uppercase text-gray-500 tracking-widest">
+                  {new Date(parseInt(sub.timestamp) * 1000).toLocaleDateString()}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>

@@ -48,10 +48,10 @@ export default function Register() {
         >
           <div className="text-center mb-10">
             <h2 className="text-4xl md:text-5xl font-black text-white mb-3 tracking-tight">
-              Join Hub
+              Get Started
             </h2>
             <p className="text-gray-400 font-medium">
-              Initialize your developer tracking suite
+              Join DevLog to track all your coding stats
             </p>
           </div>
 
@@ -95,7 +95,7 @@ export default function Register() {
 
             <div className="space-y-3">
               <label htmlFor="password" className="block text-sm font-bold text-gray-400 uppercase tracking-widest ml-1">
-                Security Password
+                Password
               </label>
               <div className="relative group">
                 <input
@@ -131,7 +131,7 @@ export default function Register() {
             {loading ? (
               <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
             ) : (
-              "Initialize Account →"
+              "Create Account →"
             )}
           </button>
 

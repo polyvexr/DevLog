@@ -49,12 +49,12 @@ export default function Dashboard() {
     <>
       <div className="mb-12 fade-in-scale">
         <h1 className="text-5xl md:text-8xl font-black mb-4 tracking-tight">
-          <span className="text-white opacity-90 italic">Developer</span>
+          <span className="text-white opacity-90 italic">Your Coding</span>
           <br />
-          <span className="animate-text-shine inline-block italic">Command Center</span>
+          <span className="animate-text-shine inline-block italic">Dashboard</span>
         </h1>
         <p className="text-gray-400 text-xl md:text-2xl font-medium max-w-2xl leading-relaxed">
-          Quantify your secondary consciousness. View your neural coding activity across the global ecosystem.
+          One place to track all your progress. Monitor your coding activity across different platforms in real-time.
         </p>
       </div>
 
@@ -65,15 +65,15 @@ export default function Dashboard() {
           <div className="w-24 h-24 bg-blue-600/10 border border-blue-500/20 rounded-3xl flex items-center justify-center mx-auto mb-10 shadow-2xl pulse-ring">
             <FiBarChart2 className="text-5xl text-blue-500" />
           </div>
-          <h3 className="text-4xl font-black mb-4 text-white italic lowercase">Identity Required</h3>
+          <h3 className="text-4xl font-black mb-4 text-white italic lowercase">No Accounts Linked</h3>
           <p className="text-gray-500 text-xl max-w-md mx-auto mb-12 font-medium leading-relaxed">
-            No neural nodes are currently synchronized. Initialize your ecosystems to begin data aggregation.
+            You haven't connected any platforms yet. Connect your accounts to see your combined stats here.
           </p>
           <button
             onClick={() => navigate('/link')}
             className="px-10 py-5 bg-blue-600 hover:bg-blue-500 text-white font-black text-lg rounded-2xl transition-all shadow-2xl shadow-blue-500/30 active:scale-95 group uppercase tracking-widest"
           >
-            Connect Hub <span className="inline-block group-hover:translate-x-2 transition-transform ml-2">→</span>
+            Connect Account <span className="inline-block group-hover:translate-x-2 transition-transform ml-2">→</span>
           </button>
         </div>
       ) : (
@@ -99,7 +99,7 @@ export default function Dashboard() {
         title={messageDialog.title}
         message={messageDialog.message}
         type={messageDialog.type}
-        confirmText="Acknowledged"
+        confirmText="Got it"
         onConfirm={() => setMessageDialog(prev => ({ ...prev, open: false }))}
       />
     </>

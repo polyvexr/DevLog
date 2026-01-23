@@ -127,10 +127,10 @@ export default function Landing() {
         <div className="app-container relative z-10">
           <div className="text-center mb-16 md:mb-24">
             <h2 className="text-4xl md:text-6xl font-black mb-6 fade-in-up">
-              Integrated Ecosystems
+              All Your Profiles, Unified
             </h2>
             <p className="text-gray-400 text-xl max-w-2xl mx-auto fade-in-up delay-100 italic">
-              "One dashboard to rule them all. One hub to track your growth."
+              "Your complete development profile. All your stats in one place."
             </p>
           </div>
 
@@ -239,7 +239,7 @@ export default function Landing() {
                 <FiBarChart2 />
               </div>
               <h3 className="text-xl font-bold">Unified Dashboard</h3>
-              <p className="text-gray-500 text-sm leading-relaxed">Holistic overview of your performance across all platforms in real-time.</p>
+              <p className="text-gray-500 text-sm leading-relaxed">See your overall performance across all platforms on a single screen.</p>
             </div>
             <div className="space-y-4 fade-in-up delay-200">
               <div className="w-12 h-12 rounded-xl bg-pink-600 flex items-center justify-center text-xl shadow-lg shadow-pink-600/20">
@@ -308,10 +308,10 @@ export default function Landing() {
                 3
               </div>
               <h3 className="text-xl font-bold text-white mb-2 group-hover:text-pink-400 transition-colors">
-                View Stats
+                See Your Stats
               </h3>
               <p className="text-gray-400">
-                View your unified stats and monitor your coding activity
+                Instantly view your unified stats and share your profile with others
               </p>
             </div>
           </div>

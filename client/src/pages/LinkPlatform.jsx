@@ -6,40 +6,40 @@ import { SiLeetcode, SiCodeforces, SiGithub, SiCodechef } from "react-icons/si";
 
 // Platform configuration with icons and colors
 const platforms = [
-  { 
-    id: "leetcode", 
-    name: "LeetCode", 
-    icon: SiLeetcode, 
+  {
+    id: "leetcode",
+    name: "LeetCode",
+    icon: SiLeetcode,
     color: "#FFA116",
-    placeholder: "e.g. touring_machine" 
+    placeholder: "e.g. touring_machine"
   },
-  { 
-    id: "codeforces", 
-    name: "Codeforces", 
-    icon: SiCodeforces, 
+  {
+    id: "codeforces",
+    name: "Codeforces",
+    icon: SiCodeforces,
     color: "#1F8ACB",
-    placeholder: "e.g. tourist" 
+    placeholder: "e.g. tourist"
   },
-  { 
-    id: "github", 
-    name: "GitHub", 
-    icon: SiGithub, 
+  {
+    id: "github",
+    name: "GitHub",
+    icon: SiGithub,
     color: "#FFFFFF",
-    placeholder: "e.g. torvalds" 
+    placeholder: "e.g. torvalds"
   },
-  { 
-    id: "codechef", 
-    name: "CodeChef", 
-    icon: SiCodechef, 
+  {
+    id: "codechef",
+    name: "CodeChef",
+    icon: SiCodechef,
     color: "#5B4638",
-    placeholder: "e.g. gennady.korotkevich" 
+    placeholder: "e.g. gennady.korotkevich"
   },
-  { 
-    id: "atcoder", 
-    name: "AtCoder", 
+  {
+    id: "atcoder",
+    name: "AtCoder",
     icon: null, // Will use text fallback
     color: "#222222",
-    placeholder: "e.g. tourist" 
+    placeholder: "e.g. tourist"
   },
 ];
 
@@ -72,12 +72,12 @@ export default function LinkPlatform() {
     <>
       <div className="mb-12 fade-in-scale">
         <h1 className="text-5xl md:text-6xl font-black mb-4 tracking-tight">
-          <span className="text-white opacity-90">Expand</span>
+          <span className="text-white opacity-90">Connect</span>
           <br />
-          <span className="animate-text-shine inline-block">Ecosystem</span>
+          <span className="animate-text-shine inline-block">New Account</span>
         </h1>
         <p className="text-gray-400 text-xl font-medium">
-          Integrate a new platform into your command center.
+          Add a new platform to your dashboard to track your progress and solve counts.
         </p>
       </div>
 
@@ -109,21 +109,20 @@ export default function LinkPlatform() {
                       key={p.id}
                       type="button"
                       onClick={() => setPlatform(p.id)}
-                      className={`p-4 rounded-xl border transition-all flex flex-col items-center gap-2 ${
-                        isSelected
+                      className={`p-4 rounded-xl border transition-all flex flex-col items-center gap-2 ${isSelected
                           ? "bg-white/10 border-blue-500/50 ring-2 ring-blue-500/30"
                           : "bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20"
-                      }`}
+                        }`}
                     >
                       {Icon ? (
-                        <Icon 
-                          className="w-6 h-6" 
-                          style={{ color: isSelected ? p.color : "#9CA3AF" }} 
+                        <Icon
+                          className="w-6 h-6"
+                          style={{ color: isSelected ? p.color : "#9CA3AF" }}
                         />
                       ) : (
-                        <span 
+                        <span
                           className="w-6 h-6 flex items-center justify-center font-black text-sm rounded"
-                          style={{ 
+                          style={{
                             backgroundColor: isSelected ? p.color : "#374151",
                             color: isSelected ? "#FFFFFF" : "#9CA3AF"
                           }}
@@ -166,7 +165,7 @@ export default function LinkPlatform() {
             ) : (
               <>
                 <FiLink className="group-hover:rotate-12 transition-transform" />
-                Link {selectedPlatform?.name}
+                Connect {selectedPlatform?.name}
               </>
             )}
           </button>
@@ -175,17 +174,17 @@ export default function LinkPlatform() {
         <div className="mt-8 p-6 bg-white/[0.02] border border-white/5 rounded-2xl fade-in-up delay-200">
           <h4 className="text-white font-bold mb-2 flex items-center gap-2">
             <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
-            Connection Protocol
+            About Connecting
           </h4>
           <p className="text-gray-500 text-sm leading-relaxed">
-            By linking your account, DevLog will track public statistics and activity history. 
+            By linking your account, DevLog will track public statistics and activity history.
             Platform data is fetched from public APIs. Some platforms have sync cooldowns to prevent API rate limiting.
           </p>
         </div>
 
         <div className="mt-4 p-4 bg-yellow-500/5 border border-yellow-500/10 rounded-xl fade-in-up delay-300">
           <p className="text-yellow-500/80 text-xs">
-            <strong>Note:</strong> CodeChef and AtCoder use third-party APIs which may have occasional downtime. 
+            <strong>Note:</strong> CodeChef and AtCoder use third-party APIs which may have occasional downtime.
             If linking fails, try again later.
           </p>
         </div>
