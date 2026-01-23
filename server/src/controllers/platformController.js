@@ -8,7 +8,7 @@ import { fetchAtCoder } from "../utils/fetchAtCoder.js";
 import { platformService } from "../services/platformService.js";
 import logger from "../utils/logger.js";
 
-const FIFTEEN_DAYS_MS = 15 * 24 * 60 * 60 * 1000;
+const TWO_DAYS_MS = 2 * 24 * 60 * 60 * 1000;
 
 // Platform fetch function mapping
 const platformFetchers = {
@@ -25,9 +25,9 @@ async function checkMonthlyLimit(userId, platform) {
   });
   if (!last) return null;
   const elapsed = Date.now() - new Date(last.createdAt).getTime();
-  if (elapsed < FIFTEEN_DAYS_MS) {
+  if (elapsed < TWO_DAYS_MS) {
     const retryAfter = new Date(
-      new Date(last.createdAt).getTime() + FIFTEEN_DAYS_MS
+      new Date(last.createdAt).getTime() + TWO_DAYS_MS
     );
     return {
       blocked: true,
@@ -44,9 +44,9 @@ export const linkPlatform = async (req, res) => {
 
   // Validate platform
   if (!platformFetchers[platform]) {
-    return res.status(400).json({ 
-      success: false, 
-      message: `Unsupported platform: ${platform}` 
+    return res.status(400).json({
+      success: false,
+      message: `Unsupported platform: ${platform}`
     });
   }
 
@@ -78,7 +78,7 @@ export const linkPlatform = async (req, res) => {
     } else {
       return res.status(429).json({
         success: false,
-        message: "You can add or remove this platform at most once every 15 days.",
+        message: "You can add or remove this platform at most once every 2 days.",
         retryAfter: blocked.retryAfter,
       });
     }
@@ -110,17 +110,17 @@ export const linkPlatform = async (req, res) => {
     entry.stats = platformService.extractStats(platform, entry.data);
     entry.lastUpdated = new Date();
     await entry.save();
-    
-    logger.info("Platform linked and stats fetched", { 
-      userId: req.user._id, 
-      platform, 
-      username 
+
+    logger.info("Platform linked and stats fetched", {
+      userId: req.user._id,
+      platform,
+      username
     });
   } catch (err) {
-    logger.error("Platform fetch error during link", { 
-      error: err.message, 
-      platform, 
-      username 
+    logger.error("Platform fetch error during link", {
+      error: err.message,
+      platform,
+      username
     });
     // keep entry with empty stats; do not fail the link operation
   }
@@ -157,7 +157,7 @@ export const unlinkPlatform = async (req, res) => {
   if (blocked) {
     return res.status(429).json({
       success: false,
-      message: "You can add or remove this platform at most once every 15 days.",
+      message: "You can add or remove this platform at most once every 2 days.",
       retryAfter: blocked.retryAfter,
     });
   }
@@ -180,11 +180,11 @@ export const unlinkPlatform = async (req, res) => {
       action: "unlink",
       meta: { username: existing.username },
     });
-    
-    logger.info("Platform unlinked", { 
-      userId: req.user._id, 
-      platform, 
-      username: existing.username 
+
+    logger.info("Platform unlinked", {
+      userId: req.user._id,
+      platform,
+      username: existing.username
     });
   } catch (err) {
     logger.error("PlatformAction write error", { error: err.message });
@@ -199,12 +199,12 @@ export const unlinkPlatform = async (req, res) => {
  */
 export const refreshPlatform = async (req, res) => {
   const { platform } = req.params;
-  
+
   // Validate platform
   if (!platformFetchers[platform]) {
-    return res.status(400).json({ 
-      success: false, 
-      message: `Unsupported platform: ${platform}` 
+    return res.status(400).json({
+      success: false,
+      message: `Unsupported platform: ${platform}`
     });
   }
 
@@ -227,14 +227,14 @@ export const refreshPlatform = async (req, res) => {
     platformStat.lastManualRefresh = new Date();
     await platformStat.save();
 
-    logger.info("Platform refreshed", { 
-      userId: req.user._id, 
-      platform, 
-      username: platformStat.username 
+    logger.info("Platform refreshed", {
+      userId: req.user._id,
+      platform,
+      username: platformStat.username
     });
 
-    res.json({ 
-      success: true, 
+    res.json({
+      success: true,
       message: "Platform stats refreshed successfully",
       data: { stat: platformStat }
     });

@@ -110,8 +110,8 @@ export default function LinkPlatform() {
                       type="button"
                       onClick={() => setPlatform(p.id)}
                       className={`p-4 rounded-xl border transition-all flex flex-col items-center gap-2 ${isSelected
-                          ? "bg-white/10 border-blue-500/50 ring-2 ring-blue-500/30"
-                          : "bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20"
+                        ? "bg-white/10 border-blue-500/50 ring-2 ring-blue-500/30"
+                        : "bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20"
                         }`}
                     >
                       {Icon ? (
@@ -178,7 +178,7 @@ export default function LinkPlatform() {
           </h4>
           <p className="text-gray-500 text-sm leading-relaxed">
             By linking your account, DevLog will track public statistics and activity history.
-            Platform data is fetched from public APIs. Some platforms have sync cooldowns to prevent API rate limiting.
+            Platform data is fetched from public APIs. Note that once connected, you can only disconnect or change accounts after 2 days.
           </p>
         </div>
 

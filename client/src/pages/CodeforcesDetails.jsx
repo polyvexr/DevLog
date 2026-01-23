@@ -1,6 +1,7 @@
-import React from "react";
 import { SiCodeforces } from "react-icons/si";
+import { useNavigate } from "react-router-dom";
 import { usePlatformStats } from "../hooks/useApi";
+import { unlinkPlatform } from "../api/axios";
 import FullPageLoader from "../components/FullPageLoader";
 import {
   PlatformDetailsHeader,
@@ -11,7 +12,18 @@ import {
 } from "../components/PlatformDetails";
 
 export default function CodeforcesDetails() {
+  const navigate = useNavigate();
   const { data, loading, error, stats } = usePlatformStats("codeforces");
+
+  const handleUnlink = async () => {
+    if (!window.confirm("Are you sure you want to unlink Codeforces? You can re-connect after 2 days.")) return;
+    try {
+      await unlinkPlatform("codeforces");
+      navigate("/");
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed to unlink platform");
+    }
+  };
 
   if (loading) return <FullPageLoader />;
   if (error || !data) return (
@@ -31,6 +43,7 @@ export default function CodeforcesDetails() {
         iconColor="#1f8eff"
         iconBgColor="#1a1a1a"
         title="Codeforces"
+        onUnlink={handleUnlink}
       />
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">

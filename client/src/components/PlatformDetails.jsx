@@ -1,5 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { FiTrash2 } from "react-icons/fi";
 
 /**
  * PlatformDetailsHeader - Reusable header component for platform detail pages
@@ -11,19 +12,32 @@ export function PlatformDetailsHeader({
   iconColor,
   iconBgColor,
   title,
-  isTextIcon = false
+  isTextIcon = false,
+  onUnlink
 }) {
   const navigate = useNavigate();
 
   return (
     <>
-      <button
-        onClick={() => navigate("/")}
-        className="mb-10 text-gray-400 hover:text-white flex items-center gap-2 group transition-all fade-in-scale"
-      >
-        <span className="group-hover:-translate-x-1 transition-transform">←</span>
-        <span className="font-bold uppercase tracking-widest text-xs">Back to Dashboard</span>
-      </button>
+      <div className="flex items-center justify-between mb-10 fade-in-scale">
+        <button
+          onClick={() => navigate("/")}
+          className="text-gray-400 hover:text-white flex items-center gap-2 group transition-all"
+        >
+          <span className="group-hover:-translate-x-1 transition-transform">←</span>
+          <span className="font-bold uppercase tracking-widest text-xs">Back to Dashboard</span>
+        </button>
+
+        {onUnlink && (
+          <button
+            onClick={onUnlink}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500 hover:text-white transition-all text-xs font-black uppercase tracking-widest group"
+          >
+            <FiTrash2 className="group-hover:scale-110 transition-transform" />
+            Unlink Platform
+          </button>
+        )}
+      </div>
 
       <div className="mb-12 fade-in-scale">
         <div className="flex items-center gap-8">

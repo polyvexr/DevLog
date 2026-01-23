@@ -1,48 +1,61 @@
-import React from "react";
 import { SiGithub } from "react-icons/si";
 import { FiStar, FiGitBranch, FiEye, FiExternalLink } from "react-icons/fi";
+import { useNavigate } from "react-router-dom";
 import { usePlatformStats } from "../hooks/useApi";
+import { unlinkPlatform } from "../api/axios";
 import FullPageLoader from "../components/FullPageLoader";
-import { 
-  PlatformDetailsHeader, 
-  StatBox, 
-  SectionHeader, 
-  LanguageStats 
+import {
+  PlatformDetailsHeader,
+  StatBox,
+  SectionHeader,
+  LanguageStats
 } from "../components/PlatformDetails";
 
 export default function GitHubDetails() {
+  const navigate = useNavigate();
   const { data, loading, error, stats } = usePlatformStats("github");
+
+  const handleUnlink = async () => {
+    if (!window.confirm("Are you sure you want to unlink GitHub? You can re-connect after 2 days.")) return;
+    try {
+      await unlinkPlatform("github");
+      navigate("/");
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed to unlink platform");
+    }
+  };
 
   if (loading) return <FullPageLoader />;
   if (error || !data) return (
     <div className="text-center py-20 px-4">
-       <h2 className="text-3xl font-black text-white mb-4 italic uppercase">Repository Error</h2>
-       <p className="text-gray-400 mb-8 max-w-md mx-auto">Neural access to GitHub repositories denied. Please initialize your identity in the command center.</p>
-       <button onClick={() => window.location.href='/link'} className="glass-card-premium px-8 py-3 text-blue-400 font-black tracking-widest uppercase hover:scale-105 transition-transform active:scale-95">Link GitHub</button>
+      <h2 className="text-3xl font-black text-white mb-4 italic uppercase">Not Connected</h2>
+      <p className="text-gray-400 mb-8 max-w-md mx-auto">This account is not yet linked. Please connect your GitHub account to see your repositories and stats.</p>
+      <button onClick={() => window.location.href = '/link'} className="glass-card-premium px-8 py-3 text-blue-400 font-black tracking-widest uppercase hover:scale-105 transition-transform active:scale-95">Connect Now</button>
     </div>
   );
 
   return (
     <div className="max-w-7xl mx-auto py-8 px-4">
-      <PlatformDetailsHeader 
+      <PlatformDetailsHeader
         platform="github"
         username={data.username}
         icon={SiGithub}
         iconColor="#ffffff"
         iconBgColor="#181717"
         title="GitHub"
+        onUnlink={handleUnlink}
       />
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
-        <StatBox label="Total Influence" value={stats.totalStars || 0} subValue="Stars" colSpan={2} valueColor="text-yellow-400" />
+        <StatBox label="Total Stars" value={stats.totalStars || 0} subValue="Stars" colSpan={2} valueColor="text-yellow-400" />
         <StatBox label="Repositories" value={stats.publicRepos || 0} />
         <StatBox label="Followers" value={stats.followers || 0} valueColor="text-blue-400" />
       </div>
 
       <div className="mb-16">
-        <SectionHeader title="Activity Matrix" dotColor="bg-purple-500" />
+        <SectionHeader title="Account Activity" dotColor="bg-purple-500" />
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          <StatBox label="Neural Pulses" value={stats.totalEvents || 0} subValue="Events" />
+          <StatBox label="Total Events" value={stats.totalEvents || 0} subValue="Events" />
           <StatBox label="Forks" value={stats.totalForks || 0} valueColor="text-cyan-400" />
           <StatBox label="Following" value={stats.following || 0} />
           <StatBox label="Gists" value={stats.publicGists || 0} valueColor="text-gray-400" />
@@ -51,7 +64,7 @@ export default function GitHubDetails() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
         <div>
-          <SectionHeader title="Neural Repositories" dotColor="bg-blue-500" />
+          <SectionHeader title="Top Repositories" dotColor="bg-blue-500" />
           <div className="space-y-4">
             {stats.topRepositories?.slice(0, 5).map((repo, idx) => (
               <div key={idx} className="glass-card-premium p-6 hover:bg-white/5 transition-all group">
@@ -61,7 +74,7 @@ export default function GitHubDetails() {
                     <FiExternalLink />
                   </a>
                 </div>
-                <p className="text-xs text-gray-400 mb-6 font-medium line-clamp-2">{repo.description || "No neural description provided."}</p>
+                <p className="text-xs text-gray-400 mb-6 font-medium line-clamp-2">{repo.description || "No description provided."}</p>
                 <div className="flex items-center gap-6 text-[10px] font-black uppercase tracking-widest text-gray-500">
                   <div className="flex items-center gap-2"><FiStar className="text-yellow-500" /> {repo.stars}</div>
                   <div className="flex items-center gap-2"><FiGitBranch className="text-purple-500" /> {repo.forks}</div>
@@ -73,23 +86,23 @@ export default function GitHubDetails() {
         </div>
 
         <div>
-          <SectionHeader title="Code Pulse" dotColor="bg-green-500" />
+          <SectionHeader title="Recent Activity" dotColor="bg-green-500" />
           <div className="glass-card-premium p-4 mb-8">
             <div className="space-y-1">
               {stats.recentActivity?.slice(0, 8).map((event, idx) => (
                 <div key={idx} className="flex items-center justify-between p-5 hover:bg-white/5 rounded-2xl transition-all group">
-                   <div className="flex items-center gap-4">
-                     <div className="w-2 h-2 rounded-full bg-blue-500 opacity-50 group-hover:scale-150 transition-transform"></div>
-                     <div className="font-bold text-white group-hover:text-cyan-400 transition-colors truncate max-w-[200px]">{event.type.replace('Event', '')}</div>
-                   </div>
-                   <div className="text-[10px] font-black uppercase text-gray-500 tracking-widest truncate max-w-[150px]">
-                      {event.repo.split('/')[1]}
-                   </div>
+                  <div className="flex items-center gap-4">
+                    <div className="w-2 h-2 rounded-full bg-blue-500 opacity-50 group-hover:scale-150 transition-transform"></div>
+                    <div className="font-bold text-white group-hover:text-cyan-400 transition-colors truncate max-w-[200px]">{event.type.replace('Event', '')}</div>
+                  </div>
+                  <div className="text-[10px] font-black uppercase text-gray-500 tracking-widest truncate max-w-[150px]">
+                    {event.repo.split('/')[1]}
+                  </div>
                 </div>
               ))}
             </div>
           </div>
-          <LanguageStats languages={stats.languagesUsed} title="Syntax Preference" dotColor="bg-cyan-500" />
+          <LanguageStats languages={stats.languagesUsed} title="Languages Used" dotColor="bg-cyan-500" />
         </div>
       </div>
     </div>

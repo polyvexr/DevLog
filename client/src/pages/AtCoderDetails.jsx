@@ -1,5 +1,6 @@
-import React from "react";
+import { useNavigate } from "react-router-dom";
 import { usePlatformStats } from "../hooks/useApi";
+import { unlinkPlatform } from "../api/axios";
 import FullPageLoader from "../components/FullPageLoader";
 import {
   PlatformDetailsHeader,
@@ -9,7 +10,18 @@ import {
 } from "../components/PlatformDetails";
 
 export default function AtCoderDetails() {
+  const navigate = useNavigate();
   const { data, loading, error, stats } = usePlatformStats("atcoder");
+
+  const handleUnlink = async () => {
+    if (!window.confirm("Are you sure you want to unlink AtCoder? You can re-connect after 2 days.")) return;
+    try {
+      await unlinkPlatform("atcoder");
+      navigate("/");
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed to unlink platform");
+    }
+  };
 
   if (loading) return <FullPageLoader />;
   if (error || !data) return (
@@ -36,6 +48,7 @@ export default function AtCoderDetails() {
         iconColor="#222"
         iconBgColor="#222"
         title="AtCoder"
+        onUnlink={handleUnlink}
       />
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
