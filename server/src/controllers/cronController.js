@@ -86,7 +86,7 @@ export const handleUnifiedCron = async (req, res) => {
     const scheduleResult = await platformService.scheduleGlobalSync();
 
     // 2. Process a batch of sync jobs from the queue
-    const syncResult = await processSyncJobs({ batchSize: 15 });
+    const syncResult = await processSyncJobs({ batchSize: 50 });
 
     // 3. Fetch upcoming contests
     const contestsResult = await fetchContests();

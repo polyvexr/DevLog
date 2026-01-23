@@ -148,16 +148,46 @@ export const platformService = {
       // Fetch fresh data from external API
       const freshData = await fetchFunction(platformStat.username);
 
-      // Update platform stat
-      platformStat.data = freshData || {};
-      platformStat.stats = this.extractStats(job.platform, freshData);
-      platformStat.lastUpdated = new Date();
+      // Only update if we got valid data (align with adminController logic)
+      if (freshData && Object.keys(freshData).length > 0 && !freshData.error) {
+        // Log a summary of what's being saved to help debug
+        const statsSummary = job.platform === "github"
+          ? `Public Repos: ${freshData.public_repos}`
+          : `Rating: ${freshData.rating || freshData.currentRating || "N/A"}`;
 
-      // Tell Mongoose these Mixed fields have changed
-      platformStat.markModified("data");
-      platformStat.markModified("stats");
+        logger.info(`Updating DB for ${job.platform} (${platformStat.username}): ${statsSummary}`);
 
-      await platformStat.save();
+        // Use findOneAndUpdate for better atomic updates in serverless
+        await PlatformStat.findOneAndUpdate(
+          { _id: platformStat._id },
+          {
+            $set: {
+              data: freshData,
+              stats: this.extractStats(job.platform, freshData),
+              lastUpdated: Date.now()
+            }
+          }
+        );
+
+        // Also update User cooldown to show the latest sync time on the UI
+        await User.findOneAndUpdate(
+          { _id: job.userId },
+          {
+            $set: {
+              [`cooldowns.${job.platform}.lastRefresh`]: new Date(),
+              [`cooldowns.${job.platform}.nextAvailable`]: new Date(Date.now() + (6 * 60 * 60 * 1000))
+            }
+          }
+        );
+
+        logger.info(`Database successfully updated for ${job.platform}`);
+      } else {
+        const errorMsg = freshData?.error || "Empty data returned";
+        logger.warn(`Sync for ${job.platform} skipped: ${errorMsg}`, {
+          username: platformStat.username
+        });
+        throw new Error(errorMsg);
+      }
 
       // Mark job as completed
       job.status = "completed";
