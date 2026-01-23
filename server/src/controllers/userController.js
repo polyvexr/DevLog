@@ -1,9 +1,6 @@
 import User from "../models/User.js";
 import PlatformStat from "../models/PlatformStat.js";
 import PlatformAction from "../models/PlatformAction.js";
-import PlatformStatHistory from "../models/PlatformStatHistory.js";
-import Notification from "../models/Notification.js";
-import Insight from "../models/Insight.js";
 import SyncJob from "../models/SyncJob.js";
 import { sanitizeUser } from "../middleware/validation.js";
 import logger from "../utils/logger.js";
@@ -31,7 +28,7 @@ export const getProfile = async (req, res) => {
 export const updateProfile = async (req, res) => {
   try {
     const { name, bio, location, website, publicProfile } = req.body;
-    
+
     const user = await User.findById(req.user._id);
     if (!user) {
       return res.status(404).json({ success: false, message: "User not found" });
@@ -55,29 +52,29 @@ export const updateProfile = async (req, res) => {
       if (!user.publicProfile) {
         user.publicProfile = {};
       }
-      
+
       // Handle username uniqueness check
       if (publicProfile.username && publicProfile.username !== user.publicProfile.username) {
-        const existingUser = await User.findOne({ 
+        const existingUser = await User.findOne({
           "publicProfile.username": publicProfile.username,
           _id: { $ne: user._id }
         });
         if (existingUser) {
-          return res.status(400).json({ 
-            success: false, 
-            message: "Username is already taken" 
+          return res.status(400).json({
+            success: false,
+            message: "Username is already taken"
           });
         }
       }
-      
+
       Object.assign(user.publicProfile, publicProfile);
       user.markModified('publicProfile');
     }
 
     await user.save();
 
-    res.json({ 
-      success: true, 
+    res.json({
+      success: true,
       message: "Profile updated successfully",
       data: { user: sanitizeUser(user) }
     });
@@ -93,8 +90,8 @@ export const updateProfile = async (req, res) => {
  */
 export const updateSettings = async (req, res) => {
   try {
-    const { theme, emailNotifications, progressMilestones, timezone } = req.body;
-    
+    const { theme, timezone } = req.body;
+
     const user = await User.findById(req.user._id);
     if (!user) {
       return res.status(404).json({ success: false, message: "User not found" });
@@ -106,24 +103,14 @@ export const updateSettings = async (req, res) => {
     }
 
     if (theme !== undefined) user.settings.theme = theme;
-    if (emailNotifications !== undefined) user.settings.emailNotifications = emailNotifications;
     if (timezone !== undefined) user.settings.timezone = timezone;
-    
-    if (progressMilestones !== undefined) {
-      const currentMilestones = user.settings.progressMilestones?.toObject?.() 
-        || user.settings.progressMilestones 
-        || {};
-      user.settings.progressMilestones = {
-        ...currentMilestones,
-        ...progressMilestones,
-      };
-      user.markModified('settings.progressMilestones');
-    }
+
+
 
     await user.save();
 
-    res.json({ 
-      success: true, 
+    res.json({
+      success: true,
       message: "Settings updated successfully",
       data: { settings: user.settings }
     });
@@ -175,38 +162,35 @@ export const updatePassword = async (req, res) => {
 export const deleteAccount = async (req, res) => {
   try {
     const userId = req.user._id;
-    
+
     logger.info("Account deletion initiated", { userId });
 
     // Delete all related data (cascade delete)
     const deletions = await Promise.allSettled([
       PlatformStat.deleteMany({ userId }),
       PlatformAction.deleteMany({ userId }),
-      PlatformStatHistory.deleteMany({ userId }),
-      Notification.deleteMany({ userId }),
-      Insight.deleteMany({ userId }),
       SyncJob.deleteMany({ userId }),
     ]);
 
     // Log deletion results
-    const collections = ['PlatformStat', 'PlatformAction', 'PlatformStatHistory', 'Notification', 'Insight', 'SyncJob'];
+    const collections = ['PlatformStat', 'PlatformAction', 'SyncJob'];
     deletions.forEach((result, index) => {
       if (result.status === 'fulfilled') {
-        logger.info(`Deleted ${collections[index]}`, { 
-          userId, 
-          deletedCount: result.value.deletedCount 
+        logger.info(`Deleted ${collections[index]}`, {
+          userId,
+          deletedCount: result.value.deletedCount
         });
       } else {
-        logger.error(`Failed to delete ${collections[index]}`, { 
-          userId, 
-          error: result.reason 
+        logger.error(`Failed to delete ${collections[index]}`, {
+          userId,
+          error: result.reason
         });
       }
     });
 
     // Delete the user
     await User.findByIdAndDelete(userId);
-    
+
     logger.info("Account deleted successfully", { userId });
 
     res.json({ success: true, message: "Account and all associated data deleted successfully" });

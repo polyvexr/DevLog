@@ -7,22 +7,22 @@ const userSchema = new mongoose.Schema({
   email: { type: String, unique: true, lowercase: true },
   password: String,
   oneTimeReaddUsed: { type: Map, of: Boolean, default: {} },
-  
+
   // RBAC - Role-based access control
-  role: { 
-    type: String, 
-    enum: ["user", "admin"], 
-    default: "user" 
+  role: {
+    type: String,
+    enum: ["user", "admin"],
+    default: "user"
   },
   permissions: [String],
-  
+
   // Profile subdocument
   profile: {
     bio: { type: String, default: "" },
     location: { type: String, default: "" },
     website: { type: String, default: "" },
   },
-  
+
   // Public profile settings for /u/:username route
   publicProfile: {
     enabled: { type: Boolean, default: false },
@@ -31,39 +31,29 @@ const userSchema = new mongoose.Schema({
     showCodeforces: { type: Boolean, default: true },
     showGitHub: { type: Boolean, default: true },
   },
-  
+
   // Settings subdocument
   settings: {
     theme: { type: String, enum: ["light", "dark", "system"], default: "dark" },
-    emailNotifications: { type: Boolean, default: true },
-    progressMilestones: {
-      leetcode: { type: Number, default: 500 },
-      codeforces: { type: Number, default: 1500 },
-      github: { type: Number, default: 100 },
-    },
     timezone: { type: String, default: "UTC" },
   },
-  
+
   // Cooldowns for stateless enforcement (serverless)
   cooldowns: {
-    leetcode: { 
+    leetcode: {
       lastRefresh: { type: Date, default: null },
       nextAvailable: { type: Date, default: null }
     },
-    codeforces: { 
+    codeforces: {
       lastRefresh: { type: Date, default: null },
       nextAvailable: { type: Date, default: null }
     },
-    github: { 
+    github: {
       lastRefresh: { type: Date, default: null },
       nextAvailable: { type: Date, default: null }
     }
   },
-  
-  // Serverless job tracking
-  lastSnapshotDate: { type: Date, default: null },
-  lastInsightDate: { type: Date, default: null },
-  
+
   // Password reset fields
   resetPasswordToken: String,
   resetPasswordExpires: Date,
