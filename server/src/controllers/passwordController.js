@@ -1,5 +1,6 @@
 import User from "../models/User.js";
 import crypto from "crypto";
+import { sendResetPasswordEmail } from "../services/emailService.js";
 
 /**
  * Request password reset
@@ -14,12 +15,12 @@ export const forgotPassword = async (req, res) => {
     }
 
     const user = await User.findOne({ email: email.toLowerCase() });
-    
+
     if (!user) {
       // Don't reveal if email exists or not (security)
-      return res.json({ 
-        success: true, 
-        message: "If an account exists, a reset link will be sent" 
+      return res.json({
+        success: true,
+        message: "If an account exists, a reset link will be sent"
       });
     }
 
@@ -27,19 +28,29 @@ export const forgotPassword = async (req, res) => {
     const resetToken = user.generateResetToken();
     await user.save();
 
-    // In production, send email here with resetToken
-    // For development, log the token
-    console.log("=================================");
-    console.log("Password Reset Token for:", email);
-    console.log("Token:", resetToken);
-    console.log("Reset URL: http://localhost:5173/reset-password/" + resetToken);
-    console.log("=================================");
+    // Dispatch email notification
+    const emailResult = await sendResetPasswordEmail(user.email, resetToken);
 
-    res.json({ 
-      success: true, 
+    // For development, log the token as fallback
+    if (process.env.NODE_ENV === "development") {
+      console.log("=================================");
+      console.log("Password Reset Token for:", email);
+      if (!emailResult.success) {
+        console.log("Email Dispatch: FAILED");
+        console.log("Error Detail:", emailResult.error);
+      } else {
+        console.log("Email Dispatch: ACCEPTED BY RESEND (Check Inbox/Spam)");
+      }
+      console.log("Token:", resetToken);
+      console.log("Reset URL: http://localhost:5173/reset-password/" + resetToken);
+      console.log("=================================");
+    }
+
+    res.json({
+      success: true,
       message: "If an account exists, a reset link will be sent",
       // Only include token in development
-      ...(process.env.NODE_ENV === "development" && { 
+      ...(process.env.NODE_ENV === "development" && {
         devToken: resetToken,
         devNote: "This token is only shown in development mode"
       })
@@ -60,8 +71,8 @@ export const resetPassword = async (req, res) => {
     const { password } = req.body;
 
     if (!password || password.length < 6) {
-      return res.status(400).json({ 
-        message: "Password must be at least 6 characters" 
+      return res.status(400).json({
+        message: "Password must be at least 6 characters"
       });
     }
 
@@ -77,8 +88,8 @@ export const resetPassword = async (req, res) => {
     });
 
     if (!user) {
-      return res.status(400).json({ 
-        message: "Invalid or expired reset token" 
+      return res.status(400).json({
+        message: "Invalid or expired reset token"
       });
     }
 
@@ -88,9 +99,9 @@ export const resetPassword = async (req, res) => {
     user.resetPasswordExpires = undefined;
     await user.save();
 
-    res.json({ 
-      success: true, 
-      message: "Password reset successful. You can now login." 
+    res.json({
+      success: true,
+      message: "Password reset successful. You can now login."
     });
   } catch (err) {
     console.error("Reset password error:", err);
@@ -117,9 +128,9 @@ export const verifyResetToken = async (req, res) => {
     });
 
     if (!user) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         valid: false,
-        message: "Invalid or expired reset token" 
+        message: "Invalid or expired reset token"
       });
     }
 

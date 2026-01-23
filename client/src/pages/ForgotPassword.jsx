@@ -38,10 +38,10 @@ export default function ForgotPassword() {
             </div>
             <h2 className="text-4xl font-black text-white mb-4 italic">Neural Link Sent</h2>
             <p className="text-gray-400 text-lg mb-10 leading-relaxed">
-              If an account exists for <span className="text-blue-400 font-bold">@{email.split('@')[0]}</span>, 
+              If an account exists for <span className="text-blue-400 font-bold">{email}</span>,
               the reset authorization has been dispatched.
             </p>
-            <Link 
+            <Link
               to="/login"
               className="inline-flex items-center gap-3 text-blue-400 hover:text-blue-300 font-black uppercase tracking-widest text-xs transition-all group"
             >
@@ -100,7 +100,7 @@ export default function ForgotPassword() {
             </button>
 
             <div className="text-center">
-              <Link 
+              <Link
                 to="/login"
                 className="inline-flex items-center gap-3 text-gray-500 hover:text-white font-black uppercase tracking-widest text-[10px] transition-all group pt-6"
               >
