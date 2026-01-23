@@ -12,10 +12,7 @@ import adminRoutes from "./src/routes/admin.js";
 import passwordRoutes from "./src/routes/password.js";
 import userRoutes from "./src/routes/user.js";
 // New V2 routes
-import historyRoutes from "./src/routes/history.js";
 import contestRoutes from "./src/routes/contests.js";
-import insightRoutes from "./src/routes/insights.js";
-import notificationRoutes from "./src/routes/notifications.js";
 import publicRoutes from "./src/routes/public.js";
 import cronRoutes from "./src/routes/cron.js";
 import dashboardRoutes from "./src/routes/dashboard.js";
@@ -88,15 +85,15 @@ app.use((req, res, next) => {
 
   const origin = req.headers.origin;
   const path = req.path;
-  
+
   // If no origin, only allow specific paths
   if (!origin) {
     const isAllowedPath = noOriginAllowedPaths.some(p => path === p || path.startsWith(p + "/"));
     if (!isAllowedPath) {
       logger.warn("Request blocked: No origin and not an allowed path", { path });
-      return res.status(403).json({ 
-        success: false, 
-        message: "Origin required for this endpoint" 
+      return res.status(403).json({
+        success: false,
+        message: "Origin required for this endpoint"
       });
     }
   }
@@ -133,10 +130,7 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/user", userRoutes);
 
 // V2 API Routes
-app.use("/api/history", historyRoutes);
 app.use("/api/contests", contestRoutes);
-app.use("/api/insights", insightRoutes);
-app.use("/api/notifications", notificationRoutes);
 app.use("/api/cron", cronRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 
@@ -172,8 +166,8 @@ app.use((err, req, res, next) => {
   // Default error response
   res.status(err.status || 500).json({
     success: false,
-    message: process.env.NODE_ENV === "production" 
-      ? "Internal server error" 
+    message: process.env.NODE_ENV === "production"
+      ? "Internal server error"
       : err.message,
   });
 });

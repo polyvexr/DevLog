@@ -170,7 +170,7 @@ export const updatePassword = async (req, res) => {
 // Update user settings
 export const updateSettings = async (req, res) => {
   try {
-    const { theme, emailNotifications, progressMilestones, timezone, publicProfile } =
+    const { theme, timezone, publicProfile } =
       req.body;
 
     const user = await User.findById(req.user._id);
@@ -182,21 +182,8 @@ export const updateSettings = async (req, res) => {
     }
 
     if (theme !== undefined) user.settings.theme = theme;
-    if (emailNotifications !== undefined)
-      user.settings.emailNotifications = emailNotifications;
-    if (progressMilestones !== undefined) {
-      // Properly merge nested objects for MongoDB
-      const currentMilestones = user.settings.progressMilestones?.toObject?.() 
-        || user.settings.progressMilestones 
-        || {};
-      user.settings.progressMilestones = {
-        ...currentMilestones,
-        ...progressMilestones,
-      };
-      user.markModified('settings.progressMilestones');
-    }
     if (timezone !== undefined) user.settings.timezone = timezone;
-    
+
     // Update public profile settings
     if (publicProfile !== undefined) {
       if (!user.publicProfile) {

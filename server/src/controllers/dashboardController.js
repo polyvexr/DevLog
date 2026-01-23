@@ -1,6 +1,4 @@
 import PlatformStat from "../models/PlatformStat.js";
-import Insight from "../models/Insight.js";
-import Notification from "../models/Notification.js";
 import Contest from "../models/Contest.js";
 
 /**
@@ -12,30 +10,9 @@ export const getDashboardData = async (req, res) => {
     const userId = req.user.id;
 
     // Parallel fetch all dashboard data
-    const [platformStats, insights, unreadCount, upcomingContests] = await Promise.all([
+    const [platformStats, upcomingContests] = await Promise.all([
       // Get all platform stats with summary
       PlatformStat.find({ userId }).select("platform username data stats lastUpdated lastManualRefresh"),
-
-      // Get latest unread insights (limit 5)
-      Insight.find({
-        userId,
-        read: false,
-        dismissed: false,
-        $or: [
-          { expiresAt: null },
-          { expiresAt: { $gt: new Date() } }
-        ]
-      })
-        .sort({ priority: -1, createdAt: -1 })
-        .limit(5)
-        .select("type platform title message priority createdAt"),
-
-      // Get unread notification count
-      Notification.countDocuments({
-        userId,
-        read: false,
-        sent: true
-      }),
 
       // Get upcoming contests (next 7 days)
       Contest.find({
@@ -67,16 +44,6 @@ export const getDashboardData = async (req, res) => {
           canRefresh: canRefresh(stat.lastManualRefresh),
           nextRefreshAvailable: getNextRefreshTime(stat.lastManualRefresh)
         })),
-        insights: insights.map(insight => ({
-          id: insight._id,
-          type: insight.type,
-          platform: insight.platform,
-          title: insight.title,
-          message: insight.message,
-          priority: insight.priority,
-          createdAt: insight.createdAt
-        })),
-        unreadNotifications: unreadCount,
         upcomingContests: upcomingContests.map(contest => ({
           id: contest._id,
           platform: contest.platform,

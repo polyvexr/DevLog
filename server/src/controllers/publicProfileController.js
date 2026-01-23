@@ -1,6 +1,5 @@
 import User from "../models/User.js";
 import PlatformStat from "../models/PlatformStat.js";
-import PlatformStatHistory from "../models/PlatformStatHistory.js";
 
 /**
  * Public Profile Controller - Unauthenticated public developer profiles
@@ -35,30 +34,6 @@ export const getPublicProfile = async (req, res) => {
       platform: { $in: platformsToShow }
     }).select("platform username data stats lastUpdated");
 
-    // Get last 30 days of history for charts
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-
-    const history = await PlatformStatHistory.find({
-      userId: user._id,
-      platform: { $in: platformsToShow },
-      snapshotDate: { $gte: thirtyDaysAgo }
-    })
-      .sort({ snapshotDate: 1 })
-      .select("platform snapshotDate metrics");
-
-    // Group history by platform
-    const historyByPlatform = {};
-    for (const h of history) {
-      if (!historyByPlatform[h.platform]) {
-        historyByPlatform[h.platform] = [];
-      }
-      historyByPlatform[h.platform].push({
-        date: h.snapshotDate,
-        metrics: h.metrics
-      });
-    }
-
     // Calculate aggregate stats
     const aggregateStats = calculateAggregateStats(platformStats);
 
@@ -78,7 +53,6 @@ export const getPublicProfile = async (req, res) => {
         stats: p.stats,
         lastUpdated: p.lastUpdated
       })),
-      history: historyByPlatform,
       aggregateStats
     });
   } catch (error) {
@@ -153,8 +127,8 @@ export const updatePublicProfile = async (req, res) => {
     if (username !== undefined) {
       // Validate username format
       if (username && !/^[a-zA-Z0-9_-]{3,30}$/.test(username)) {
-        return res.status(400).json({ 
-          error: "Username must be 3-30 characters, alphanumeric with _ or -" 
+        return res.status(400).json({
+          error: "Username must be 3-30 characters, alphanumeric with _ or -"
         });
       }
 
