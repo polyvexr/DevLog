@@ -281,3 +281,59 @@ This project is open source and available under the [MIT License](LICENSE).
 ## Support
 
 For issues, questions, or contributions, please open an issue on GitHub.
+
+
+Vercel Cron Configuration Walkthrough (Hobby Plan)
+I have successfully configured your server to support automatic data fetching on a Vercel Hobby plan.
+
+Changes Made
+1. Unified Cron Controller
+In 
+
+cronController.js
+, I added a new 
+
+handleUnifiedCron
+ function. This allows us to trigger both the Sync Queue and Contest Fetcher in a single request, which is necessary to stay within the Vercel Hobby plan's 1-cron-job limit.
+
+I also updated the authorization logic to support Vercel's standard security header (Authorization: Bearer <token>).
+
+2. Updated Routes
+In 
+
+cron.js
+, I updated the routes to support both GET and POST requests. This makes it easier to test the endpoints directly in your browser.
+
+GET /api/cron/all (The new unified endpoint)
+GET /api/cron/sync
+GET /api/cron/contests
+3. Vercel Configuration
+I created a 
+
+vercel.json
+ file in the server folder with the following schedule:
+
+Frequency: Daily at midnight.
+Endpoint: /api/cron/all
+How to Verify It's Working
+1. Check Vercel Dashboard
+Once you deploy these changes, go to your Vercel Project Dashboard:
+
+Select your project.
+Click on the Settings tab.
+Click on the Cron side menu.
+You should see the /api/cron/all job listed there with its next execution time.
+2. Manual Verification (via Browser)
+You can manually trigger the cron job at any time to see if it's working:
+
+Copy your CRON_SECRET from your Vercel environment variables.
+Visit this URL in your browser (replace <your-domain> and <your-secret>): https://<your-domain>/api/cron/all?x-cron-secret=<your-secret> Note: I enabled x-cron-secret as a query parameter or header for easy testing.
+3. Check Logs
+In the Vercel Logs tab, you will see entries for the cron execution. A successful run will return a JSON response like this:
+
+{
+  "success": true,
+  "executionMs": 1234,
+  "sync": { "processed": 10, ... },
+  "contests": { "success": true, "platforms": { ... } }
+}

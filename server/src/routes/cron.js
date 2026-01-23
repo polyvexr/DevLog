@@ -1,7 +1,8 @@
 import express from "express";
 import {
   handleSyncCron,
-  handleContestsCron
+  handleContestsCron,
+  handleUnifiedCron
 } from "../controllers/cronController.js";
 import { optionalAuth } from "../middleware/auth.js";
 
