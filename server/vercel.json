@@ -1,12 +1,15 @@
 {
   "functions": {
-    "api/cron/all.js": {
-      "maxDuration": 300
-    },
-    "api/cron/sync.js": {
+    "api/index.js": {
       "maxDuration": 300
     }
   },
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/api/index.js"
+    }
+  ],
   "crons": [
     {
       "path": "/api/cron/all",

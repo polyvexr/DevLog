@@ -182,3 +182,5 @@ server.listen(PORT, () => {
   logger.info(`DevLog V2 Server running on port ${PORT}`);
   logger.info(`Open server at http://localhost:${PORT}`);
 });
+
+export default app;
