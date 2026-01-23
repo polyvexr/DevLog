@@ -134,8 +134,8 @@ app.use("/api/contests", contestRoutes);
 app.use("/api/cron", cronRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 
-// Public profile route (no /api prefix for clean URLs)
-app.use("/u", publicRoutes);
+// Public profile route (consistency with /api prefix)
+app.use("/api/u", publicRoutes);
 
 // 404 handler for undefined routes
 app.use((req, res, next) => {

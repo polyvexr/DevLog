@@ -28,6 +28,8 @@ export const getPublicProfile = async (req, res) => {
     if (user.publicProfile.showLeetCode) platformsToShow.push("leetcode");
     if (user.publicProfile.showCodeforces) platformsToShow.push("codeforces");
     if (user.publicProfile.showGitHub) platformsToShow.push("github");
+    if (user.publicProfile.showCodeChef) platformsToShow.push("codechef");
+    if (user.publicProfile.showAtCoder) platformsToShow.push("atcoder");
 
     const platformStats = await PlatformStat.find({
       userId: user._id,
@@ -77,34 +79,53 @@ function calculateAggregateStats(platformStats) {
         stats.totalProblemsSolved += ps.stats?.totalSolved || 0;
         // Add badge for high problem count
         if ((ps.stats?.totalSolved || 0) >= 500) {
-          stats.badges.push({ type: "leetcode_500", label: "500+ LeetCode Problems" });
+          stats.badges.push({ type: "leetcode_500", label: "500+ LeetCode Problems", platform: "LeetCode" });
         }
         if ((ps.stats?.hardSolved || 0) >= 100) {
-          stats.badges.push({ type: "leetcode_hard_100", label: "100+ Hard Problems" });
+          stats.badges.push({ type: "leetcode_hard_100", label: "100+ Hard Problems", platform: "LeetCode" });
         }
         break;
       case "codeforces":
-        stats.totalContests += ps.stats?.contestsParticipated || 0;
+        stats.totalContests += ps.stats?.contestsParticipated || ps.stats?.totalContests || 0;
         const cfRating = ps.stats?.rating || 0;
         // Add rank badges
         if (cfRating >= 2100) {
-          stats.badges.push({ type: "cf_master", label: "Codeforces Master" });
+          stats.badges.push({ type: "cf_master", label: "Codeforces Master", platform: "Codeforces" });
         } else if (cfRating >= 1900) {
-          stats.badges.push({ type: "cf_candidate", label: "Codeforces Candidate Master" });
+          stats.badges.push({ type: "cf_candidate", label: "Codeforces Candidate Master", platform: "Codeforces" });
         } else if (cfRating >= 1600) {
-          stats.badges.push({ type: "cf_expert", label: "Codeforces Expert" });
+          stats.badges.push({ type: "cf_expert", label: "Codeforces Expert", platform: "Codeforces" });
         }
         break;
       case "github":
         const stars = ps.stats?.totalStars || 0;
         if (stars >= 100) {
-          stats.badges.push({ type: "github_stars_100", label: "100+ GitHub Stars" });
+          stats.badges.push({ type: "github_stars_100", label: "100+ GitHub Stars", platform: "GitHub" });
         }
         if ((ps.stats?.publicRepos || 0) >= 50) {
-          stats.badges.push({ type: "github_repos_50", label: "50+ Repositories" });
+          stats.badges.push({ type: "github_repos_50", label: "50+ Repositories", platform: "GitHub" });
+        }
+        break;
+      case "codechef":
+        stats.totalProblemsSolved += ps.stats?.totalSolved || 0;
+        const chefRating = ps.stats?.rating || 0;
+        if (chefRating >= 2000) {
+          stats.badges.push({ type: "codechef_5star", label: "5★ CodeChef Coder", platform: "CodeChef" });
+        }
+        break;
+      case "atcoder":
+        stats.totalProblemsSolved += ps.stats?.acCount || ps.stats?.totalSolved || 0;
+        const atRating = ps.stats?.rating || 0;
+        if (atRating >= 1200) {
+          stats.badges.push({ type: "atcoder_cyan", label: "AtCoder Cyan", platform: "AtCoder" });
         }
         break;
     }
+  }
+
+  // Common high-level badges
+  if (stats.totalProblemsSolved >= 1000) {
+    stats.badges.push({ type: "grandmaster_solver", label: "1000+ Total Problems", platform: "Global" });
   }
 
   return stats;
@@ -154,6 +175,12 @@ export const updatePublicProfile = async (req, res) => {
     }
     if (typeof showGitHub === "boolean") {
       updates["publicProfile.showGitHub"] = showGitHub;
+    }
+    if (typeof showCodeChef === "boolean") {
+      updates["publicProfile.showCodeChef"] = showCodeChef;
+    }
+    if (typeof showAtCoder === "boolean") {
+      updates["publicProfile.showAtCoder"] = showAtCoder;
     }
 
     const user = await User.findByIdAndUpdate(

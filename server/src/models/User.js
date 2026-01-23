@@ -30,6 +30,8 @@ const userSchema = new mongoose.Schema({
     showLeetCode: { type: Boolean, default: true },
     showCodeforces: { type: Boolean, default: true },
     showGitHub: { type: Boolean, default: true },
+    showCodeChef: { type: Boolean, default: true },
+    showAtCoder: { type: Boolean, default: true },
   },
 
   // Settings subdocument
