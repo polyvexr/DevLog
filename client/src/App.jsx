@@ -23,7 +23,7 @@ const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
 const AdminUsers = lazy(() => import("./pages/AdminUsers"));
 const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
-const Profile = lazy(() => import("./pages/Profile"));
+const Settings = lazy(() => import("./pages/Settings"));
 const Contests = lazy(() => import("./pages/Contests"));
 const PublicProfile = lazy(() => import("./pages/PublicProfile"));
 
@@ -179,17 +179,17 @@ function App() {
           }
         />
 
-        {/* User profile */}
+        {/* System Settings */}
         <Route
-          path="/profile"
+          path="/settings"
           element={
             <PrivateRoute>
-              <Profile />
+              <Settings />
             </PrivateRoute>
           }
         />
-        {/* Redirect /settings to /profile */}
-        <Route path="/settings" element={<Navigate to="/profile" replace />} />
+        {/* Legacy redirect */}
+        <Route path="/profile" element={<Navigate to="/settings" replace />} />
 
         {/* Auth routes */}
         <Route

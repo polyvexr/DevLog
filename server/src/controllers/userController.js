@@ -53,18 +53,12 @@ export const updateProfile = async (req, res) => {
         user.publicProfile = {};
       }
 
-      // Handle username uniqueness check
+      // Prevention of username change (enforced to email prefix)
       if (publicProfile.username && publicProfile.username !== user.publicProfile.username) {
-        const existingUser = await User.findOne({
-          "publicProfile.username": publicProfile.username,
-          _id: { $ne: user._id }
+        return res.status(400).json({
+          success: false,
+          message: "Username is locked to your email identity and cannot be changed"
         });
-        if (existingUser) {
-          return res.status(400).json({
-            success: false,
-            message: "Username is already taken"
-          });
-        }
       }
 
       Object.assign(user.publicProfile, publicProfile);

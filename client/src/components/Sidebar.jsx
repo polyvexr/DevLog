@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import { NavLink, useLocation, useNavigate, Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { useSidebar } from "../hooks/useSidebar";
 import {
@@ -13,11 +13,13 @@ import {
   FiChevronRight,
   FiX,
   FiLayers,
+  FiGlobe,
+  FiExternalLink,
 } from "react-icons/fi";
 import { SiLeetcode, SiCodeforces, SiGithub, SiCodechef } from "react-icons/si";
 
 export default function Sidebar() {
-  const { logout, isAdmin } = useContext(AuthContext);
+  const { logout, isAdmin, user } = useContext(AuthContext);
   const {
     isCollapsed,
     isMobileOpen,
@@ -47,7 +49,7 @@ export default function Sidebar() {
     { path: "/", icon: FiBarChart2, label: "Dashboard", exact: true },
     { path: "/link", icon: FiLink, label: "Connect Platforms" },
     { path: "/contests", icon: FiTarget, label: "Contests" },
-    { path: "/profile", icon: FiUser, label: "Profile" },
+    { path: "/settings", icon: FiSettings, label: "Settings" },
   ];
 
 
@@ -159,38 +161,39 @@ export default function Sidebar() {
                 <span className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-600">Navigation</span>
               </div>
             )}
-            {navItems.map((item) => (
-              <NavLink
-                key={item.path}
-                to={item.path}
-                end={item.exact}
-                onClick={handleNavClick}
-                className={({ isActive }) => `
-                  flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all relative group
-                  ${isActive
-                    ? "bg-blue-600 text-white shadow-lg shadow-blue-500/25 scale-[1.02]"
-                    : "text-gray-500 hover:text-gray-300 hover:bg-white/5"
-                  }
-                `}
-              >
-                <item.icon className={`text-xl ${isCollapsed ? "mx-auto" : ""}`} />
-                {!isCollapsed && (
-                  <div className="flex-1 flex items-center justify-between overflow-hidden">
-                    <span className="font-black text-xs uppercase tracking-widest animate-fade-in line-clamp-1">
-                      {item.label}
-                    </span>
-                    {item.count > 0 && (
-                      <span className="ml-2 bg-red-500 text-white text-[10px] font-black px-1.5 py-0.5 rounded-full animate-fade-in shrink-0">
-                        {item.count}
+            {navItems.map((item) => {
+              const NavComp = item.external ? 'a' : NavLink;
+              const navProps = item.external
+                ? { href: item.path, target: "_blank", rel: "noopener noreferrer" }
+                : { to: item.path, end: item.exact };
+
+              return (
+                <NavComp
+                  key={item.path}
+                  {...navProps}
+                  onClick={handleNavClick}
+                  className={({ isActive }) => `
+                    flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all relative group
+                    ${!item.external && isActive
+                      ? "bg-blue-600 text-white shadow-lg shadow-blue-500/25 scale-[1.02]"
+                      : "text-gray-500 hover:text-gray-300 hover:bg-white/5"
+                    }
+                  `}
+                >
+                  <item.icon className={`text-xl ${isCollapsed ? "mx-auto" : ""}`} />
+                  {!isCollapsed && (
+                    <div className="flex-1 flex items-center justify-between overflow-hidden">
+                      <span className="font-black text-xs uppercase tracking-widest animate-fade-in line-clamp-1">
+                        {item.label}
                       </span>
-                    )}
-                  </div>
-                )}
-                {isCollapsed && item.count > 0 && (
-                  <div className="absolute top-3 right-5 w-2.5 h-2.5 bg-red-500 rounded-full ring-2 ring-[#0a111b] animate-pulse" />
-                )}
-              </NavLink>
-            ))}
+                      {item.external && (
+                        <FiExternalLink className="ml-2 text-[10px] opacity-40 group-hover:opacity-100 transition-opacity" />
+                      )}
+                    </div>
+                  )}
+                </NavComp>
+              );
+            })}
           </div>
 
           {/* Platforms Sub-section */}

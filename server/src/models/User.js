@@ -64,9 +64,20 @@ const userSchema = new mongoose.Schema({
 
 
 // Hash password
-userSchema.pre("save", async function () {
-  if (!this.isModified("password")) return;
+userSchema.pre("save", async function (next) {
+  // Set default public username from email if not set OR always enforce it
+  if (this.email && !this.publicProfile.username) {
+    this.publicProfile.username = this.email.split('@')[0];
+  }
+
+  // Ensure username is always the email prefix (as requested)
+  if (this.isModified('email')) {
+    this.publicProfile.username = this.email.split('@')[0];
+  }
+
+  if (!this.isModified("password")) return next();
   this.password = await bcrypt.hash(this.password, 10);
+  next();
 });
 
 // Compare password

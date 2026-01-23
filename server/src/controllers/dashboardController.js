@@ -10,7 +10,8 @@ export const getDashboardData = async (req, res) => {
     const userId = req.user.id;
 
     // Parallel fetch all dashboard data
-    const [platformStats, upcomingContests] = await Promise.all([
+    const [user, platformStats, upcomingContests] = await Promise.all([
+      import("../models/User.js").then(m => m.default.findById(userId).select("name email publicProfile")),
       // Get all platform stats with summary
       PlatformStat.find({ userId }).select("platform username data stats lastUpdated lastManualRefresh"),
 
@@ -32,6 +33,7 @@ export const getDashboardData = async (req, res) => {
     res.json({
       success: true,
       data: {
+        user,
         summary,
         platforms: platformStats.map(stat => ({
           platform: stat.platform,

@@ -48,18 +48,31 @@ export default function Dashboard() {
 
   return (
     <>
-      <div className="mb-12 fade-in-scale">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] font-black uppercase tracking-widest mb-6">
-          System Access Granted • Welcome, {username}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-12 fade-in-scale">
+        <div>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] font-black uppercase tracking-widest mb-6">
+            System Access Granted • Welcome, {username}
+          </div>
+          <h1 className="text-5xl md:text-8xl font-black mb-4 tracking-tight">
+            <span className="text-white opacity-90 italic">Your Coding</span>
+            <br />
+            <span className="animate-text-shine inline-block italic">Dashboard</span>
+          </h1>
+          <p className="text-gray-400 text-xl md:text-2xl font-medium max-w-2xl leading-relaxed">
+            Monitor your coding activity across the multiverse in real-time. Everything is synchronized.
+          </p>
         </div>
-        <h1 className="text-5xl md:text-8xl font-black mb-4 tracking-tight">
-          <span className="text-white opacity-90 italic">Your Coding</span>
-          <br />
-          <span className="animate-text-shine inline-block italic">Dashboard</span>
-        </h1>
-        <p className="text-gray-400 text-xl md:text-2xl font-medium max-w-2xl leading-relaxed">
-          Monitor your coding activity across the multiverse in real-time. Everything is synchronized.
-        </p>
+
+        {data?.user?.publicProfile?.enabled && (
+          <button
+            onClick={() => window.open(`/u/${data.user.publicProfile.username}`, "_blank")}
+            className="flex items-center gap-3 px-8 py-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl text-white font-black text-[10px] uppercase tracking-widest transition-all active:scale-95 group shadow-2xl backdrop-blur-xl"
+          >
+            <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse ring-4 ring-blue-500/20"></span>
+            View Public Profile
+            <span className="opacity-40 group-hover:translate-x-1 transition-transform">↗</span>
+          </button>
+        )}
       </div>
 
       <SummarySection summary={summary} loading={false} />

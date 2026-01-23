@@ -24,7 +24,7 @@ import {
   FiChevronRight
 } from "react-icons/fi";
 
-export default function Profile() {
+export default function Settings() {
   const { logout, refreshUser } = useContext(AuthContext);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -181,10 +181,10 @@ export default function Profile() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 mb-16 fade-in-scale">
         <div>
           <h1 className="text-4xl md:text-6xl font-black text-white italic tracking-tighter mb-2">
-            Control <span className="animate-text-shine">Center</span>
+            Account <span className="animate-text-shine">Settings</span>
           </h1>
           <p className="text-gray-500 font-medium flex items-center gap-2">
-            Logged in as <span className="text-blue-400 font-black">@{username}</span>
+            Managing credentials for <span className="text-blue-400 font-black">@{username}</span>
           </p>
         </div>
 
@@ -212,8 +212,8 @@ export default function Profile() {
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`w-full group flex items-center justify-between px-6 py-4 rounded-2xl transition-all duration-300 ${isActive
-                    ? "bg-white/10 ring-1 ring-white/10 text-white shadow-2xl"
-                    : "hover:bg-white/5 text-gray-500 hover:text-gray-300"
+                  ? "bg-white/10 ring-1 ring-white/10 text-white shadow-2xl"
+                  : "hover:bg-white/5 text-gray-500 hover:text-gray-300"
                   }`}
               >
                 <div className="flex items-center gap-4">
@@ -374,12 +374,18 @@ export default function Profile() {
                         <span className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-600 font-black italic">devlog.io/u/</span>
                         <input
                           type="text"
-                          className="w-full pl-[7.5rem] pr-6 py-5 bg-white/5 border border-white/5 rounded-2xl text-cyan-400 font-black tracking-widest outline-none focus:ring-2 focus:ring-cyan-500/30 transition-all"
+                          disabled
+                          className="w-full pl-[7.5rem] pr-14 py-5 bg-white/[0.02] border border-white/5 rounded-2xl text-cyan-400/50 font-black tracking-widest outline-none cursor-not-allowed italic"
                           value={publicUsername}
-                          onChange={(e) => setPublicUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ""))}
                           placeholder="unique-id"
                         />
+                        <div className="absolute right-6 top-1/2 -translate-y-1/2 text-gray-600">
+                          <FiLock />
+                        </div>
                       </div>
+                      <p className="text-[9px] text-gray-600 font-medium ml-2 mt-1">
+                        Registry handle is locked to your email identity for security.
+                      </p>
                     </div>
 
                     <div className="space-y-4">

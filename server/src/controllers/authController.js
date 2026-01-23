@@ -189,6 +189,15 @@ export const updateSettings = async (req, res) => {
       if (!user.publicProfile) {
         user.publicProfile = {};
       }
+
+      // Prevention of username change (enforced to email prefix)
+      if (publicProfile.username && publicProfile.username !== user.publicProfile.username) {
+        return res.status(400).json({
+          success: false,
+          message: "Username is locked to your email identity and cannot be changed"
+        });
+      }
+
       Object.assign(user.publicProfile, publicProfile);
       user.markModified('publicProfile');
     }
