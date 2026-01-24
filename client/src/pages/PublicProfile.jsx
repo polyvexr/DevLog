@@ -233,7 +233,7 @@ export default function PublicProfile() {
                       <img src={userProfile.avatar} alt={userProfile.name} className="w-full h-full object-cover grayscale-[20%] group-hover:grayscale-0 transition-all duration-700" />
                     ) : (
                       <span className="text-8xl font-black text-white/10 italic">
-                        {userProfile.name?.charAt(0)}
+                        U
                       </span>
                     )}
                   </div>

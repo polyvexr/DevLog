@@ -7,7 +7,7 @@ import Dialog from "../components/Dialog";
 import {
   FiUser, FiMail, FiLock, FiTrash2, FiEdit3, FiSave, FiX, FiShield,
   FiEye, FiEyeOff, FiGlobe, FiMapPin, FiLink, FiFileText, FiCheckCircle,
-  FiAlertCircle
+  FiAlertCircle, FiCamera
 } from "react-icons/fi";
 
 export default function Settings() {
@@ -23,6 +23,7 @@ export default function Settings() {
   // Form State
   const [formData, setFormData] = useState({
     name: "", bio: "", location: "", website: "",
+    avatar: "",
     socials: [], // Array of { platform, username }
     publicProfile: {
       enabled: true, // Force enabled or just keep as is without UI
@@ -52,6 +53,7 @@ export default function Settings() {
         bio: u.profile?.bio || "",
         location: u.profile?.location || "",
         website: u.profile?.website || "",
+        avatar: u.profile?.avatar || "",
         socials: u.profile?.socials || [],
         publicProfile: {
           enabled: u.publicProfile?.enabled ?? true,
@@ -131,6 +133,36 @@ export default function Settings() {
     }));
   };
 
+  const handleAvatarUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      showStatus("error", "Image must be less than 5MB");
+      return;
+    }
+
+    const uploadData = new FormData();
+    uploadData.append("avatar", file);
+
+    try {
+      showStatus("success", "Uploading image...");
+      const res = await api.post("/user/avatar", uploadData, {
+        headers: { "Content-Type": "multipart/form-data" }
+      });
+
+      if (res.data.success) {
+        const newAvatar = res.data.url;
+        await handleAction("/user/profile", { avatar: newAvatar }, "put", "Avatar updated");
+        setFormData(prev => ({ ...prev, avatar: newAvatar }));
+        if (user) setUser({ ...user, profile: { ...user.profile, avatar: newAvatar } });
+      }
+    } catch (err) {
+      const msg = err.response?.data?.error || err.response?.data?.message || "Failed to upload image";
+      showStatus("error", msg);
+    }
+  };
+
   if (loading) return <FullPageLoader />;
 
   const platforms = [
@@ -196,6 +228,28 @@ export default function Settings() {
         </div>
 
         <form onSubmit={updateProfile} className="space-y-8">
+          {/* Avatar Upload */}
+          <div className="flex flex-col items-center gap-4 py-4">
+            <div className="relative group">
+              <div className="w-32 h-32 rounded-[2.5rem] bg-gradient-to-br from-blue-600 to-indigo-700 p-1 shadow-2xl">
+                <div className="w-full h-full rounded-[2.4rem] bg-[#0A0A0A] flex items-center justify-center overflow-hidden relative">
+                  {formData.avatar ? (
+                    <img src={formData.avatar} alt="Avatar" className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="text-5xl font-black text-white/10">U</span>
+                  )}
+                  {isEditing && (
+                    <label className="absolute inset-0 bg-black/60 flex items-center justify-center cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity">
+                      <FiCamera className="text-white text-2xl" />
+                      <input type="file" className="hidden" accept="image/*" onChange={handleAvatarUpload} />
+                    </label>
+                  )}
+                </div>
+              </div>
+            </div>
+            {isEditing && <p className="text-[9px] font-black uppercase tracking-widest text-gray-500">Click to change picture</p>}
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {[
               { label: "Full Name", icon: FiUser, key: "name", disabled: !isEditing },

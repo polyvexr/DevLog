@@ -46,7 +46,7 @@ export const getPublicProfile = async (req, res) => {
       profile: {
         name: user.name,
         username: user.publicProfile.username,
-        avatar: user.profile?.avatar || leetCodeStat?.data?.avatar || "",
+        avatar: user.profile?.avatar || "",
         bio: user.profile?.bio || "",
         location: user.profile?.location || "",
         website: user.profile?.website || "",

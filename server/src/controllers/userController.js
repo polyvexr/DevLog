@@ -27,7 +27,7 @@ export const getProfile = async (req, res) => {
  */
 export const updateProfile = async (req, res) => {
   try {
-    const { name, bio, location, website, socials, publicProfile } = req.body;
+    const { name, avatar, bio, location, website, socials, publicProfile } = req.body;
 
     const user = await User.findById(req.user._id);
     if (!user) {
@@ -43,6 +43,7 @@ export const updateProfile = async (req, res) => {
     if (!user.profile) {
       user.profile = {};
     }
+    if (avatar !== undefined) user.profile.avatar = avatar;
     if (bio !== undefined) user.profile.bio = bio;
     if (location !== undefined) user.profile.location = location;
     if (website !== undefined) user.profile.website = website;
