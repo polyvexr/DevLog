@@ -30,7 +30,7 @@ export default function Contests() {
   const fetchContests = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await api.get(`/contests?platforms=${selectedPlatforms.join(",")}&days=30`);
+      const response = await api.get(`/contests?platforms=${selectedPlatforms.join(",")}&days=60`);
       if (response.data.success) {
         setContests(response.data.contests);
       }
@@ -88,7 +88,7 @@ export default function Contests() {
     const date = new Date(dateString);
     const today = new Date();
     const diffDays = Math.ceil((date - today) / (1000 * 60 * 60 * 24));
-    
+
     if (diffDays <= 0) return { label: "Live Now", color: "bg-green-500/20 text-green-400 border-green-500/30" };
     if (diffDays === 1) return { label: "Tomorrow", color: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30" };
     if (diffDays <= 3) return { label: "This Week", color: "bg-blue-500/20 text-blue-400 border-blue-500/30" };
@@ -131,11 +131,10 @@ export default function Contests() {
               <button
                 key={platform.id}
                 onClick={() => togglePlatform(platform.id)}
-                className={`group flex items-center gap-3 px-6 py-4 rounded-2xl border transition-all active:scale-95 ${
-                  isSelected
+                className={`group flex items-center gap-3 px-6 py-4 rounded-2xl border transition-all active:scale-95 ${isSelected
                     ? `${platform.bgColor} ${platform.borderColor} ring-2 ${platform.ringColor}`
                     : "bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20"
-                }`}
+                  }`}
               >
                 <Icon
                   size={20}

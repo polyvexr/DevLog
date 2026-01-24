@@ -10,11 +10,11 @@ import { contestService } from "../services/contestService.js";
  */
 export const getUpcomingContests = async (req, res) => {
   try {
-    const { platforms, limit = 50, days = 30 } = req.query;
+    const { platforms, limit = 50, days = 60 } = req.query;
 
     let platformFilter = ["leetcode", "codeforces", "codechef", "atcoder"];
     if (platforms) {
-      platformFilter = platforms.split(",").filter(p => 
+      platformFilter = platforms.split(",").filter(p =>
         ["leetcode", "codeforces", "codechef", "atcoder"].includes(p)
       );
     }

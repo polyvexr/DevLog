@@ -12,11 +12,16 @@ export const contestService = {
     );
   },
 
-  async getUpcomingContests({ platforms = ["leetcode", "codeforces", "codechef", "atcoder"], limit = 50, days = 30 } = {}) {
+  async getUpcomingContests({ platforms = ["leetcode", "codeforces", "codechef", "atcoder"], limit = 50, days = 60 } = {}) {
+    const now = new Date();
     const end = new Date();
     end.setDate(end.getDate() + days);
-    return Contest.find({ platform: { $in: platforms }, startTime: { $gte: new Date(), $lte: end } })
-      .sort({ startTime: 1 }).limit(limit);
+
+    return Contest.find({
+      platform: { $in: platforms },
+      endTime: { $gte: now },
+      startTime: { $lte: end }
+    }).sort({ startTime: 1 }).limit(limit);
   },
 
   async fetchAllContests() {
