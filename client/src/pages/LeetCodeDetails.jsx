@@ -74,22 +74,22 @@ export default function LeetCodeDetails() {
         <div className="mb-16">
           <SectionHeader title="Contest Performance" dotColor="bg-purple-500" />
           <div className="glass-card-premium p-10 bg-gradient-to-br from-white/[0.03] to-purple-500/[0.03]">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-10">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
               <div className="space-y-1">
                 <div className="text-[10px] font-black tracking-[0.2em] text-gray-500 uppercase">Rating</div>
-                <div className="text-5xl font-black text-purple-400 italic">{stats.contestRanking.rating}</div>
+                <div className="text-4xl font-black text-purple-400 italic">{stats.contestRanking.rating || "N/A"}</div>
               </div>
               <div className="space-y-1">
                 <div className="text-[10px] font-black tracking-[0.2em] text-gray-500 uppercase">Percentile</div>
-                <div className="text-5xl font-black text-cyan-400 italic">{stats.contestRanking.topPercentage}%</div>
+                <div className="text-4xl font-black text-cyan-400 italic">{stats.contestRanking.topPercentage ? `${stats.contestRanking.topPercentage}%` : "N/A"}</div>
+              </div>
+              <div className="space-y-1">
+                <div className="text-[10px] font-black tracking-[0.2em] text-gray-500 uppercase">Contests</div>
+                <div className="text-4xl font-black text-blue-400 italic">{stats.contestRanking.attendedContestsCount || 0}</div>
               </div>
               <div className="space-y-1">
                 <div className="text-[10px] font-black tracking-[0.2em] text-gray-500 uppercase">Rank</div>
-                <div className="text-4xl font-black text-white italic">#{stats.contestRanking.globalRanking?.toLocaleString()}</div>
-              </div>
-              <div className="space-y-1">
-                <div className="text-[10px] font-black tracking-[0.2em] text-gray-500 uppercase">Status</div>
-                <div className="text-3xl font-black text-yellow-500 uppercase italic">{stats.contestRanking.badge || "Unranked"}</div>
+                <div className="text-4xl font-black text-white italic">#{stats.contestRanking.globalRanking?.toLocaleString() || "—"}</div>
               </div>
             </div>
           </div>

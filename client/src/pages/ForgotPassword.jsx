@@ -36,17 +36,32 @@ export default function ForgotPassword() {
             <div className="w-24 h-24 bg-green-500/10 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-2xl shadow-green-500/20">
               <FiCheckCircle className="text-5xl text-green-500" />
             </div>
-            <h2 className="text-4xl font-black text-white mb-4 italic">Neural Link Sent</h2>
+            <h2 className="text-4xl font-black text-white mb-4 italic">Reset Link Sent</h2>
             <p className="text-gray-400 text-lg mb-10 leading-relaxed">
               If an account exists for <span className="text-blue-400 font-bold">{email}</span>,
-              the reset authorization has been dispatched.
+              we've sent a password reset link to your email.
             </p>
-            <Link
-              to="/login"
-              className="inline-flex items-center gap-3 text-blue-400 hover:text-blue-300 font-black uppercase tracking-widest text-xs transition-all group"
-            >
-              <FiArrowLeft className="group-hover:-translate-x-1 transition-transform" /> Back to Authorization
-            </Link>
+            <div className="flex justify-center mt-12">
+              <Link
+                to="/login"
+                className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-white transition-all hover:bg-blue-600 hover:border-blue-500 hover:-translate-x-1 group shadow-xl active:scale-95 duration-500"
+                title="Back to Login"
+              >
+                <svg
+                  className="w-5 h-5 group-hover:-translate-x-0.5 transition-transform"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={3}
+                    d="M15 19l-7-7 7-7"
+                  />
+                </svg>
+              </Link>
+            </div>
           </div>
         </div>
       </div>
@@ -62,8 +77,8 @@ export default function ForgotPassword() {
       <div className="w-full max-w-lg relative z-10">
         <form onSubmit={handleSubmit} className="glass-card-premium p-10 md:p-12 fade-in-scale">
           <div className="text-center mb-10">
-            <h2 className="text-4xl md:text-5xl font-black text-white mb-3 italic tracking-tight">Recover <span className="animate-text-shine">Identity</span></h2>
-            <p className="text-gray-500 font-medium">Initiate password reset protocol</p>
+            <h2 className="text-4xl md:text-5xl font-black text-white mb-3 italic tracking-tight">Reset <span className="animate-text-shine">Password</span></h2>
+            <p className="text-gray-500 font-medium">Enter your email to receive a password reset link</p>
           </div>
 
           <div className="space-y-8">
@@ -99,12 +114,25 @@ export default function ForgotPassword() {
               ) : "Dispatch Reset Link →"}
             </button>
 
-            <div className="text-center">
+            <div className="flex justify-center pt-10">
               <Link
                 to="/login"
-                className="inline-flex items-center gap-3 text-gray-500 hover:text-white font-black uppercase tracking-widest text-[10px] transition-all group pt-6"
+                className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white transition-all hover:bg-blue-600 hover:border-blue-500 hover:-translate-x-1 group shadow-xl active:scale-95 duration-500"
+                title="Return to Login"
               >
-                <FiArrowLeft className="group-hover:-translate-x-1 transition-transform" /> Return to Login
+                <svg
+                  className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={3}
+                    d="M15 19l-7-7 7-7"
+                  />
+                </svg>
               </Link>
             </div>
           </div>

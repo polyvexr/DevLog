@@ -70,6 +70,28 @@ export default function LinkPlatform() {
 
   return (
     <>
+      <div className="flex items-center justify-between mb-8 fade-in-scale">
+        <button
+          onClick={() => navigate("/")}
+          className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-white transition-all hover:bg-blue-600 hover:border-blue-500 hover:-translate-x-1 group shadow-xl active:scale-95"
+          title="Back to Dashboard"
+        >
+          <svg
+            className="w-5 h-5 group-hover:-translate-x-0.5 transition-transform"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={3}
+              d="M15 19l-7-7 7-7"
+            />
+          </svg>
+        </button>
+      </div>
+
       <div className="mb-12 fade-in-scale">
         <h1 className="text-5xl md:text-6xl font-black mb-4 tracking-tight">
           <span className="text-white opacity-90">Connect</span>
@@ -79,6 +101,10 @@ export default function LinkPlatform() {
         <p className="text-gray-400 text-xl font-medium">
           Add a new platform to your dashboard to track your progress and solve counts.
         </p>
+        <div className="mt-8">
+          <h2 className="text-xl font-black text-white italic">Linking Steps</h2>
+          <p className="text-xs font-black uppercase tracking-widest text-gray-500">How to connect your profile</p>
+        </div>
       </div>
 
       <div className="max-w-2xl">

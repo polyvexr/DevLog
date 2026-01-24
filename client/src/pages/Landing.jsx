@@ -45,17 +45,17 @@ export default function Landing() {
             <FiStar className="animate-spin-slow" /> Centralize • Analyze • Elevate
           </div>
           <h1 className="text-6xl md:text-9xl font-black tracking-tighter italic leading-none fade-in-up">
-            Your Digital <br /> <span className="animate-text-shine">Identity.</span>
+            Your Coding <br /> <span className="animate-text-shine">Journey.</span>
           </h1>
           <p className="text-gray-400 text-xl md:text-2xl max-w-3xl mx-auto font-medium leading-relaxed fade-in-up delay-100">
-            The ultimate terminal for developer stats. Seamlessly synchronize <span className="text-white">LeetCode</span>, <span className="text-white">Codeforces</span>, <span className="text-white">GitHub</span>, <span className="text-white">AtCoder</span>, and <span className="text-white">CodeChef</span>.
+            The all-in-one tracker for your developer stats. Connect your accounts from <span className="text-white">LeetCode</span>, <span className="text-white">Codeforces</span>, <span className="text-white">GitHub</span>, <span className="text-white">AtCoder</span>, and <span className="text-white">CodeChef</span>.
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center fade-in-up delay-200">
             <Link to="/register" className="px-12 py-5 bg-white text-black font-black italic rounded-2xl hover:bg-blue-600 hover:text-white transition-all shadow-xl active:scale-95 group">
-              BUILD YOUR PROFILE <span className="inline-block group-hover:translate-x-1 transition-transform ml-1">→</span>
+              GET STARTED NOW <span className="inline-block group-hover:translate-x-1 transition-transform ml-1">→</span>
             </Link>
             <a href="#more" className="px-12 py-5 bg-white/5 border border-white/10 font-bold rounded-2xl hover:bg-white/10 transition-all flex items-center justify-center gap-3">
-              THE ECOSYSTEM <FiChevronDown />
+              LEARN MORE <FiChevronDown />
             </a>
           </div>
         </section>
@@ -99,10 +99,10 @@ export default function Landing() {
         {/* Features */}
         <section className="py-24 border-t border-white/5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
           {[
-            { i: FiCpu, t: "Real-time Sync", d: "Automated engine that keeps your metrics up-to-date with background workers." },
-            { i: FiSearch, t: "Public Profiles", d: "Shareable developer cards showcasing your achievements across the multiverse." },
-            { i: FiShield, t: "Verified Data", d: "Direct API bridges ensure all stats are fetched directly from the source." },
-            { i: FiGlobe, t: "Unified Rankings", d: "See where you stand in the global developer hierarchy with aggregate metrics." }
+            { i: FiCpu, t: "Automatic Updates", d: "Your performance data is automatically updated to show your latest progress." },
+            { i: FiSearch, t: "Public Profiles", d: "Beautiful shareable pages that showcase your coding achievements to the world." },
+            { i: FiShield, t: "Reliable Data", d: "All statistics are fetched directly from the official platforms for accuracy." },
+            { i: FiGlobe, t: "Unified Overview", d: "Get a clear picture of where you stand with combined metrics from all sources." }
           ].map((f, i) => (
             <div key={i} className="space-y-4 group">
               <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center group-hover:bg-blue-600/10 transition-colors">
@@ -152,8 +152,8 @@ export default function Landing() {
           </div>
 
           <div className="mt-20 pt-10 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6 opacity-30">
-            <div className="text-[8px] font-black uppercase tracking-[0.4em]">© 2026 Developer Activity Terminal</div>
-            <div className="text-[8px] font-black uppercase tracking-[0.4em]">Built for the Multiverse</div>
+            <div className="text-[8px] font-black uppercase tracking-[0.4em]">© 2026 DevLog Tracker</div>
+            <div className="text-[8px] font-black uppercase tracking-[0.4em]">Built for Developers</div>
           </div>
         </footer>
       </div>
