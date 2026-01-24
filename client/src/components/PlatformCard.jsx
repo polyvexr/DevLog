@@ -72,7 +72,7 @@ const getStatsDisplay = (platform, stats) => {
           value: stats.totalSolved || 0,
           icon: FiCheckCircle,
         },
-        { label: "Easy", value: submissions.easy?.solved || 0, icon: FiTarget },
+        { label: "Rating", value: stats.contestRanking?.rating || "N/A", icon: FiTrendingUp },
         { label: "Medium", value: submissions.medium?.solved || 0, icon: FiZap },
         { label: "Hard", value: submissions.hard?.solved || 0, icon: FiAward },
       ];

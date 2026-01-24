@@ -11,7 +11,7 @@ export const getDashboardData = async (req, res) => {
 
     // Parallel fetch all dashboard data
     const [user, platformStats, upcomingContests] = await Promise.all([
-      import("../models/User.js").then(m => m.default.findById(userId).select("name email publicProfile")),
+      import("../models/User.js").then(m => m.default.findById(userId).select("name email profile publicProfile cooldowns")),
       // Get all platform stats with summary
       PlatformStat.find({ userId }).select("platform username data stats lastUpdated lastManualRefresh"),
 
@@ -33,18 +33,30 @@ export const getDashboardData = async (req, res) => {
     res.json({
       success: true,
       data: {
-        user,
+        user: {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          avatar: user.profile?.avatar,
+          publicProfile: user.publicProfile
+        },
         summary,
-        platforms: platformStats.map(stat => ({
-          platform: stat.platform,
-          username: stat.username,
-          stats: stat.stats,
-          data: stat.data,
-          lastUpdated: stat.lastUpdated,
-          lastManualRefresh: stat.lastManualRefresh,
-          canRefresh: canRefresh(stat.lastManualRefresh),
-          nextRefreshAvailable: getNextRefreshTime(stat.lastManualRefresh)
-        })),
+        platforms: platformStats.map(stat => {
+          const cooldown = user.cooldowns?.[stat.platform];
+          const now = new Date();
+          const isAvailable = !cooldown?.nextAvailable || new Date(cooldown.nextAvailable) <= now;
+
+          return {
+            platform: stat.platform,
+            username: stat.username,
+            stats: stat.stats,
+            data: stat.data,
+            lastUpdated: stat.lastUpdated,
+            lastManualRefresh: stat.lastManualRefresh,
+            canRefresh: isAvailable,
+            nextRefreshAvailable: isAvailable ? null : cooldown.nextAvailable
+          };
+        }),
         upcomingContests: upcomingContests.map(contest => ({
           id: contest._id,
           platform: contest.platform,
@@ -139,25 +151,5 @@ function calculateSummary(platformStats) {
   return summary;
 }
 
-
-
-/**
- * Check if manual refresh is available (2-hour cooldown)
- */
-function canRefresh(lastManualRefresh) {
-  if (!lastManualRefresh) return true;
-  const cooldownMs = 2 * 60 * 60 * 1000; // 2 hours
-  return Date.now() - new Date(lastManualRefresh).getTime() > cooldownMs;
-}
-
-/**
- * Get the next available refresh time
- */
-function getNextRefreshTime(lastManualRefresh) {
-  if (!lastManualRefresh) return null;
-  const cooldownMs = 2 * 60 * 60 * 1000; // 2 hours
-  const nextTime = new Date(lastManualRefresh).getTime() + cooldownMs;
-  return nextTime > Date.now() ? new Date(nextTime).toISOString() : null;
-}
 
 export default { getDashboardData };

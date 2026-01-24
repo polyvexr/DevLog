@@ -36,6 +36,8 @@ export const getPublicProfile = async (req, res) => {
       platform: { $in: platformsToShow }
     }).select("platform username data stats lastUpdated");
 
+    // Find LeetCode stat for fallback avatar
+    const leetCodeStat = platformStats.find(p => p.platform === "leetcode");
     // Calculate aggregate stats
     const aggregateStats = calculateAggregateStats(platformStats);
 
@@ -44,6 +46,7 @@ export const getPublicProfile = async (req, res) => {
       profile: {
         name: user.name,
         username: user.publicProfile.username,
+        avatar: user.profile?.avatar || leetCodeStat?.data?.avatar || "",
         bio: user.profile?.bio || "",
         location: user.profile?.location || "",
         website: user.profile?.website || "",
