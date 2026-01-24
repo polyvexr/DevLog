@@ -39,20 +39,25 @@
 
 ## Project Overview
 
-**DevLog** is a comprehensive developer activity tracking dashboard that aggregates statistics from three major coding platforms:
+**DevLog** is a comprehensive developer activity tracking dashboard that aggregates statistics from multiple major coding platforms:
 
 | Platform | Description |
 |----------|-------------|
 | **LeetCode** | Competitive programming and interview preparation |
 | **Codeforces** | Competitive programming contests |
 | **GitHub** | Open source contributions and repositories |
+| **AtCoder** | Japanese competitive programming platform |
+| **CodeChef** | Indian competitive programming platform |
 
 ### Core Value Proposition
 
-- **Unified Dashboard**: Single interface to view all coding activities
-- **Progress Tracking**: Monitor growth across platforms over time
-- **Admin Control**: Manual synchronization to manage API rate limits
-- **Real-time Stats**: Detailed statistics including problems solved, ratings, contributions
+- **Unified Dashboard**: Single interface to view all coding activities.
+- **Progress Tracking**: Monitor growth across platforms over time.
+- **Contest Calendar**: Stay updated with upcoming contests from CList API.
+- **Public Profiles**: Showcase your stats to others via a dedicated URL.
+- **Admin Control**: Manual and automated synchronization to manage API rate limits.
+- **Real-time Stats**: Detailed statistics including problems solved, ratings, and contributions.
+- **Telegram Notifications**: Get notified about your progress and contest schedules.
 
 ---
 
@@ -93,9 +98,9 @@
 
 | Technology | Version | Purpose |
 |------------|---------|---------|
-| React | 18.x | UI Framework |
-| Vite | 5.x | Build Tool & Dev Server |
-| React Router | 6.x | Client-side Routing |
+| React | 19.x | UI Framework |
+| Vite | 7.x | Build Tool & Dev Server |
+| React Router | 7.x | Client-side Routing |
 | Axios | 1.x | HTTP Client |
 | Tailwind CSS | 4.x | Utility-first CSS |
 | React Icons | 5.x | Icon Library |
@@ -104,12 +109,12 @@
 
 | Technology | Version | Purpose |
 |------------|---------|---------|
-| Node.js | 18.x+ | Runtime Environment |
-| Express | 4.x | Web Framework |
-| MongoDB | 6.x | Database |
-| Mongoose | 8.x | ODM |
+| Node.js | 20.x+ | Runtime Environment |
+| Express | 5.x | Web Framework |
+| MongoDB | 7.x+ | Database |
+| Mongoose | 9.x | ODM |
 | JWT | - | Authentication |
-| Bcrypt | 5.x | Password Hashing |
+| Bcrypt | 3.x | Password Hashing |
 
 ### External APIs
 
@@ -118,6 +123,8 @@
 | LeetCode | GraphQL | `https://leetcode.com/graphql` |
 | Codeforces | REST | `https://codeforces.com/api/` |
 | GitHub | REST | `https://api.github.com/` |
+| AtCoder | Scraping | `https://atcoder.jp/users/` |
+| CodeChef | REST/Scraping | `https://www.codechef.com/users/` |
 
 ---
 
@@ -129,7 +136,6 @@
 DevLog/
 ├── .gitignore
 ├── README.md
-├── ADMIN_GUIDE.md
 ├── DOCUMENTATION.md
 │
 ├── client/                          # Frontend Application
@@ -149,86 +155,76 @@ DevLog/
 │       │
 │       ├── components/
 │       │   ├── AuthenticatedLayout.jsx  # Protected route layout
-│       │   ├── Dialog.jsx               # Modal dialog component
-│       │   ├── ErrorBoundary.jsx        # Error handling wrapper
-│       │   ├── FilterButtons.jsx        # Platform filter UI
-│       │   ├── Loader.jsx               # Loading spinner
-│       │   ├── Navbar.jsx               # Navigation bar
+│       │   ├── ContestCard.jsx          # Contest display component
+│       │   ├── FullPageLoader.jsx       # Global loading state
 │       │   ├── PlatformCard.jsx         # Platform stats card
-│       │   ├── Sidebar.jsx              # Navigation sidebar
-│       │   ├── StatCard.jsx             # Statistics display card
-│       │   ├── SummarySection.jsx       # Dashboard summary
-│       │   └── UserAvatar.jsx           # User avatar component
+│       │   ├── PlatformDetails.jsx      # Detailed platform stats
+│       │   └── Sidebar.jsx              # Navigation sidebar
 │       │
 │       ├── context/
-│       │   ├── AuthContext.js           # Auth context definition
 │       │   ├── AuthProvider.jsx         # Auth state provider
-│       │   ├── SidebarContext.js        # Sidebar context definition
 │       │   └── SidebarProvider.jsx      # Sidebar state provider
 │       │
 │       ├── hooks/
+│       │   ├── useApi.js                # Global API handling hook
 │       │   └── useSidebar.js            # Sidebar custom hook
 │       │
 │       └── pages/
 │           ├── AdminDashboard.jsx       # Admin control panel
-│           ├── CodeforcesDetails.jsx    # Codeforces stats page
+│           ├── AdminUsers.jsx           # User management for admins
 │           ├── Dashboard.jsx            # Main dashboard
-│           ├── ForgotPassword.jsx       # Password recovery
-│           ├── GitHubDetails.jsx        # GitHub stats page
-│           ├── Landing.jsx              # Public landing page
-│           ├── LeetCodeDetails.jsx      # LeetCode stats page
-│           ├── LinkPlatform.jsx         # Platform linking
-│           ├── Login.jsx                # User login
-│           ├── NotFound.jsx             # 404 page
-│           ├── Profile.jsx              # User profile
-│           ├── Register.jsx             # User registration
-│           ├── ResetPassword.jsx        # Password reset
-│           └── Settings.jsx             # User settings
+│           ├── Contests.jsx             # Contest calendar page
+│           ├── PublicProfile.jsx        # Public stats page
+│           ├── Settings.jsx             # User settings & profile
+│           ├── LeetCodeDetails.jsx      # Platform specific pages...
+│           └── ...
 │
 └── server/                          # Backend Application
     ├── .env                         # Environment variables
     ├── .env.example                 # Environment template
-    ├── package.json                 # Dependencies
     ├── server.js                    # Application entry
+    ├── api/
+    │   └── index.js                 # Vercel serverless entry
     │
-    ├── scripts/
-    │   └── backfillPlatformActions.js   # Data migration script
+    ├── src/
+    │   ├── config/
+    │   │   ├── db.js                # MongoDB connection
+    │   │   └── logger.js            # Winston logger setup
+    │   │
+    │   ├── controllers/
+    │   │   ├── adminController.js   # Admin operations
+    │   │   ├── contestController.js # Contest data management
+    │   │   ├── cronController.js    # Sync orchestrator
+    │   │   ├── statsController.js   # User statistics
+    │   │   └── ...
+    │   │
+    │   ├── cron/
+    │   │   ├── index.js             # Cron entry point
+    │   │   ├── fetchContests.js     # Background contest fetcher
+    │   │   └── processSyncJobs.js   # User data sync worker
+    │   │
+    │   ├── middleware/
+    │   │   ├── auth.js              # JWT verification
+    │   │   └── adminAuth.js         # Admin authorization
+    │   │
+    │   ├── models/
+    │   │   ├── User.js              # User & Role schema
+    │   │   ├── PlatformStat.js      # Cached platform data
+    │   │   ├── Contest.js           # Contest calendar data
+    │   │   └── SyncJob.js           # Tracking sync status
+    │   │
+    │   ├── routes/                  # Express routing...
+    │   │
+    │   ├── services/
+    │   │   ├── emailService.js      # Resend integration
+    │   │   ├── telegramService.js   # Telegram bot integration
+    │   │   └── platformService.js   # Core sync logic
+    │   │
+    │   └── utils/
+    │       ├── fetchLeetCode.js     # Platform fetchers...
+    │       └── cache.js             # Utility for caching
     │
-    └── src/
-        ├── config/
-        │   └── db.js                    # MongoDB connection
-        │
-        ├── controllers/
-        │   ├── adminController.js       # Admin operations
-        │   ├── authController.js        # Authentication
-        │   ├── passwordController.js    # Password reset
-        │   ├── platformController.js    # Platform operations
-        │   ├── statsController.js       # Statistics
-        │   └── userController.js        # User management
-        │
-        ├── middleware/
-        │   ├── adminAuth.js             # Admin authorization
-        │   ├── auth.js                  # JWT verification
-        │   ├── rateLimit.js             # Rate limiting
-        │   └── validation.js            # Input validation
-        │
-        ├── models/
-        │   ├── PlatformAction.js        # Action logging
-        │   ├── PlatformStat.js          # Platform statistics
-        │   └── User.js                  # User model
-        │
-        ├── routes/
-        │   ├── admin.js                 # Admin routes
-        │   ├── auth.js                  # Auth routes
-        │   ├── password.js              # Password routes
-        │   ├── platforms.js             # Platform routes
-        │   ├── stats.js                 # Stats routes
-        │   └── user.js                  # User routes
-        │
-        └── utils/
-            ├── fetchCodeforces.js       # Codeforces API
-            ├── fetchGithub.js           # GitHub API
-            └── fetchLeetCode.js         # LeetCode API
+    └── scripts/                     # Utility & Migration scripts
 ```
 
 ---
@@ -285,6 +281,7 @@ const userSchema = new mongoose.Schema({
   name: String,
   email: { type: String, unique: true, lowercase: true },
   password: String,
+  role: { type: String, enum: ["user", "admin"], default: "user" },
   oneTimeReaddUsed: { type: Map, of: Boolean, default: {} },
   resetPasswordToken: String,
   resetPasswordExpires: Date,
@@ -331,9 +328,44 @@ const platformStatSchema = new mongoose.Schema({
 ```javascript
 const platformActionSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-  platform: { type: String, enum: ["leetcode", "codeforces", "github"] },
+  platform: { type: String, enum: ["leetcode", "codeforces", "github", "atcoder", "codechef"] },
   action: { type: String, enum: ["link", "unlink"] },
   meta: { type: Object, default: {} },
+}, { timestamps: true });
+```
+
+---
+
+#### Contest Model
+
+**File**: `server/src/models/Contest.js`
+
+```javascript
+const contestSchema = new mongoose.Schema({
+  platform: String,
+  title: String,
+  url: String,
+  startTime: Date,
+  duration: Number,
+  clistId: { type: Number, unique: true },
+}, { timestamps: true });
+```
+
+---
+
+#### SyncJob Model
+
+**File**: `server/src/models/SyncJob.js`
+
+```javascript
+const syncJobSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  type: { type: String, enum: ["full", "platform"] },
+  platform: String,
+  status: { type: String, enum: ["pending", "processing", "completed", "failed"] },
+  startedAt: Date,
+  completedAt: Date,
+  error: String,
 }, { timestamps: true });
 ```
 
@@ -367,6 +399,50 @@ const platformActionSchema = new mongoose.Schema({
 | `syncCodeforces` | Sync only Codeforces data |
 | `syncGitHub` | Sync only GitHub data |
 | `getSyncStats` | Get admin dashboard statistics |
+| `getAllUsers` | List and manage all registered users |
+
+---
+
+#### Contest Controller
+
+**File**: `server/src/controllers/contestController.js`
+
+| Function | Description |
+|----------|-------------|
+| `getUpcomingContests` | Retrieve upcoming contests from DB |
+| `refreshContests` | Trigger background fetch from CList |
+
+---
+
+#### Cron Controller
+
+**File**: `server/src/controllers/cronController.js`
+
+| Function | Description |
+|----------|-------------|
+| `handleUnifiedCron` | Orchestrates daily sync and contest fetching |
+| `triggerSyncQueue` | Manually starts the background sync worker |
+
+---
+
+#### Public Profile Controller
+
+**File**: `server/src/controllers/publicProfileController.js`
+
+| Function | Description |
+|----------|-------------|
+| `getPublicProfile` | Fetches public stats for a specific username |
+| `getPublicStats` | Returns specific platform stats for public view |
+
+---
+
+#### Dashboard Controller
+
+**File**: `server/src/controllers/dashboardController.js`
+
+| Function | Description |
+|----------|-------------|
+| `getUserDashboard` | Aggregates all user stats for the home page |
 
 ---
 
@@ -1334,19 +1410,25 @@ NODE_ENV=development
 MONGO_URI=mongodb://localhost:27017/devlog
 
 # Authentication
-JWT_SECRET=your-super-secret-jwt-key
-
-# Admin Access
-ADMIN_EMAIL=admin@example.com
+JWT_SECRET=your_super_secret_jwt_key
 
 # CORS
 CLIENT_URL=http://localhost:5173
+CORS_ALLOW_CREDENTIALS=true
 
-# Email (for password reset)
-SMTP_HOST=smtp.example.com
-SMTP_PORT=587
-SMTP_USER=your-email@example.com
-SMTP_PASS=your-email-password
+# Email Service (Resend)
+RESEND_API_KEY=re_xxxxxxxxxxxx
+RESEND_FROM_EMAIL=delivered@resend.dev
+
+# Vercel Cron
+CRON_SECRET=your_cron_secret
+
+# External APIs
+CLIST_API_KEY=username:api_key
+
+# Telegram (Optional)
+TELEGRAM_BOT_TOKEN=your_bot_token
+TELEGRAM_CHAT_ID=your_chat_id
 ```
 
 ### Client Environment Variables
@@ -1363,41 +1445,28 @@ VITE_BACKEND_URL=http://localhost:5000/api
 
 ### Prerequisites
 
-- Node.js 18.x or higher
-- MongoDB 6.x or MongoDB Atlas
-- SMTP server for email functionality
+- Node.js 20.x or higher
+- MongoDB 7.x or MongoDB Atlas
+- CList API Account for contest data
+- Resend API Key for email functionality
 
-### Server Deployment
+### Server Deployment (Vercel)
 
-```bash
-# Clone repository
-git clone https://github.com/Shankar-CSE/DevLog.git
-cd DevLog/server
+The server is optimized for Vercel Serverless Functions.
 
-# Install dependencies
-npm install
+1.  Push your code to GitHub.
+2.  Connect your repository to Vercel.
+3.  Set the **Root Directory** to `server`.
+4.  Configure environment variables in the Vercel Dashboard.
+5.  Vercel will automatically use `vercel.json` for routing and cron jobs.
 
-# Set environment variables
-cp .env.example .env
-# Edit .env with production values
+### Client Deployment (Vercel)
 
-# Start server
-npm start
-```
-
-### Client Deployment
-
-```bash
-cd DevLog/client
-
-# Install dependencies
-npm install
-
-# Build for production
-npm run build
-
-# Deploy dist folder to static hosting
-```
+1.  Connect the same repository to a new Vercel project.
+2.  Set the **Root Directory** to `client`.
+3.  Set the **Build Command** to `npm run build`.
+4.  Set the **Output Directory** to `dist`.
+5.  Add `VITE_BACKEND_URL` to the environment variables.
 
 ### Production Considerations
 
@@ -1417,13 +1486,15 @@ npm run build
 
 ### Implemented Security Measures
 
-1. **Password Hashing** - Bcrypt with salt rounds
-2. **JWT Tokens** - 7-day expiry, secure secret
-3. **Rate Limiting** - API and auth endpoint limits
-4. **CORS** - Origin whitelist
-5. **Input Validation** - Server-side validation
-6. **Admin Authorization** - Email-based admin check
-7. **Password Reset** - Time-limited tokens
+1.  **Password Hashing** - BcryptJS with secure salt rounds.
+2.  **JWT Authentication** - Secure tokens with configurable expiry.
+3.  **Role-Based Access Control** - Strict separation between `user` and `admin`.
+4.  **Helmet.js** - Security headers to prevent XSS, Clickjacking, and other attacks.
+5.  **CORS Protection** - Strict origin whitelisting with credentials support.
+6.  **Rate Limiting** - Global API and per-route rate limits via `express-rate-limit`.
+7.  **Input Sanitization** - Body size limits and validation middleware.
+8.  **Compression** - Gzip compression for faster and safer data transfer.
+9.  **Secure Password Reset** - Cryptographically secure tokens via Resend.
 
 ### Recommendations for Production
 
@@ -1441,16 +1512,15 @@ npm run build
 
 ## Scripts
 
-### Database Migration
+#### Admin & Migration Scripts
 
-**File**: `server/scripts/backfillPlatformActions.js`
+**Directory**: `server/scripts/`
 
-Backfills `PlatformAction` documents from existing `PlatformStat` records:
-
-```bash
-cd server
-node scripts/backfillPlatformActions.js
-```
+| Script | Command | Description |
+|--------|---------|-------------|
+| **Make Admin** | `node scripts/makeAdmin.js email@example.com` | Promotes a user to the admin role. |
+| **Backfill Actions** | `node scripts/backfillPlatformActions.js` | Migrates legacy data to the new action log. |
+| **Migrate User Schema** | `node scripts/migrateUserSchema.js` | Updates user documents for current schema. |
 
 ---
 

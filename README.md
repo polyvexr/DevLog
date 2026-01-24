@@ -1,339 +1,150 @@
 # DevLog
 
-A comprehensive developer activity tracker that aggregates statistics from LeetCode, Codeforces, and GitHub platforms. Features admin-controlled data synchronization for efficient API usage management.
+A premium Developer Activity Tracker that aggregates statistics from multiple coding platforms into a single, beautiful dashboard. Track your progress on LeetCode, Codeforces, GitHub, AtCoder, and CodeChef in one place.
 
-## Features
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![React](https://img.shields.io/badge/React-19-blue)
+![Vite](https://img.shields.io/badge/Vite-7-646CFF)
+![Tailwind](https://img.shields.io/badge/Tailwind-4-38B2AC)
+![Node](https://img.shields.io/badge/Node-20+-339933)
 
-- 🔐 **User Authentication** - Secure registration and login
-- 🔗 **Platform Integration** - Connect LeetCode, Codeforces, and GitHub accounts
-- 📊 **Statistics Dashboard** - View detailed stats from all platforms
-- 👑 **Admin Dashboard** - Manual control for data synchronization
-- 🎯 **Role-Based Access** - Separate views for admin and normal users
-- 💾 **MongoDB Storage** - Persistent data storage
-- 🚀 **Manual Sync** - Admin-controlled updates to prevent API rate limits
+## 🌐 Live Demo
+[Check out DevLog](https://my-devlog.vercel.app)
 
-## Tech Stack
+## ✨ Features
+
+- 🔐 **Secure Authentication** - JWT-based login, registration, and password recovery.
+- 📊 **Unified Dashboard** - Aggregate stats from LeetCode, Codeforces, GitHub, AtCoder, and CodeChef.
+- 📅 **Contest Calendar** - Stay updated with upcoming contests across all platforms using CList API.
+- 👤 **Public Profiles** - Share your coding journey with a customizable public profile link.
+- 👑 **Admin Control Panel** - Role-based access to manage users and trigger manual data synchronization.
+- 🔄 **Efficient Synchronization** - Unified cron jobs (300s timeout) and manual sync to respect API rate limits.
+- 📱 **Fully Responsive** - Premium dark-themed UI built with Tailwind CSS 4.
+- 📧 **Email Notifications** - Automated emails for password resets via Resend.
+- 🤖 **Telegram Integration** - Optional notifications via Telegram Bot.
+
+## 🚀 Tech Stack
 
 ### Frontend
-
-- React + Vite
-- React Router for navigation
-- Axios for API calls
-- Tailwind CSS for styling
-- Context API for state management
+- **Framework:** React 19 + Vite 7
+- **Styling:** Tailwind CSS 4 (Utility-first, high performance)
+- **Routing:** React Router 7
+- **Icons:** React Icons
+- **Charts:** Recharts for data visualization
+- **State:** Context API
 
 ### Backend
+- **Runtime:** Node.js (ES Modules)
+- **Framework:** Express 5
+- **Database:** MongoDB + Mongoose
+- **Auth:** JWT + BcryptJS
+- **Security:** Helmet, CORS, Express Rate Limit
+- **Mailing:** Resend
+- **Logging:** Winston
+- **Notifications:** Telegram Bot API
 
-- Node.js + Express
-- MongoDB with Mongoose
-- JWT authentication
-- Bcrypt for password hashing
-- Admin middleware for protected routes
-
-## Setup Instructions
+## 🛠️ Installation & Setup
 
 ### Prerequisites
-
-- Node.js (v16 or higher)
-- MongoDB (local or Atlas)
-- Git
+- Node.js (v20 or higher)
+- MongoDB (Local or Atlas)
+- npm or yarn
 
 ### 1. Clone the Repository
-
 ```bash
-git clone <repository-url>
+git clone https://github.com/Shankar-CSE/DevLog.git
 cd DevLog
 ```
 
 ### 2. Backend Setup
-
 ```bash
 cd server
 npm install
 ```
-
-Create a `.env` file in the `server` directory:
-
+Create a `.env` file in the `server` directory using `.env.example`:
 ```env
 PORT=5000
-MONGO_URI=mongodb://localhost:27017/devlog
-JWT_SECRET=your-secret-key-here
-
-# Admin Configuration
-ADMIN_EMAIL=admin@example.com
+NODE_ENV=development
+MONGO_URI=your_mongodb_uri
+JWT_SECRET=your_jwt_secret
+CLIENT_URL=http://localhost:5173
+RESEND_API_KEY=your_resend_key
+RESEND_FROM_EMAIL=your_email
+CRON_SECRET=your_cron_secret
+CLIST_API_KEY=username:api_key
+TELEGRAM_BOT_TOKEN=your_bot_token
+TELEGRAM_CHAT_ID=your_chat_id
 ```
-
-Start the backend:
-
+Start the development server:
 ```bash
 npm run dev
 ```
 
 ### 3. Frontend Setup
-
 ```bash
-cd client
+cd ../client
 npm install
 npm run dev
 ```
+Create a `.env` file in the `client` directory:
+```env
+VITE_BACKEND_URL=http://localhost:5000/api
+```
 
-### 4. Create Admin Account
-
-1. Go to `http://localhost:5173/register`
-2. Register with the email that matches `ADMIN_EMAIL` in your `.env`
-3. Login with those credentials
-4. You'll be redirected to the Admin Dashboard
-
-## User Flows
-
-### Normal User:
-
-1. **Register** → Create account
-2. **Login** → Access dashboard
-3. **Link Platforms** → Add platform usernames
-4. **View Stats** → See statistics (updated by admin)
-
-### Admin User:
-
-1. **Register** with `ADMIN_EMAIL`
-2. **Login** → Access Admin Dashboard
-3. **Sync Data** → Trigger manual updates:
-   - Sync all platforms at once
-   - Sync individual platforms
-4. **Monitor** → View sync results and statistics
-
-## API Endpoints
-
-### Authentication
-
-- `POST /api/auth/register` - Register new user
-- `POST /api/auth/login` - Login user
-
-### Platforms (Protected)
-
-- `POST /api/platforms/link` - Link a platform account
-- `GET /api/platforms` - Get user's linked platforms
-
-### Stats (Protected)
-
-- `GET /api/stats` - Get user's platform statistics
-
-### Admin (Protected + Admin Only)
-
-- `GET /api/admin/stats` - Get admin statistics
-- `POST /api/admin/sync/all` - Sync all platforms for all users
-- `POST /api/admin/sync/leetcode` - Sync LeetCode only
-- `POST /api/admin/sync/codeforces` - Sync Codeforces only
-- `POST /api/admin/sync/github` - Sync GitHub only
-
-## Project Structure
+## 📂 Project Structure
 
 ```
 DevLog/
-├── client/                 # Frontend React app
+├── client/                # Frontend React application
 │   ├── src/
-│   │   ├── api/           # API configuration
-│   │   ├── components/    # Reusable components
-│   │   ├── context/       # React Context (Auth)
-│   │   ├── pages/         # Page components
-│   │   │   ├── Login.jsx
-│   │   │   ├── Register.jsx
-│   │   │   ├── Dashboard.jsx
-│   │   │   ├── AdminDashboard.jsx
-│   │   │   └── ...
-│   │   ├── App.jsx
-│   │   └── main.jsx
-│   └── package.json
-├── server/                # Backend Express app
+│   │   ├── api/          # Axios instance & API calls
+│   │   ├── components/   # UI components (PlatformCard, StatCard, etc.)
+│   │   ├── context/      # Auth & Sidebar Context Providers
+│   │   ├── hooks/        # Custom hooks (useApi, useSidebar)
+│   │   ├── pages/        # Dashboard, Details, Auth Pages, etc.
+│   │   ├── App.jsx       # Root component & Routing
+│   │   └── index.css     # Global styles (Tailwind 4)
+│   └── vercel.json        # Frontend deployment config
+├── server/                # Backend Express application
 │   ├── src/
-│   │   ├── config/       # Database configuration
-│   │   ├── controllers/  # Route controllers
-│   │   │   ├── authController.js
-│   │   │   ├── adminController.js
-│   │   │   └── ...
-│   │   ├── middleware/   # Custom middleware
-│   │   │   ├── auth.js
-│   │   │   └── adminAuth.js
-│   │   ├── models/       # Mongoose models
-│   │   ├── routes/       # API routes
-│   │   │   ├── admin.js
-│   │   │   └── ...
-│   │   └── utils/        # Utility functions
-│   │       ├── fetchLeetCode.js
-│   │       ├── fetchCodeforces.js
-│   │       └── fetchGithub.js
-│   ├── server.js
-│   └── package.json
-├── ADMIN_GUIDE.md        # Detailed admin documentation
-└── README.md
+│   │   ├── config/       # DB connection & Logger setup
+│   │   ├── controllers/  # API business logic
+│   │   ├── cron/         # Scheduled tasks (Sync, Contests)
+│   │   ├── middleware/   # Auth, AdminAuth, RateLimiting
+│   │   ├── models/       # Mongoose Schemas (User, Stats, Contests)
+│   │   ├── routes/       # Express Route definitions
+│   │   ├── services/     # External integrations (Email, Telegram)
+│   │   └── utils/        # Fetchers (LeetCode, GitHub, etc.) & Cache
+│   ├── api/              # Vercel Serverless Entry (index.js)
+│   ├── scripts/          # Admin & Migration scripts
+│   └── vercel.json        # Backend deployment & Cron schedule
+└── DOCUMENTATION.md      # Comprehensive technical documentation
 ```
 
-## Key Changes from Previous Version
+## 🕒 Cron Jobs & Syncing
 
-### Removed:
+DevLog uses a unified cron endpoint to manage data synchronization:
+- **Endpoint:** `/api/cron/all`
+- **Schedule:** Runs daily at midnight (UTC+5:30) via Vercel Crons.
+- **Vercel Timeout:** Configured for 300s to handle long-running sync operations.
+- **Manual Sync:** Admins can trigger a full sync from the Admin Dashboard.
+- **User Sync:** Users can refresh individual platform stats with a cooldown period.
 
-- ❌ Automatic cron jobs
-- ❌ Background data fetching
-- ❌ `node-cron` dependency usage
+## 🤝 Contributing
 
-### Added:
-
-- ✅ Admin authentication middleware
-- ✅ Manual sync controls
-- ✅ Admin dashboard page
-- ✅ Role-based routing
-- ✅ Sync result tracking
-- ✅ Admin statistics view
-
-## Environment Variables
-
-### Server (.env)
-
-```env
-PORT=5000
-MONGO_URI=mongodb://localhost:27017/devlog
-JWT_SECRET=your-secret-key
-ADMIN_EMAIL=admin@example.com
-CLIENT_ORIGIN=http://localhost:5173
-```
-
-## Security Features
-
-- JWT-based authentication
-- Bcrypt password hashing
-- Admin-only route protection
-- CORS configuration
-- Environment variable protection
-
-## Admin Guide
-
-For detailed admin functionality documentation, see [ADMIN_GUIDE.md](./ADMIN_GUIDE.md)
-
-Topics covered:
-
-- Admin setup and configuration
-- User flow comparison
-- API endpoint details
-- Security notes
-- Troubleshooting guide
-
-## Development
-
-### Run in Development Mode
-
-Terminal 1 (Backend):
-
-```bash
-cd server
-npm run dev
-```
-
-Terminal 2 (Frontend):
-
-```bash
-cd client
-npm run dev
-```
-
-### Build for Production
-
-Frontend:
-
-```bash
-cd client
-npm run build
-```
-
-The build will be created in `client/dist` and can be served by the Express backend.
-
-## Troubleshooting
-
-### Admin Access Issues
-
-- Verify `ADMIN_EMAIL` in `.env` matches your registered email
-- Clear localStorage and login again
-- Check browser console for errors
-
-### Sync Failures
-
-- Check API rate limits (especially GitHub)
-- Verify usernames are correct
-- Review error details in admin dashboard
-
-### Database Connection
-
-- Ensure MongoDB is running
-- Check `MONGO_URI` in `.env`
-- Verify network connectivity
-
-## Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
+Contributions are welcome! Please follow these steps:
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-## License
+## 📄 License
 
-This project is open source and available under the [MIT License](LICENSE).
+Distributed under the MIT License. See `LICENSE` for more information.
 
-## Support
+## 📞 Contact
 
-For issues, questions, or contributions, please open an issue on GitHub.
+Shankar - [GitHub](https://github.com/Shankar-CSE)
 
-
-Vercel Cron Configuration Walkthrough (Hobby Plan)
-I have successfully configured your server to support automatic data fetching on a Vercel Hobby plan.
-
-Changes Made
-1. Unified Cron Controller
-In 
-
-cronController.js
-, I added a new 
-
-handleUnifiedCron
- function. This allows us to trigger both the Sync Queue and Contest Fetcher in a single request, which is necessary to stay within the Vercel Hobby plan's 1-cron-job limit.
-
-I also updated the authorization logic to support Vercel's standard security header (Authorization: Bearer <token>).
-
-2. Updated Routes
-In 
-
-cron.js
-, I updated the routes to support both GET and POST requests. This makes it easier to test the endpoints directly in your browser.
-
-GET /api/cron/all (The new unified endpoint)
-GET /api/cron/sync
-GET /api/cron/contests
-3. Vercel Configuration
-I created a 
-
-vercel.json
- file in the server folder with the following schedule:
-
-Frequency: Daily at midnight.
-Endpoint: /api/cron/all
-How to Verify It's Working
-1. Check Vercel Dashboard
-Once you deploy these changes, go to your Vercel Project Dashboard:
-
-Select your project.
-Click on the Settings tab.
-Click on the Cron side menu.
-You should see the /api/cron/all job listed there with its next execution time.
-2. Manual Verification (via Browser)
-You can manually trigger the cron job at any time to see if it's working:
-
-Copy your CRON_SECRET from your Vercel environment variables.
-Visit this URL in your browser (replace <your-domain> and <your-secret>): https://<your-domain>/api/cron/all?x-cron-secret=<your-secret> Note: I enabled x-cron-secret as a query parameter or header for easy testing.
-3. Check Logs
-In the Vercel Logs tab, you will see entries for the cron execution. A successful run will return a JSON response like this:
-
-{
-  "success": true,
-  "executionMs": 1234,
-  "sync": { "processed": 10, ... },
-  "contests": { "success": true, "platforms": { ... } }
-}
+Project Link: [https://github.com/Shankar-CSE/DevLog](https://github.com/Shankar-CSE/DevLog)
