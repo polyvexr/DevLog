@@ -65,16 +65,16 @@ const getStatsDisplay = (platform, stats) => {
 
   switch (platform) {
     case "leetcode": {
-      const submissions = stats.submissionsByDifficulty || {};
+      const ranking = stats.contestRanking || {};
       return [
         {
-          label: "Problems Solved",
+          label: "Solved",
           value: stats.totalSolved || 0,
           icon: FiCheckCircle,
         },
-        { label: "Rating", value: stats.contestRanking?.rating || "N/A", icon: FiTrendingUp },
-        { label: "Medium", value: submissions.medium?.solved || 0, icon: FiZap },
-        { label: "Hard", value: submissions.hard?.solved || 0, icon: FiAward },
+        { label: "Rating", value: ranking.rating || "Unrated", icon: FiTrendingUp },
+        { label: "Percentile", value: ranking.topPercentage ? `${ranking.topPercentage}%` : "N/A", icon: FiTarget },
+        { label: "Contests", value: ranking.attendedContestsCount || 0, icon: FiActivity },
       ];
     }
     case "codeforces":

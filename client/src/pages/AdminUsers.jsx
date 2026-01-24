@@ -69,13 +69,27 @@ export default function AdminUsers() {
             <div className="max-w-7xl mx-auto">
                 {/* Header Section */}
                 <div className="mb-12">
-                    <button
-                        onClick={() => navigate("/admin")}
-                        className="flex items-center gap-2 text-gray-500 hover:text-white transition-all mb-8 group"
-                    >
-                        <FiArrowLeft className="group-hover:-translate-x-1 transition-transform" />
-                        <span className="font-bold uppercase tracking-widest text-xs">Back to Admin Panel</span>
-                    </button>
+                    <div className="flex items-center justify-between mb-8 fade-in-scale">
+                        <button
+                            onClick={() => navigate("/admin")}
+                            className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-white transition-all hover:bg-blue-600 hover:border-blue-500 hover:-translate-x-1 group shadow-xl active:scale-95"
+                            title="Back to Admin Panel"
+                        >
+                            <svg
+                                className="w-5 h-5 group-hover:-translate-x-0.5 transition-transform"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={3}
+                                    d="M15 19l-7-7 7-7"
+                                />
+                            </svg>
+                        </button>
+                    </div>
 
                     <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
                         <div className="fade-in-scale">
@@ -153,8 +167,8 @@ export default function AdminUsers() {
                                             </td>
                                             <td className="px-8 py-6">
                                                 <span className={`px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest border ${user.role === "admin"
-                                                        ? "bg-blue-500/10 border-blue-500/20 text-blue-400"
-                                                        : "bg-gray-500/10 border-white/5 text-gray-500"
+                                                    ? "bg-blue-500/10 border-blue-500/20 text-blue-400"
+                                                    : "bg-gray-500/10 border-white/5 text-gray-500"
                                                     }`}>
                                                     {user.role}
                                                 </span>
