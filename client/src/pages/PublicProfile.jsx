@@ -35,7 +35,8 @@ const platformConfig = {
     bg: "bg-[#ffa116]/10",
     border: "border-[#ffa116]/20",
     text: "text-[#ffa116]",
-    gradient: "from-[#ffa116] to-[#ffb84d]"
+    gradient: "from-[#ffa116] to-[#ffb84d]",
+    url: (username) => `https://leetcode.com/u/${username}`
   },
   codeforces: {
     icon: SiCodeforces,
@@ -44,7 +45,8 @@ const platformConfig = {
     bg: "bg-[#1f8acb]/10",
     border: "border-[#1f8acb]/20",
     text: "text-[#1f8acb]",
-    gradient: "from-[#1f8acb] to-[#4cb3f0]"
+    gradient: "from-[#1f8acb] to-[#4cb3f0]",
+    url: (username) => `https://codeforces.com/profile/${username}`
   },
   github: {
     icon: SiGithub,
@@ -53,7 +55,8 @@ const platformConfig = {
     bg: "bg-[#ffffff]/10",
     border: "border-[#ffffff]/20",
     text: "text-white",
-    gradient: "from-[#333] to-[#666]"
+    gradient: "from-[#333] to-[#666]",
+    url: (username) => `https://github.com/${username}`
   },
   codechef: {
     icon: SiCodechef,
@@ -62,7 +65,8 @@ const platformConfig = {
     bg: "bg-[#5B4638]/20",
     border: "border-[#5B4638]/30",
     text: "text-[#5B4638]",
-    gradient: "from-[#5B4638] to-[#8B7355]"
+    gradient: "from-[#5B4638] to-[#8B7355]",
+    url: (username) => `https://www.codechef.com/users/${username}`
   },
   atcoder: {
     icon: AtCoderIcon,
@@ -71,7 +75,8 @@ const platformConfig = {
     bg: "bg-[#ffffff]/5",
     border: "border-[#ffffff]/10",
     text: "text-white",
-    gradient: "from-[#222] to-[#444]"
+    gradient: "from-[#222] to-[#444]",
+    url: (username) => `https://atcoder.jp/users/${username}`
   },
 };
 
@@ -135,10 +140,10 @@ export default function PublicProfile() {
           <p className="text-gray-500 mb-10 font-medium leading-relaxed">{error}</p>
           <Link
             to="/"
-            className="inline-flex items-center gap-3 px-10 py-4 bg-white/5 hover:bg-white/10 text-white font-black rounded-2xl transition-all uppercase tracking-[0.2em] text-[10px] border border-white/10"
+            className="w-16 h-16 mx-auto rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-white transition-all hover:bg-blue-600 hover:border-blue-500 hover:scale-110 shadow-2xl active:scale-95 group"
+            title="Back to Base"
           >
-            <FiArrowLeft className="text-lg" />
-            Back to Base
+            <FiArrowLeft className="text-2xl group-hover:-translate-x-1 transition-transform" />
           </Link>
         </div>
       </div>
@@ -146,6 +151,26 @@ export default function PublicProfile() {
   }
 
   const { profile: userProfile, aggregateStats, platforms } = profile;
+
+  // Calculate total contest count across all platforms
+  const totalContests = platforms.reduce((acc, p) => {
+    const s = p.stats || {};
+    if (p.platform === "leetcode") return acc + (s.contestRanking?.attendedContestsCount || 0);
+    if (p.platform === "codeforces") return acc + (s.totalContests || 0);
+    if (p.platform === "codechef") return acc + (s.contestsParticipated || 0);
+    if (p.platform === "atcoder") return acc + (s.contestsParticipated || 0);
+    return acc;
+  }, 0);
+
+  // Get highest rating across all platforms
+  const maxRating = Math.max(...platforms.map(p => {
+    const s = p.stats || {};
+    if (p.platform === "leetcode") return s.contestRanking?.rating || 0;
+    if (p.platform === "codeforces") return s.rating || 0;
+    if (p.platform === "codechef") return s.rating || 0;
+    if (p.platform === "atcoder") return s.rating || 0;
+    return 0;
+  }), 0);
 
   return (
     <div className="min-h-screen bg-[#020202] text-gray-300 selection:bg-blue-600/30 font-inter pb-20">
@@ -159,11 +184,20 @@ export default function PublicProfile() {
       <div className="relative z-10 max-w-7xl mx-auto px-6">
         {/* Navigation / Header */}
         <header className="flex justify-between items-center py-8 mb-12 animate-fade-in">
-          <Link to="/" className="flex items-center gap-2 group">
-            <div className="w-10 h-10 rounded-xl bg-blue-600/10 border border-blue-500/20 flex items-center justify-center text-blue-500 group-hover:bg-blue-600 group-hover:text-white transition-all">
-              <FiZap />
-            </div>
-            <span className="text-xl font-black italic tracking-tighter text-white">DEVLOG</span>
+          <Link to="/" className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-white transition-all hover:bg-blue-600 hover:border-blue-500 hover:-translate-x-1 group shadow-xl active:scale-95 duration-500" title="Back to Base">
+            <svg
+              className="w-5 h-5 group-hover:-translate-x-0.5 transition-transform"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={3}
+                d="M15 19l-7-7 7-7"
+              />
+            </svg>
           </Link>
           <button
             onClick={handleShare}
@@ -220,7 +254,7 @@ export default function PublicProfile() {
                     <FiTarget className="text-sm" /> @{userProfile.username}
                   </div>
                   <div className="text-gray-500 font-bold text-xs flex items-center gap-2 px-2">
-                    <FiCalendar className="text-blue-500/50" /> Initialized {new Date(userProfile.memberSince).toLocaleDateString("en-US", { month: 'long', year: 'numeric' })}
+                    <FiCalendar className="text-blue-500/50" /> Joined {new Date(userProfile.memberSince).toLocaleDateString("en-US", { month: 'long', year: 'numeric' })}
                   </div>
                 </div>
 
@@ -260,16 +294,16 @@ export default function PublicProfile() {
 
         {/* Global Stats Grid */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-16 animate-fade-in delay-200">
-          <StatBox label="Nodes Synced" value={aggregateStats.platforms} icon={<FiLayers />} color="blue" />
-          <StatBox label="Solutions Synthesized" value={aggregateStats.totalProblemsSolved} icon={<FiCode />} color="green" />
-          <StatBox label="Battle Exp" value={aggregateStats.totalContests} icon={<FiActivity />} color="red" />
-          <StatBox label="Neural Medals" value={aggregateStats.badges.length} icon={<FiStar />} color="purple" />
+          <StatBox label="Platforms connected" value={platforms.length} icon={<FiLayers />} color="blue" />
+          <StatBox label="Problems Solved" value={aggregateStats.totalProblemsSolved} icon={<FiCode />} color="green" />
+          <StatBox label="Contests Played" value={totalContests} icon={<FiActivity />} color="red" />
+          <StatBox label="Top Rating" value={maxRating > 0 ? Math.round(maxRating) : "—"} icon={<FiTarget />} color="purple" />
         </div>
 
         {/* Platforms Showcase */}
         <div className="mb-20">
           <div className="flex items-center gap-6 mb-12">
-            <h2 className="text-[10px] font-black uppercase tracking-[0.5em] text-gray-500 whitespace-nowrap">Integrated Ecosystems</h2>
+            <h2 className="text-[10px] font-black uppercase tracking-[0.5em] text-gray-500 whitespace-nowrap">Connected Platforms</h2>
             <div className="h-px bg-gradient-to-r from-white/5 to-transparent flex-1"></div>
           </div>
 
@@ -282,9 +316,38 @@ export default function PublicProfile() {
                 bg: "bg-white/5",
                 border: "border-white/10",
                 text: "text-white",
-                gradient: "from-gray-700 to-gray-500"
+                gradient: "from-gray-700 to-gray-500",
+                url: (u) => "#"
               };
               const Icon = cfg.icon;
+
+              const extractDisplayStats = (p) => {
+                const s = p.stats || {};
+                const res = [];
+                if (p.platform === "leetcode") {
+                  res.push({ k: "Solved", v: s.totalSolved });
+                  res.push({ k: "Rating", v: s.contestRanking?.rating });
+                  res.push({ k: "Percentile", v: s.contestRanking?.topPercentage + "%" });
+                  res.push({ k: "Contests", v: s.contestRanking?.attendedContestsCount });
+                } else if (p.platform === "codeforces") {
+                  res.push({ k: "Rating", v: s.rating });
+                  res.push({ k: "Rank", v: s.rank });
+                  res.push({ k: "Solved", v: s.problemsSolved });
+                  res.push({ k: "Contests", v: s.totalContests });
+                } else if (p.platform === "github") {
+                  res.push({ k: "Repos", v: s.publicRepos });
+                  res.push({ k: "Stars", v: s.totalStars });
+                  res.push({ k: "Followers", v: s.followers });
+                  res.push({ k: "Events", v: s.totalEvents });
+                } else {
+                  // Fallback for others
+                  Object.entries(s).slice(0, 4).forEach(([k, v]) => res.push({ k, v }));
+                }
+                return res;
+              };
+
+              const displayStats = extractDisplayStats(platform);
+
               return (
                 <div
                   key={platform.platform}
@@ -302,23 +365,34 @@ export default function PublicProfile() {
                       </div>
                       <div>
                         <h3 className="text-3xl font-black text-white italic tracking-tighter uppercase">{cfg.label}</h3>
-                        <p className={`${cfg.text} opacity-50 font-black text-[10px] uppercase tracking-[0.3em]`}>@{platform.username}</p>
+                        <div className="flex items-center gap-3">
+                          <p className={`${cfg.text} opacity-50 font-black text-[10px] uppercase tracking-[0.3em]`}>@{platform.username}</p>
+                          <a
+                            href={cfg.url(platform.username)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white transition-all group/btn"
+                            title="View External Profile"
+                          >
+                            <FiExternalLink className="text-[10px] group-hover/btn:scale-110 transition-transform" />
+                          </a>
+                        </div>
                       </div>
                     </div>
                     <div className="hidden sm:block text-right opacity-30 group-hover:opacity-60 transition-opacity">
-                      <div className="text-[8px] font-black uppercase tracking-widest text-gray-400 mb-1">Last Protocol</div>
+                      <div className="text-[8px] font-black uppercase tracking-widest text-gray-400 mb-1">Last Updated</div>
                       <p className="text-white font-bold text-[10px]">{new Date(platform.lastUpdated).toLocaleDateString()}</p>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-3 gap-6 relative z-10">
-                    {Object.entries(platform.stats).slice(0, 3).map(([key, value]) => (
-                      <div key={key} className="bg-white/[0.02] border border-white/5 rounded-3xl p-5 hover:bg-white/[0.05] transition-all hover:scale-[1.02]">
-                        <div className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-500 mb-3 truncate">
-                          {key.replace(/([A-Z])/g, " $1").trim()}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 relative z-10">
+                    {displayStats.map((stat, si) => (
+                      <div key={si} className="bg-white/[0.02] border border-white/5 rounded-2xl p-4 hover:bg-white/[0.05] transition-all hover:scale-[1.02]">
+                        <div className="text-[8px] font-black uppercase tracking-[0.1em] text-gray-500 mb-2 truncate">
+                          {stat.k.replace(/([A-Z])/g, " $1").trim()}
                         </div>
-                        <div className="text-2xl font-black text-white italic tracking-tighter">
-                          {typeof value === 'number' ? Math.round(value).toLocaleString() : value}
+                        <div className="text-lg font-black text-white italic tracking-tighter">
+                          {typeof stat.v === 'number' ? Math.round(stat.v).toLocaleString() : (stat.v || "—")}
                         </div>
                       </div>
                     ))}

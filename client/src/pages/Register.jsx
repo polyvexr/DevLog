@@ -35,10 +35,22 @@ export default function Register() {
       <div className="w-full max-w-lg relative z-10">
         <Link
           to="/"
-          className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-all mb-8 group fade-in-up"
+          className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-white transition-all hover:bg-blue-600 hover:border-blue-500 hover:-translate-x-1 group shadow-xl active:scale-95 mb-8"
+          title="Back to Home"
         >
-          <span className="group-hover:-translate-x-1 transition-transform">←</span>
-          <span className="font-medium">Back to Home</span>
+          <svg
+            className="w-5 h-5 group-hover:-translate-x-0.5 transition-transform"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={3}
+              d="M15 19l-7-7 7-7"
+            />
+          </svg>
         </Link>
 
         <form
