@@ -54,18 +54,9 @@ export default function LeetCodeDetails() {
       />
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
-        <StatBox label="Global Rank" value={`#${stats.ranking?.toLocaleString() || "—"}`} subValue="Rank" />
+        <StatBox label="Global Rank" value={`#${stats.ranking?.toLocaleString() || "—"}`} subValue="Rank" colSpan={2} />
         <StatBox label="Reputation" value={stats.reputation?.toLocaleString() || 0} valueColor="text-purple-400" />
-        <StatBox label="Community Stats"
-          value={
-            <div className="flex flex-col gap-1">
-              <div className="flex justify-between text-[11px] font-black uppercase tracking-widest"><span className="text-gray-500">Views:</span> <span className="text-white">{stats.contributions?.points || 0}</span></div>
-              <div className="flex justify-between text-[11px] font-black uppercase tracking-widest"><span className="text-gray-500">Solutions:</span> <span className="text-white">{stats.solutionCount || 0}</span></div>
-              <div className="flex justify-between text-[11px] font-black uppercase tracking-widest"><span className="text-gray-500">Discuss:</span> <span className="text-white">{stats.categoryDiscussCount || 0}</span></div>
-            </div>
-          }
-          colSpan={2}
-        />
+        <StatBox label="Profile Name" value={stats.realName || "Anonymous"} />
       </div>
 
       <DifficultyGrid

@@ -287,9 +287,20 @@ export default function PublicProfile() {
                       <div className="w-10 h-10 rounded-2xl bg-white/[0.03] border border-white/5 flex items-center justify-center group-hover/item:border-blue-400/30 group-hover/item:bg-blue-500/5">
                         <FiGlobe />
                       </div>
-                      <span className="text-sm font-black tracking-tight uppercase opacity-60 group-hover/item:opacity-100">{new URL(userProfile.website).hostname}</span>
+                      <span className="text-sm font-black tracking-tight uppercase opacity-60 group-hover/item:opacity-100">{new URL(userProfile.website).hostname.replace('www.', '')}</span>
                     </a>
                   )}
+                  {userProfile.socials && userProfile.socials.map((s, si) => (
+                    <div key={si} className="flex items-center gap-3 text-gray-400 group/item">
+                      <div className="w-10 h-10 rounded-2xl bg-white/[0.03] border border-white/5 flex items-center justify-center group-hover/item:border-blue-400/30 group-hover/item:text-blue-400 transition-all">
+                        <FiLink />
+                      </div>
+                      <div className="flex flex-col items-start">
+                        <span className="text-[8px] font-black uppercase text-blue-500/50 group-hover/item:text-blue-500 tracking-widest">{s.platform}</span>
+                        <span className="text-sm font-black tracking-tight uppercase opacity-60 group-hover/item:opacity-100">@{s.username}</span>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
@@ -298,10 +309,10 @@ export default function PublicProfile() {
 
         {/* Global Stats Grid */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-16 animate-fade-in delay-200">
-          <StatBox label="Platforms connected" value={platforms.length} icon={<FiLayers />} color="blue" />
+          <StatBox label="GitHub Stars" value={totalGithubStars} icon={<FiStar />} color="blue" />
           <StatBox label="Problems Solved" value={aggregateStats.totalProblemsSolved} icon={<FiCode />} color="green" />
           <StatBox label="Contests Played" value={totalContests} icon={<FiActivity />} color="red" />
-          <StatBox label="Top Rating" value={maxRating > 0 ? Math.round(maxRating) : "—"} icon={<FiTarget />} color="purple" />
+          <StatBox label="Most Used Language" value={topLanguage} icon={<FiTrendingUp />} color="purple" />
         </div>
 
         {/* Platforms Showcase */}
@@ -370,7 +381,17 @@ export default function PublicProfile() {
                       <div>
                         <h3 className="text-3xl font-black text-white italic tracking-tighter uppercase">{cfg.label}</h3>
                         <div className="flex items-center gap-3">
-                          <p className={`${cfg.text} opacity-50 font-black text-[10px] uppercase tracking-[0.3em]`}>@{platform.username}</p>
+                          {platform.platform === "codechef" ? (
+                            <p className={`${cfg.text} opacity-80 font-black text-[10px] uppercase tracking-[0.3em]`}>
+                              Rating: {platform.stats?.rating || "N/A"}
+                            </p>
+                          ) : platform.platform === "atcoder" ? (
+                            <p className={`${cfg.text} opacity-80 font-black text-[10px] uppercase tracking-[0.3em]`}>
+                              Solved: {platform.stats?.problemsSolved || 0}
+                            </p>
+                          ) : (
+                            <p className={`${cfg.text} opacity-50 font-black text-[10px] uppercase tracking-[0.3em]`}>@{platform.username}</p>
+                          )}
                           <a
                             href={cfg.url(platform.username)}
                             target="_blank"

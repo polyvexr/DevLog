@@ -21,13 +21,9 @@ export default function Settings() {
   // Form State
   const [formData, setFormData] = useState({
     name: "", bio: "", location: "", website: "",
-    socials: {
-      linkedin: "",
-      twitter: "",
-      github: ""
-    },
+    socials: [], // Array of { platform, username }
     publicProfile: {
-      enabled: false,
+      enabled: true, // Force enabled or just keep as is without UI
       username: "",
       showLeetCode: true,
       showCodeforces: true,
@@ -54,13 +50,9 @@ export default function Settings() {
         bio: u.profile?.bio || "",
         location: u.profile?.location || "",
         website: u.profile?.website || "",
-        socials: {
-          linkedin: u.profile?.socials?.linkedin || "",
-          twitter: u.profile?.socials?.twitter || "",
-          github: u.profile?.socials?.github || ""
-        },
+        socials: u.profile?.socials || [],
         publicProfile: {
-          enabled: u.publicProfile?.enabled || false,
+          enabled: u.publicProfile?.enabled ?? true,
           username: u.publicProfile?.username || u.email?.split('@')[0] || "",
           showLeetCode: u.publicProfile?.showLeetCode ?? true,
           showCodeforces: u.publicProfile?.showCodeforces ?? true,
@@ -104,7 +96,7 @@ export default function Settings() {
   };
 
   const updateVisibility = () => {
-    handleAction("/user/profile", { publicProfile: formData.publicProfile }, "put", "Privacy settings updated");
+    handleAction("/user/profile", { publicProfile: formData.publicProfile }, "put", "Platform visibility updated");
   };
 
   const updatePassword = (e) => {
@@ -115,6 +107,26 @@ export default function Settings() {
     }, "put", "Password updated successfully").then(() => {
       setFormData(p => ({ ...p, currentPassword: "", newPassword: "" }));
     });
+  };
+
+  const addSocial = () => {
+    setFormData(prev => ({
+      ...prev,
+      socials: [...prev.socials, { platform: "twitter", username: "" }]
+    }));
+  };
+
+  const updateSocial = (index, field, value) => {
+    const newSocials = [...formData.socials];
+    newSocials[index][field] = value;
+    setFormData(prev => ({ ...prev, socials: newSocials }));
+  };
+
+  const removeSocial = (index) => {
+    setFormData(prev => ({
+      ...prev,
+      socials: prev.socials.filter((_, i) => i !== index)
+    }));
   };
 
   if (loading) return <FullPageLoader />;
@@ -206,23 +218,59 @@ export default function Settings() {
           </div>
 
           <div className="space-y-4">
-            <label className="text-[9px] font-black uppercase tracking-widest text-gray-500 ml-1">Social Profiles</label>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {[
-                { label: "LinkedIn Username", key: "linkedin", placeholder: "e.g. johndoe" },
-                { label: "Twitter Username", key: "twitter", placeholder: "e.g. johndoe" },
-              ].map((s) => (
-                <div key={s.key} className="relative">
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-600 font-bold text-xs">@</div>
-                  <input
-                    type="text" disabled={!isEditing}
-                    placeholder={s.placeholder}
-                    className="w-full pl-10 pr-4 py-3.5 bg-white/5 border border-white/5 rounded-xl text-white font-bold outline-none focus:ring-1 focus:ring-blue-500/40 disabled:opacity-30 placeholder-gray-700"
-                    value={formData.socials[s.key]}
-                    onChange={(e) => setFormData({ ...formData, socials: { ...formData.socials, [s.key]: e.target.value } })}
-                  />
+            <div className="flex items-center justify-between">
+              <label className="text-[9px] font-black uppercase tracking-widest text-gray-500 ml-1">Social Profiles</label>
+              {isEditing && (
+                <button
+                  type="button"
+                  onClick={addSocial}
+                  className="px-3 py-1 bg-blue-600/10 border border-blue-500/20 text-blue-400 text-[8px] font-black uppercase tracking-widest rounded-lg hover:bg-blue-600 hover:text-white transition-all"
+                >
+                  + Add Profile
+                </button>
+              )}
+            </div>
+            <div className="space-y-3">
+              {formData.socials.map((social, index) => (
+                <div key={index} className="flex gap-3">
+                  <select
+                    disabled={!isEditing}
+                    className="w-1/3 px-4 py-3 bg-white/5 border border-white/5 rounded-xl text-white font-bold outline-none focus:ring-1 focus:ring-blue-500/40 disabled:opacity-30 appearance-none cursor-pointer"
+                    value={social.platform}
+                    onChange={(e) => updateSocial(index, "platform", e.target.value)}
+                  >
+                    <option value="twitter">Twitter</option>
+                    <option value="linkedin">LinkedIn</option>
+                    <option value="github">GitHub</option>
+                    <option value="instagram">Instagram</option>
+                    <option value="facebook">Facebook</option>
+                    <option value="youtube">YouTube</option>
+                    <option value="other">Other</option>
+                  </select>
+                  <div className="relative flex-1">
+                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-600 font-bold text-xs">@</div>
+                    <input
+                      type="text" disabled={!isEditing}
+                      placeholder="username"
+                      className="w-full pl-10 pr-10 py-3.5 bg-white/5 border border-white/5 rounded-xl text-white font-bold outline-none focus:ring-1 focus:ring-blue-500/40 disabled:opacity-30 placeholder-gray-700"
+                      value={social.username}
+                      onChange={(e) => updateSocial(index, "username", e.target.value)}
+                    />
+                    {isEditing && (
+                      <button
+                        type="button"
+                        onClick={() => removeSocial(index)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-red-500/50 hover:text-red-500 transition-colors"
+                      >
+                        <FiTrash2 size={16} />
+                      </button>
+                    )}
+                  </div>
                 </div>
               ))}
+              {formData.socials.length === 0 && !isEditing && (
+                <p className="text-[10px] text-gray-600 font-bold uppercase tracking-widest px-1 italic">No social profiles linked</p>
+              )}
             </div>
           </div>
 
@@ -259,19 +307,6 @@ export default function Settings() {
         </div>
 
         <div className="space-y-8">
-          <div className="flex items-center justify-between p-6 bg-white/5 rounded-2xl border border-white/10">
-            <div className="space-y-1">
-              <div className="font-black text-white text-[11px] uppercase tracking-widest">Public Profile Page</div>
-              <div className="text-[10px] text-gray-500 font-medium whitespace-pre-wrap">Allow others to see your stats at: devlog.io/u/{formData.publicProfile.username}</div>
-            </div>
-            <button
-              onClick={() => setFormData({ ...formData, publicProfile: { ...formData.publicProfile, enabled: !formData.publicProfile.enabled } })}
-              className={`w-14 h-7 rounded-full transition-all relative ${formData.publicProfile.enabled ? "bg-cyan-600 shadow-lg" : "bg-white/10"}`}
-            >
-              <div className={`absolute top-1 w-5 h-5 rounded-full bg-white transition-all ${formData.publicProfile.enabled ? "left-8" : "left-1"}`} />
-            </button>
-          </div>
-
           <div className="space-y-4">
             <label className="text-[9px] font-black uppercase tracking-widest text-gray-500 ml-1">Visible Platforms</label>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -347,7 +382,7 @@ export default function Settings() {
           If you are experiencing issues with platform synchronization or have suggestions for new features, please reach out to our team.
         </p>
         <div className="flex gap-4">
-          <a href="mailto:support@devlog.io" className="px-6 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white font-black text-[10px] uppercase tracking-widest hover:bg-white/10 transition-all flex items-center gap-2">
+          <a href="mailto:shankar.l5252@gmail.com" className="px-6 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white font-black text-[10px] uppercase tracking-widest hover:bg-white/10 transition-all flex items-center gap-2">
             <FiMail /> Contact Support
           </a>
         </div>

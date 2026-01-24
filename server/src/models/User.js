@@ -22,6 +22,7 @@ const userSchema = new mongoose.Schema({
     bio: { type: String, default: "" },
     location: { type: String, default: "" },
     website: { type: String, default: "" },
+    socials: { type: Array, default: [] }, // Array of { platform, username }
   },
 
   // Public profile settings for /u/:username route
