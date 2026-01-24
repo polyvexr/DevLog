@@ -43,7 +43,7 @@ export default function AdminDashboard() {
       fetchStats();
       notify("success", `Sync Success: ${results.success} updated`);
     } catch (err) {
-      notify("error", "Sync protocol failed");
+      notify("error", "Data refresh failed");
       setSync({ ...sync, active: "" });
     }
   };
@@ -70,6 +70,28 @@ export default function AdminDashboard() {
 
   return (
     <div className="max-w-7xl mx-auto py-8 px-4 space-y-16">
+      <div className="flex items-center justify-between mb-8 fade-in-scale">
+        <button
+          onClick={() => navigate("/")}
+          className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-white transition-all hover:bg-blue-600 hover:border-blue-500 hover:-translate-x-1 group shadow-xl active:scale-95"
+          title="Back to Dashboard"
+        >
+          <svg
+            className="w-5 h-5 group-hover:-translate-x-0.5 transition-transform"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={3}
+              d="M15 19l-7-7 7-7"
+            />
+          </svg>
+        </button>
+      </div>
+
       {/* Notification */}
       {notif && (
         <div className={`fixed top-24 right-6 z-50 p-5 rounded-xl flex items-center gap-4 glass-card-premium border-none ring-1 ${notif.type === "error" ? "ring-red-500/30 text-red-400" : "ring-green-500/30 text-green-400"}`}>
@@ -81,9 +103,9 @@ export default function AdminDashboard() {
 
       {/* Header */}
       <div className="fade-in-scale">
-        <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] font-black uppercase tracking-widest mb-6"><FiShield /> Admin Mode</div>
-        <h1 className="text-6xl md:text-8xl font-black italic mb-4 tracking-tighter">System <span className="animate-text-shine">Admin</span></h1>
-        <p className="text-gray-400 text-lg font-medium max-w-2xl">Infrastructure management and global synchronization terminal.</p>
+        <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] font-black uppercase tracking-widest mb-6"><FiShield /> Admin Controls</div>
+        <h1 className="text-6xl md:text-8xl font-black italic mb-4 tracking-tighter">System <span className="animate-text-shine">Management</span></h1>
+        <p className="text-gray-400 text-lg font-medium max-w-2xl">Overview of platform accounts and data refresh controls.</p>
       </div>
 
       {/* Stats Grid */}
@@ -93,13 +115,13 @@ export default function AdminDashboard() {
             <FiUsers className="absolute -right-4 -top-4 text-7xl text-blue-500/5" />
             <div className="text-4xl font-black text-white mb-2">{stats.totalUsers}</div>
             <div className="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-6">Total Users</div>
-            <button onClick={() => navigate("/admin/users")} className="w-full py-2.5 bg-blue-600/10 border border-blue-500/20 text-blue-400 text-[9px] font-black uppercase tracking-widest rounded-lg hover:bg-blue-600 hover:text-white transition-all">List Users</button>
+            <button onClick={() => navigate("/admin/users")} className="w-full py-2.5 bg-blue-600/10 border border-blue-500/20 text-blue-400 text-[9px] font-black uppercase tracking-widest rounded-lg hover:bg-blue-600 hover:text-white transition-all">View All Users</button>
           </div>
           {cards.map(c => (
             <div key={c.p} className="glass-card-premium p-8 relative overflow-hidden">
               <c.icon className={`absolute -right-4 -top-4 text-6xl ${c.color} opacity-5`} />
               <div className={`text-4xl font-black ${c.color} mb-2`}>{stats.platformCounts[c.p]}</div>
-              <div className="text-[10px] font-black uppercase tracking-widest text-gray-500">{c.label} Accounts</div>
+              <div className="text-[10px] font-black uppercase tracking-widest text-gray-500">{c.label} Linked</div>
             </div>
           ))}
         </div>
@@ -110,8 +132,8 @@ export default function AdminDashboard() {
         <div className="flex items-center gap-6">
           <FiRefreshCw className={`text-3xl text-blue-500 ${sync.active ? 'animate-spin' : ''}`} />
           <div>
-            <h2 className="text-2xl font-black text-white italic uppercase tracking-tighter">Platform Sync</h2>
-            <p className="text-[9px] font-black uppercase tracking-widest text-gray-500">Global user data refresh protocol</p>
+            <h2 className="text-2xl font-black text-white italic uppercase tracking-tighter">Data Refresh</h2>
+            <p className="text-[9px] font-black uppercase tracking-widest text-gray-500">Update user statistics from external platforms</p>
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">

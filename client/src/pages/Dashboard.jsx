@@ -44,14 +44,14 @@ export default function Dashboard() {
 
   const stats = data?.platforms || [];
   const summary = data?.summary || null;
-  const username = data?.user?.email?.split('@')[0] || "Developer";
+  const displayName = data?.user?.name || "Developer";
 
   return (
     <>
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-12 fade-in-scale">
         <div>
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] font-black uppercase tracking-widest mb-6">
-            System Access Granted • Welcome, {username}
+            Welcome back, {displayName}
           </div>
           <h1 className="text-5xl md:text-8xl font-black mb-4 tracking-tight">
             <span className="text-white opacity-90 italic">Your Coding</span>
@@ -59,7 +59,7 @@ export default function Dashboard() {
             <span className="animate-text-shine inline-block italic">Dashboard</span>
           </h1>
           <p className="text-gray-400 text-xl md:text-2xl font-medium max-w-2xl leading-relaxed">
-            Monitor your coding activity across the multiverse in real-time. Everything is synchronized.
+            Track your coding progress and performance stats across all your connected platforms in one place.
           </p>
         </div>
 

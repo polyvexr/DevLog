@@ -17,20 +17,20 @@ export default function NotFound() {
             </div>
           </div>
         </div>
-        
+
         <div className="fade-in-up">
           <h1 className="text-5xl md:text-7xl font-black text-white mb-6 italic tracking-tight italic">
-            Signal <span className="animate-text-shine">Lost</span>
+            Page Not <span className="animate-text-shine">Found</span>
           </h1>
           <p className="text-gray-500 mb-12 text-xl font-medium max-w-md mx-auto leading-relaxed">
-            The requested neural node could not be located in the current datastream.
+            The page you are looking for doesn't exist or has been moved.
           </p>
-          
-          <Link 
+
+          <Link
             to="/"
             className="inline-flex items-center gap-4 px-10 py-5 bg-blue-600 hover:bg-blue-500 text-white font-black text-lg rounded-2xl shadow-xl shadow-blue-500/20 transition-all active:scale-[0.98] group"
           >
-            <FiHome className="text-2xl group-hover:-translate-y-1 transition-transform" /> 
+            <FiHome className="text-2xl group-hover:-translate-y-1 transition-transform" />
             Reconnect Dashboard
           </Link>
         </div>

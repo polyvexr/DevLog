@@ -76,7 +76,7 @@ export default function ResetPassword() {
             </div>
             <h2 className="text-4xl font-black text-white mb-4 italic">Invalid Protocol</h2>
             <p className="text-gray-400 text-lg mb-10">{error}</p>
-            <Link 
+            <Link
               to="/forgot-password"
               className="block w-full py-5 bg-white/5 hover:bg-white/10 text-white font-black rounded-2xl transition-all border border-white/5 shadow-xl active:scale-[0.98]"
             >
@@ -93,18 +93,18 @@ export default function ResetPassword() {
       <div className="min-h-screen relative flex items-center justify-center p-6 overflow-hidden">
         {/* Background blobs for depth */}
         <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-green-600/10 rounded-full blur-[100px] animate-blob"></div>
-        
+
         <div className="w-full max-w-lg relative z-10">
           <div className="glass-card-premium p-12 text-center fade-in-scale border-green-500/20">
             <div className="w-24 h-24 bg-green-500/10 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-2xl shadow-green-500/20">
               <FiCheckCircle className="text-5xl text-green-500" />
             </div>
-            <h2 className="text-4xl font-black text-white mb-4 italic">Identity Secured</h2>
+            <h2 className="text-4xl font-black text-white mb-4 italic">Password Updated</h2>
             <p className="text-gray-400 text-lg mb-10 leading-relaxed">
-              Your encryption keys have been rotated successfully. <br />
-              <span className="text-blue-400 font-bold">Redirecting to Access Point...</span>
+              Your password has been changed successfully. <br />
+              <span className="text-blue-400 font-bold">Redirecting to login...</span>
             </p>
-            <Link 
+            <Link
               to="/login"
               className="text-xs font-black uppercase tracking-widest text-gray-500 hover:text-white transition-colors"
             >
@@ -128,8 +128,8 @@ export default function ResetPassword() {
             <div className="w-20 h-20 bg-blue-600/10 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-blue-500/20 shadow-inner">
               <FiShield className="text-4xl text-blue-500" />
             </div>
-            <h2 className="text-4xl md:text-5xl font-black text-white mb-3 italic tracking-tight">Rotate <span className="animate-text-shine">Cipher</span></h2>
-            <p className="text-gray-500 font-medium">Define your new encryption sequence</p>
+            <h2 className="text-4xl md:text-5xl font-black text-white mb-3 italic tracking-tight">Update <span className="animate-text-shine">Password</span></h2>
+            <p className="text-gray-500 font-medium">Choose a strong new password for your account</p>
           </div>
 
           <div className="space-y-8">
@@ -142,7 +142,7 @@ export default function ResetPassword() {
 
             <div className="space-y-4">
               <div className="space-y-3">
-                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 ml-1">New Sequence</label>
+                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 ml-1">New Password</label>
                 <div className="relative group">
                   <FiLock className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-blue-500 transition-colors" />
                   <input
@@ -165,7 +165,7 @@ export default function ResetPassword() {
               </div>
 
               <div className="space-y-3">
-                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 ml-1">Sync Sequence</label>
+                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 ml-1">Confirm Password</label>
                 <div className="relative group">
                   <FiLock className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-blue-500 transition-colors" />
                   <input
@@ -188,7 +188,7 @@ export default function ResetPassword() {
             >
               {loading ? (
                 <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              ) : "Seal Identity →"}
+              ) : "Update Password →"}
             </button>
           </div>
         </form>

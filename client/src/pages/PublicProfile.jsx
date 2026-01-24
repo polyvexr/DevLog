@@ -172,6 +172,25 @@ export default function PublicProfile() {
     return 0;
   }), 0);
 
+  const totalGithubStars = platforms.reduce((acc, p) => {
+    if (p.platform === "github") return acc + (p.stats?.totalStars || 0);
+    return acc;
+  }, 0);
+
+  // Calculate Most Used Language from all platforms (favoring GitHub/LeetCode)
+  const languageCounts = {};
+  platforms.forEach(p => {
+    if (p.platform === "leetcode" && p.stats?.languageStats) {
+      p.stats.languageStats.forEach(l => {
+        languageCounts[l.languageName] = (languageCounts[l.languageName] || 0) + l.problemsSolved;
+      });
+    }
+    // Codeforces doesn't provide easy language stats in basic profile
+    // GitHub provides language stats but usually in bytes. For simplicity, we use solved count if available.
+  });
+
+  const topLanguage = Object.entries(languageCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || "JavaScript";
+
   return (
     <div className="min-h-screen bg-[#020202] text-gray-300 selection:bg-blue-600/30 font-inter pb-20">
       {/* Immersive Background */}
@@ -183,22 +202,7 @@ export default function PublicProfile() {
 
       <div className="relative z-10 max-w-7xl mx-auto px-6">
         {/* Navigation / Header */}
-        <header className="flex justify-between items-center py-8 mb-12 animate-fade-in">
-          <Link to="/" className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-white transition-all hover:bg-blue-600 hover:border-blue-500 hover:-translate-x-1 group shadow-xl active:scale-95 duration-500" title="Back to Base">
-            <svg
-              className="w-5 h-5 group-hover:-translate-x-0.5 transition-transform"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={3}
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
-          </Link>
+        <header className="flex justify-end items-center py-8 mb-12 animate-fade-in">
           <button
             onClick={handleShare}
             className={`flex items-center gap-3 px-6 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all active:scale-95 shadow-2xl ${copied

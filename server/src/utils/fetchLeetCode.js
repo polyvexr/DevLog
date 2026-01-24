@@ -20,6 +20,9 @@ export const fetchLeetCode = async (username) => {
               skillTags
               aboutMe
               starRating
+              solutionCount
+              postCount
+              categoryDiscussCount
             }
             submitStats {
               acSubmissionNum {
@@ -175,6 +178,9 @@ export const fetchLeetCode = async (username) => {
       skillTags: profile.skillTags || [],
       websites: profile.websites || [],
       starRating: profile.starRating,
+      solutionCount: profile.solutionCount || 0,
+      postCount: profile.postCount || 0,
+      categoryDiscussCount: profile.categoryDiscussCount || 0,
 
       submissionsByDifficulty,
       totalSolved: submissionsByDifficulty.all.solved,
