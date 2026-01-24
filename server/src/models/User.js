@@ -18,6 +18,7 @@ const userSchema = new mongoose.Schema({
 
   // Profile subdocument
   profile: {
+    avatar: { type: String, default: "" },
     bio: { type: String, default: "" },
     location: { type: String, default: "" },
     website: { type: String, default: "" },

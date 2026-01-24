@@ -56,6 +56,19 @@ export const platformService = {
    * Enqueue a sync job (API endpoint handler)
    */
   async enqueueSyncJob(userId, platform, triggeredBy = "user") {
+    // Check cooldown for user-triggered refreshes
+    if (triggeredBy === "user") {
+      const { allowed, remainingMs } = await this.canRefresh(userId, platform);
+      if (!allowed) {
+        return {
+          queued: false,
+          message: `Dynamic cooldown active. Available in ${Math.ceil(remainingMs / 60000)} minutes.`,
+          cooldownActive: true,
+          remainingMs
+        };
+      }
+    }
+
     // Create idempotency key (one job per platform per day per user)
     const today = new Date().toISOString().split("T")[0];
     const idempotencyKey = `${userId}-${platform}-${today}`;
@@ -181,6 +194,18 @@ export const platformService = {
             }
           }
         );
+
+        // Auto-update user avatar from LeetCode if not set
+        if (job.platform === "leetcode" && freshData.avatar) {
+          const user = await User.findById(job.userId);
+          if (user && !user.profile?.avatar) {
+            await User.updateOne(
+              { _id: job.userId },
+              { $set: { "profile.avatar": freshData.avatar } }
+            );
+            logger.info(`Updated avatar for user ${job.userId} from LeetCode`);
+          }
+        }
 
         // Also update User cooldown to show the latest sync time on the UI
         await User.findOneAndUpdate(

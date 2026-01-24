@@ -189,7 +189,10 @@ export const fetchLeetCode = async (username) => {
         activeYears: [],
       },
 
-      contestRanking: data.userContestRanking || {},
+      contestRanking: data.userContestRanking ? {
+        ...data.userContestRanking,
+        rating: Math.round(data.userContestRanking.rating)
+      } : {},
       contestHistory: (data.userContestRankingHistory || []).slice(-10),
       recentSubmissions: (data.recentAcSubmissionList || []).map(sub => ({
         title: sub.title,
