@@ -1,396 +1,120 @@
 import Contest from "../models/Contest.js";
 import axios from "axios";
 
-/**
- * Contest Service - Aggregated contests from multiple platforms
- */
+const logError = (platform, err) => console.error(`[ContestService] ${platform} error:`, err.message);
+
 export const contestService = {
-  /**
-   * Get upcoming contests with optional filters
-   */
-  async getUpcomingContests(options = {}) {
-    const { 
-      platforms = ["leetcode", "codeforces", "codechef", "atcoder"],
-      limit = 50,
-      days = 30 
-    } = options;
-
-    const now = new Date();
-    const endDate = new Date();
-    endDate.setDate(endDate.getDate() + days);
-
-    const contests = await Contest.find({
-      platform: { $in: platforms },
-      startTime: { $gte: now, $lte: endDate }
-    })
-      .sort({ startTime: 1 })
-      .limit(limit);
-
-    return contests;
+  async save(platform, contestId, data) {
+    return Contest.findOneAndUpdate(
+      { platform, contestId: contestId.toString() },
+      { $set: { ...data, fetchedAt: new Date() } },
+      { upsert: true }
+    );
   },
 
-  /**
-   * Get contests by platform
-   */
-  async getContestsByPlatform(platform, options = {}) {
-    const { limit = 20, includeOngoing = true } = options;
-
-    const now = new Date();
-    const query = { platform };
-
-    if (!includeOngoing) {
-      query.startTime = { $gte: now };
-    } else {
-      query.$or = [
-        { startTime: { $gte: now } },
-        { endTime: { $gte: now } }
-      ];
-    }
-
-    return Contest.find(query)
-      .sort({ startTime: 1 })
-      .limit(limit);
+  async getUpcomingContests({ platforms = ["leetcode", "codeforces", "codechef", "atcoder"], limit = 50, days = 30 } = {}) {
+    const end = new Date();
+    end.setDate(end.getDate() + days);
+    return Contest.find({ platform: { $in: platforms }, startTime: { $gte: new Date(), $lte: end } })
+      .sort({ startTime: 1 }).limit(limit);
   },
 
-  /**
-   * Fetch and update all contests (cron job)
-   */
   async fetchAllContests() {
-    const results = {
-      leetcode: { fetched: 0, error: null },
-      codeforces: { fetched: 0, error: null },
-      codechef: { fetched: 0, error: null },
-      atcoder: { fetched: 0, error: null }
-    };
-
-    // Fetch from each platform with delays
-    try {
-      results.codeforces = await this.fetchCodeforcesContests();
-    } catch (error) {
-      results.codeforces.error = error.message;
+    const platforms = ["codeforces", "leetcode", "codechef", "atcoder"];
+    const results = {};
+    for (const p of platforms) {
+      try {
+        results[p] = await this[`fetch${p.charAt(0).toUpperCase() + p.slice(1)}Contests`]();
+        await new Promise(r => setTimeout(r, 1000));
+      } catch (err) {
+        logError(p, err);
+        results[p] = { fetched: 0, error: err.message };
+      }
     }
-
-    await this.delay(1000);
-
-    try {
-      results.leetcode = await this.fetchLeetCodeContests();
-    } catch (error) {
-      results.leetcode.error = error.message;
-    }
-
-    await this.delay(1000);
-
-    try {
-      results.codechef = await this.fetchCodeChefContests();
-    } catch (error) {
-      results.codechef.error = error.message;
-    }
-
-    await this.delay(1000);
-
-    try {
-      results.atcoder = await this.fetchAtCoderContests();
-    } catch (error) {
-      results.atcoder.error = error.message;
-    }
-
-    // Cleanup old contests
-    await this.cleanupExpiredContests();
-
+    await this.cleanup();
     return results;
   },
 
-  /**
-   * Fetch Codeforces contests
-   */
   async fetchCodeforcesContests() {
-    const response = await axios.get("https://codeforces.com/api/contest.list", {
-      timeout: 10000
-    });
-
-    if (response.data.status !== "OK") {
-      throw new Error("Codeforces API returned error");
+    const res = await axios.get("https://codeforces.com/api/contest.list", { timeout: 10000 });
+    const upcoming = res.data.result.filter(c => c.phase === "BEFORE" || (c.phase === "CODING" && c.relativeTimeSeconds < 0)).slice(0, 20);
+    for (const c of upcoming) {
+      const start = new Date(c.startTimeSeconds * 1000);
+      await this.save("codeforces", c.id, {
+        name: c.name, startTime: start, endTime: new Date(start.getTime() + c.durationSeconds * 1000),
+        duration: Math.round(c.durationSeconds / 60), url: `https://codeforces.com/contest/${c.id}`,
+        division: this.extractCFDiv(c.name), rated: true
+      });
     }
-
-    const now = Date.now() / 1000;
-    const upcomingContests = response.data.result
-      .filter(c => c.phase === "BEFORE" || (c.phase === "CODING" && c.relativeTimeSeconds < 0))
-      .slice(0, 20);
-
-    let fetched = 0;
-    for (const contest of upcomingContests) {
-      const startTime = new Date(contest.startTimeSeconds * 1000);
-      const endTime = new Date(startTime.getTime() + contest.durationSeconds * 1000);
-
-      await Contest.findOneAndUpdate(
-        { platform: "codeforces", contestId: contest.id.toString() },
-        {
-          $set: {
-            name: contest.name,
-            startTime,
-            endTime,
-            duration: Math.round(contest.durationSeconds / 60),
-            url: `https://codeforces.com/contest/${contest.id}`,
-            division: this.extractCFDivision(contest.name),
-            rated: true,
-            fetchedAt: new Date()
-          }
-        },
-        { upsert: true }
-      );
-      fetched++;
-    }
-
-    return { fetched, error: null };
+    return { fetched: upcoming.length };
   },
 
-  /**
-   * Fetch LeetCode contests
-   */
   async fetchLeetCodeContests() {
-    const query = `
-      query {
-        topTwoContests {
-          title
-          startTime
-          duration
-          titleSlug
-        }
-      }
-    `;
-
-    const response = await axios.post(
-      "https://leetcode.com/graphql",
-      { query },
-      {
-        headers: { "Content-Type": "application/json" },
-        timeout: 10000
-      }
-    );
-
-    const contests = response.data?.data?.topTwoContests || [];
-    let fetched = 0;
-
-    for (const contest of contests) {
-      const startTime = new Date(contest.startTime * 1000);
-      const endTime = new Date(startTime.getTime() + contest.duration * 1000);
-
-      await Contest.findOneAndUpdate(
-        { platform: "leetcode", contestId: contest.titleSlug },
-        {
-          $set: {
-            name: contest.title,
-            startTime,
-            endTime,
-            duration: Math.round(contest.duration / 60),
-            url: `https://leetcode.com/contest/${contest.titleSlug}`,
-            rated: true,
-            fetchedAt: new Date()
-          }
-        },
-        { upsert: true }
-      );
-      fetched++;
+    const query = `query { topTwoContests { title startTime duration titleSlug } }`;
+    const res = await axios.post("https://leetcode.com/graphql", { query }, { timeout: 10000 });
+    const contests = res.data?.data?.topTwoContests || [];
+    for (const c of contests) {
+      const start = new Date(c.startTime * 1000);
+      await this.save("leetcode", c.titleSlug, {
+        name: c.title, startTime: start, endTime: new Date(start.getTime() + c.duration * 1000),
+        duration: Math.round(c.duration / 60), url: `https://leetcode.com/contest/${c.titleSlug}`, rated: true
+      });
     }
-
-    return { fetched, error: null };
+    return { fetched: contests.length };
   },
 
-  /**
-   * Fetch CodeChef contests
-   */
   async fetchCodeChefContests() {
-    try {
-      const response = await axios.get(
-        "https://www.codechef.com/api/list/contests/all?sort_by=START&sorting_order=asc&offset=0&mode=all",
-        { timeout: 10000 }
-      );
-
-      const futureContests = response.data?.future_contests || [];
-      const presentContests = response.data?.present_contests || [];
-      const allContests = [...presentContests, ...futureContests].slice(0, 20);
-
-      let fetched = 0;
-      for (const contest of allContests) {
-        const startTime = new Date(contest.contest_start_date_iso);
-        const endTime = new Date(contest.contest_end_date_iso);
-        const durationMs = endTime - startTime;
-
-        await Contest.findOneAndUpdate(
-          { platform: "codechef", contestId: contest.contest_code },
-          {
-            $set: {
-              name: contest.contest_name,
-              startTime,
-              endTime,
-              duration: Math.round(durationMs / 60000),
-              url: `https://www.codechef.com/${contest.contest_code}`,
-              rated: true,
-              fetchedAt: new Date()
-            }
-          },
-          { upsert: true }
-        );
-        fetched++;
-      }
-
-      return { fetched, error: null };
-    } catch (error) {
-      // CodeChef API can be flaky, don't fail the whole job
-      return { fetched: 0, error: error.message };
+    const res = await axios.get("https://www.codechef.com/api/list/contests/all?sort_by=START&sorting_order=asc&offset=0&mode=all", { timeout: 10000 });
+    const list = [...(res.data?.present_contests || []), ...(res.data?.future_contests || [])].slice(0, 20);
+    for (const c of list) {
+      const start = new Date(c.contest_start_date_iso), end = new Date(c.contest_end_date_iso);
+      await this.save("codechef", c.contest_code, {
+        name: c.contest_name, startTime: start, endTime: end,
+        duration: Math.round((end - start) / 60000), url: `https://www.codechef.com/${c.contest_code}`, rated: true
+      });
     }
+    return { fetched: list.length };
   },
 
-  /**
-   * Fetch AtCoder contests
-   * Uses AtCoder's contest schedule page data
-   */
   async fetchAtCoderContests() {
     try {
-      // Try to fetch from AtCoder's homepage API (contests are embedded in the page)
-      // If that fails, fall back to clist.by API or return cached data
-      
-      // Method 1: Try clist.by API (a popular contest aggregator)
-      try {
-        const response = await axios.get(
-          "https://clist.by/api/v4/contest/",
-          {
-            params: {
-              upcoming: true,
-              resource: "atcoder.jp",
-              order_by: "start",
-              limit: 20
-            },
-            headers: {
-              "Authorization": `ApiKey ${process.env.CLIST_API_KEY || ""}`
-            },
-            timeout: 10000
-          }
-        );
-
-        if (response.data?.objects?.length > 0) {
-          let fetched = 0;
-          for (const contest of response.data.objects) {
-            const startTime = new Date(contest.start);
-            const endTime = new Date(contest.end);
-            const durationMs = endTime - startTime;
-
-            await Contest.findOneAndUpdate(
-              { platform: "atcoder", contestId: contest.id.toString() },
-              {
-                $set: {
-                  name: contest.event,
-                  startTime,
-                  endTime,
-                  duration: Math.round(durationMs / 60000),
-                  url: contest.href,
-                  rated: true,
-                  fetchedAt: new Date()
-                }
-              },
-              { upsert: true }
-            );
-            fetched++;
-          }
-          if (fetched > 0) {
-            return { fetched, error: null };
-          }
-        }
-      } catch (clistError) {
-        console.log("clist.by API failed, trying kenkoooo API...");
+      const res = await axios.get("https://clist.by/api/v4/contest/", {
+        params: { upcoming: true, resource: "atcoder.jp", order_by: "start", limit: 20 },
+        headers: { "Authorization": `ApiKey ${process.env.CLIST_API_KEY || ""}` },
+        timeout: 10000
+      });
+      const list = res.data?.objects || [];
+      for (const c of list) {
+        const start = new Date(c.start), end = new Date(c.end);
+        await this.save("atcoder", c.id, {
+          name: c.event, startTime: start, endTime: end, duration: Math.round((end - start) / 60000),
+          url: c.href, rated: true
+        });
       }
-
-      // Method 2: Fallback to kenkoooo API (may have limited upcoming contest data)
-      const response = await axios.get(
-        "https://kenkoooo.com/atcoder/resources/contests.json",
-        { timeout: 10000 }
-      );
-
+      return { fetched: list.length };
+    } catch {
+      const res = await axios.get("https://kenkoooo.com/atcoder/resources/contests.json", { timeout: 10000 });
       const now = Date.now() / 1000;
-      // Filter for contests that start in the future
-      const upcomingContests = response.data
-        .filter(c => c.start_epoch_second > now)
-        .sort((a, b) => a.start_epoch_second - b.start_epoch_second)
-        .slice(0, 20);
-
-      // If no upcoming contests found in kenkoooo, try to get recent contests that might still be valid
-      if (upcomingContests.length === 0) {
-        // Get the most recent contests (some might be ongoing or just finished)
-        const recentContests = response.data
-          .sort((a, b) => b.start_epoch_second - a.start_epoch_second)
-          .slice(0, 5)
-          .filter(c => {
-            const startTime = c.start_epoch_second;
-            const endTime = startTime + c.duration_second;
-            // Include if ongoing or ended within last hour
-            return endTime > now - 3600;
-          });
-        
-        upcomingContests.push(...recentContests);
+      const upcoming = res.data.filter(c => c.start_epoch_second > now - 3600).sort((a, b) => a.start_epoch_second - b.start_epoch_second).slice(0, 20);
+      for (const c of upcoming) {
+        const start = new Date(c.start_epoch_second * 1000);
+        await this.save("atcoder", c.id, {
+          name: c.title, startTime: start, endTime: new Date(start.getTime() + c.duration_second * 1000),
+          duration: Math.round(c.duration_second / 60), url: `https://atcoder.jp/contests/${c.id}`, rated: c.rate_change !== "-"
+        });
       }
-
-      let fetched = 0;
-      for (const contest of upcomingContests) {
-        const startTime = new Date(contest.start_epoch_second * 1000);
-        const endTime = new Date(startTime.getTime() + contest.duration_second * 1000);
-
-        await Contest.findOneAndUpdate(
-          { platform: "atcoder", contestId: contest.id },
-          {
-            $set: {
-              name: contest.title,
-              startTime,
-              endTime,
-              duration: Math.round(contest.duration_second / 60),
-              url: `https://atcoder.jp/contests/${contest.id}`,
-              rated: contest.rate_change !== "-",
-              fetchedAt: new Date()
-            }
-          },
-          { upsert: true }
-        );
-        fetched++;
-      }
-
-      return { fetched, error: upcomingContests.length === 0 ? "No upcoming contests found" : null };
-    } catch (error) {
-      return { fetched: 0, error: error.message };
+      return { fetched: upcoming.length };
     }
   },
 
-  /**
-   * Extract Codeforces division from contest name
-   */
-  extractCFDivision(name) {
-    if (name.includes("Div. 1 + 2") || name.includes("Div. 1+2")) return "Div. 1 + 2";
-    if (name.includes("Div. 1")) return "Div. 1";
-    if (name.includes("Div. 2")) return "Div. 2";
-    if (name.includes("Div. 3")) return "Div. 3";
-    if (name.includes("Div. 4")) return "Div. 4";
-    if (name.includes("Educational")) return "Educational";
-    if (name.includes("Global")) return "Global";
-    return null;
+  extractCFDiv(name) {
+    const divs = ["Div. 1 + 2", "Div. 1+2", "Div. 1", "Div. 2", "Div. 3", "Div. 4", "Educational", "Global"];
+    return divs.find(d => name.includes(d)) || null;
   },
 
-  /**
-   * Cleanup expired contests (older than 24 hours)
-   */
-  async cleanupExpiredContests() {
-    const cutoff = new Date();
-    cutoff.setHours(cutoff.getHours() - 24);
-
-    const result = await Contest.deleteMany({
-      endTime: { $lt: cutoff }
-    });
-
-    return result.deletedCount;
-  },
-
-  /**
-   * Delay helper
-   */
-  delay(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+  async cleanup() {
+    const cutoff = new Date(Date.now() - 24 * 3600000);
+    return Contest.deleteMany({ endTime: { $lt: cutoff } });
   }
 };
 
