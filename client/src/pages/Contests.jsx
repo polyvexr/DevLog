@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import { FiCalendar, FiClock, FiExternalLink, FiRefreshCw, FiFilter, FiZap } from "react-icons/fi";
 import { FaCode } from "react-icons/fa";
 import { SiLeetcode, SiCodeforces, SiCodechef } from "react-icons/si";
@@ -10,6 +11,7 @@ import api from "../api/axios";
  * Contests Page - Premium contest calendar with filters
  */
 export default function Contests() {
+  const navigate = useNavigate();
   const [contests, setContests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -100,8 +102,8 @@ export default function Contests() {
   return (
     <>
       <div className="flex items-center justify-between mb-8 fade-in-scale">
-        <button
-          onClick={() => navigate("/")}
+        <Link
+          to="/"
           className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-white transition-all hover:bg-blue-600 hover:border-blue-500 hover:-translate-x-1 group shadow-xl active:scale-95"
           title="Back to Dashboard"
         >
@@ -118,7 +120,7 @@ export default function Contests() {
               d="M15 19l-7-7 7-7"
             />
           </svg>
-        </button>
+        </Link>
       </div>
 
       {/* Hero Header */}

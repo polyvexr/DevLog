@@ -1,5 +1,6 @@
 import { useState, useEffect, useContext } from "react";
 import api from "../api/axios";
+import { useNavigate, Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import FullPageLoader from "../components/FullPageLoader";
 import Dialog from "../components/Dialog";
@@ -10,6 +11,7 @@ import {
 } from "react-icons/fi";
 
 export default function Settings() {
+  const navigate = useNavigate();
   const { logout, refreshUser } = useContext(AuthContext);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -142,8 +144,8 @@ export default function Settings() {
   return (
     <div className="max-w-4xl mx-auto py-12 px-6 space-y-12">
       <div className="flex items-center justify-between mb-8 fade-in-scale">
-        <button
-          onClick={() => navigate("/")}
+        <Link
+          to="/"
           className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-white transition-all hover:bg-blue-600 hover:border-blue-500 hover:-translate-x-1 group shadow-xl active:scale-95"
           title="Back to Dashboard"
         >
@@ -160,7 +162,7 @@ export default function Settings() {
               d="M15 19l-7-7 7-7"
             />
           </svg>
-        </button>
+        </Link>
       </div>
 
       {/* Header & Notification */}
@@ -233,25 +235,19 @@ export default function Settings() {
             <div className="space-y-3">
               {formData.socials.map((social, index) => (
                 <div key={index} className="flex gap-3">
-                  <select
+                  <input
+                    type="text"
                     disabled={!isEditing}
-                    className="w-1/3 px-4 py-3 bg-white/5 border border-white/5 rounded-xl text-white font-bold outline-none focus:ring-1 focus:ring-blue-500/40 disabled:opacity-30 appearance-none cursor-pointer"
+                    placeholder="Platform (e.g. Twitter)"
+                    className="w-1/3 px-4 py-3 bg-white/5 border border-white/5 rounded-xl text-white font-bold outline-none focus:ring-1 focus:ring-blue-500/40 disabled:opacity-30"
                     value={social.platform}
                     onChange={(e) => updateSocial(index, "platform", e.target.value)}
-                  >
-                    <option value="twitter">Twitter</option>
-                    <option value="linkedin">LinkedIn</option>
-                    <option value="github">GitHub</option>
-                    <option value="instagram">Instagram</option>
-                    <option value="facebook">Facebook</option>
-                    <option value="youtube">YouTube</option>
-                    <option value="other">Other</option>
-                  </select>
+                  />
                   <div className="relative flex-1">
-                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-600 font-bold text-xs">@</div>
+                    <FiLink className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-600 font-bold text-xs" />
                     <input
                       type="text" disabled={!isEditing}
-                      placeholder="username"
+                      placeholder="URL (https://...)"
                       className="w-full pl-10 pr-10 py-3.5 bg-white/5 border border-white/5 rounded-xl text-white font-bold outline-none focus:ring-1 focus:ring-blue-500/40 disabled:opacity-30 placeholder-gray-700"
                       value={social.username}
                       onChange={(e) => updateSocial(index, "username", e.target.value)}

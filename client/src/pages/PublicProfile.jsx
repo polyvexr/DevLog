@@ -15,6 +15,7 @@ import {
   FiCalendar,
   FiTrendingUp,
   FiCode,
+  FiLink,
   FiStar,
   FiGithub as FiGithubIcon
 } from "react-icons/fi";
@@ -200,26 +201,28 @@ export default function PublicProfile() {
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-[0.03]"></div>
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-6">
-        {/* Navigation / Header */}
-        <header className="flex justify-end items-center py-8 mb-12 animate-fade-in">
-          <button
-            onClick={handleShare}
-            className={`flex items-center gap-3 px-6 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all active:scale-95 shadow-2xl ${copied
-              ? "bg-green-600 text-white"
-              : "bg-white/5 hover:bg-white/10 text-white border border-white/10 backdrop-blur-xl"
-              }`}
-          >
-            {copied ? <FiCheckCircle className="text-lg" /> : <FiShare2 className="text-lg" />}
-            {copied ? "Copied" : "Share"}
-          </button>
-        </header>
+      <div className="relative z-10 max-w-7xl mx-auto px-6 pt-12">
+        {/* Navigation / Header moved inside card */}
 
         {/* Profile Identity Card */}
         <div className="glass-card-premium p-1 md:p-1.5 rounded-[3.5rem] mb-12 border-none ring-1 ring-white/5 overflow-hidden group">
           <div className="bg-[#050505]/80 backdrop-blur-3xl rounded-[3.4rem] p-10 md:p-16 relative overflow-hidden">
             {/* Background Decorative Element */}
             <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-blue-600/10 to-transparent blur-3xl -mr-20 -mt-20"></div>
+
+            {/* In-Card Share Button */}
+            <div className="absolute top-10 right-10 z-20">
+              <button
+                onClick={handleShare}
+                className={`flex items-center gap-3 px-6 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all active:scale-95 shadow-2xl ${copied
+                  ? "bg-green-600 text-white"
+                  : "bg-white/5 hover:bg-white/10 text-white border border-white/10 backdrop-blur-xl"
+                  }`}
+              >
+                {copied ? <FiCheckCircle className="text-lg" /> : <FiShare2 className="text-lg" />}
+                {copied ? "Copied" : "Share"}
+              </button>
+            </div>
 
             <div className="flex flex-col lg:flex-row gap-12 items-center relative z-10">
               {/* Avatar Section */}
@@ -291,15 +294,18 @@ export default function PublicProfile() {
                     </a>
                   )}
                   {userProfile.socials && userProfile.socials.map((s, si) => (
-                    <div key={si} className="flex items-center gap-3 text-gray-400 group/item">
-                      <div className="w-10 h-10 rounded-2xl bg-white/[0.03] border border-white/5 flex items-center justify-center group-hover/item:border-blue-400/30 group-hover/item:text-blue-400 transition-all">
+                    <a
+                      key={si}
+                      href={s.username?.startsWith('http') ? s.username : `https://${s.username}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-3 text-gray-400 group/item hover:text-blue-400 transition-all"
+                    >
+                      <div className="w-10 h-10 rounded-2xl bg-white/[0.03] border border-white/5 flex items-center justify-center group-hover/item:border-blue-400/30 group-hover/item:bg-blue-500/5">
                         <FiLink />
                       </div>
-                      <div className="flex flex-col items-start">
-                        <span className="text-[8px] font-black uppercase text-blue-500/50 group-hover/item:text-blue-500 tracking-widest">{s.platform}</span>
-                        <span className="text-sm font-black tracking-tight uppercase opacity-60 group-hover/item:opacity-100">@{s.username}</span>
-                      </div>
-                    </div>
+                      <span className="text-sm font-black tracking-tight uppercase opacity-60 group-hover/item:opacity-100 whitespace-nowrap">{s.platform}</span>
+                    </a>
                   ))}
                 </div>
               </div>
@@ -354,6 +360,16 @@ export default function PublicProfile() {
                   res.push({ k: "Stars", v: s.totalStars });
                   res.push({ k: "Followers", v: s.followers });
                   res.push({ k: "Events", v: s.totalEvents });
+                } else if (p.platform === "codechef") {
+                  res.push({ k: "Rating", v: s.rating });
+                  res.push({ k: "Stars", v: s.stars });
+                  res.push({ k: "Solved", v: s.totalSolved });
+                  res.push({ k: "Contests", v: s.contestsParticipated });
+                } else if (p.platform === "atcoder") {
+                  res.push({ k: "Rating", v: s.rating });
+                  res.push({ k: "Level", v: s.rankColor });
+                  res.push({ k: "Solved", v: s.totalSolved });
+                  res.push({ k: "Contests", v: s.contestsParticipated });
                 } else {
                   // Fallback for others
                   Object.entries(s).slice(0, 4).forEach(([k, v]) => res.push({ k, v }));
@@ -382,12 +398,12 @@ export default function PublicProfile() {
                         <h3 className="text-3xl font-black text-white italic tracking-tighter uppercase">{cfg.label}</h3>
                         <div className="flex items-center gap-3">
                           {platform.platform === "codechef" ? (
-                            <p className={`${cfg.text} opacity-80 font-black text-[10px] uppercase tracking-[0.3em]`}>
-                              Rating: {platform.stats?.rating || "N/A"}
+                            <p className={`${cfg.text} font-black text-[12px] uppercase tracking-[0.1em] bg-white/5 px-3 py-1 rounded-lg border border-white/5`}>
+                              {platform.stats?.rating || "N/A"} Rating
                             </p>
                           ) : platform.platform === "atcoder" ? (
-                            <p className={`${cfg.text} opacity-80 font-black text-[10px] uppercase tracking-[0.3em]`}>
-                              Solved: {platform.stats?.problemsSolved || 0}
+                            <p className={`${cfg.text} font-black text-[12px] uppercase tracking-[0.1em] bg-white/5 px-3 py-1 rounded-lg border border-white/5`}>
+                              {platform.stats?.totalSolved || 0} Solved
                             </p>
                           ) : (
                             <p className={`${cfg.text} opacity-50 font-black text-[10px] uppercase tracking-[0.3em]`}>@{platform.username}</p>

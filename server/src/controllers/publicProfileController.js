@@ -50,6 +50,7 @@ export const getPublicProfile = async (req, res) => {
         bio: user.profile?.bio || "",
         location: user.profile?.location || "",
         website: user.profile?.website || "",
+        socials: user.profile?.socials || [],
         memberSince: user.createdAt
       },
       platforms: platformStats.map(p => ({
