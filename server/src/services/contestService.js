@@ -29,7 +29,7 @@ export const contestService = {
     const results = {};
     for (const p of platforms) {
       try {
-        results[p] = await this[`fetch${p.charAt(0).toUpperCase() + p.slice(1)}Contests`]();
+        results[p] = await contestService[`fetch${p.charAt(0).toUpperCase() + p.slice(1)}Contests`]();
         await new Promise(r => setTimeout(r, 1000));
       } catch (err) {
         logError(p, err);
@@ -54,7 +54,7 @@ export const contestService = {
     return { fetched: upcoming.length };
   },
 
-  async fetchLeetCodeContests() {
+  async fetchLeetcodeContests() {
     const query = `query { topTwoContests { title startTime duration titleSlug } }`;
     const res = await axios.post("https://leetcode.com/graphql", { query }, { timeout: 10000 });
     const contests = res.data?.data?.topTwoContests || [];
@@ -68,7 +68,7 @@ export const contestService = {
     return { fetched: contests.length };
   },
 
-  async fetchCodeChefContests() {
+  async fetchCodechefContests() {
     const res = await axios.get("https://www.codechef.com/api/list/contests/all?sort_by=START&sorting_order=asc&offset=0&mode=all", { timeout: 10000 });
     const list = [...(res.data?.present_contests || []), ...(res.data?.future_contests || [])].slice(0, 20);
     for (const c of list) {
@@ -81,7 +81,7 @@ export const contestService = {
     return { fetched: list.length };
   },
 
-  async fetchAtCoderContests() {
+  async fetchAtcoderContests() {
     try {
       const res = await axios.get("https://clist.by/api/v4/contest/", {
         params: { upcoming: true, resource: "atcoder.jp", order_by: "start", limit: 20 },
