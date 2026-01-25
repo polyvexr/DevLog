@@ -119,8 +119,10 @@ export const fetchLeetCode = async (username) => {
       headers: {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
         "Content-Type": "application/json",
+        "Referer": "https://leetcode.com/",
+        "Origin": "https://leetcode.com",
       },
-      timeout: 20000 // 20 second timeout for slow API
+      timeout: 25000 // 25 second timeout
     });
 
     const data = res.data.data;

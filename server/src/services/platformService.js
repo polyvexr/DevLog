@@ -221,8 +221,10 @@ export const platformService = {
         logger.info(`Database successfully updated for ${job.platform}`);
       } else {
         const errorMsg = freshData?.error || "Empty data returned";
-        logger.warn(`Sync for ${job.platform} skipped: ${errorMsg}`, {
-          username: platformStat.username
+        logger.warn(`Sync for ${job.platform} failed: ${errorMsg}`, {
+          username: platformStat.username,
+          userId: job.userId,
+          dataReceived: JSON.stringify(freshData).slice(0, 500)
         });
         throw new Error(errorMsg);
       }
