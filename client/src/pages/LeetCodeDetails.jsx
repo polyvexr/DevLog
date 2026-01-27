@@ -77,7 +77,7 @@ export default function LeetCodeDetails() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
               <div className="space-y-1">
                 <div className="text-[10px] font-black tracking-[0.2em] text-gray-500 uppercase">Rating</div>
-                <div className="text-4xl font-black text-purple-400 italic">{stats.contestRanking.rating || "N/A"}</div>
+                <div className="text-4xl font-black text-purple-400 italic">{stats.contestRanking.rating ? Math.round(stats.contestRanking.rating) : "N/A"}</div>
               </div>
               <div className="space-y-1">
                 <div className="text-[10px] font-black tracking-[0.2em] text-gray-500 uppercase">Percentile</div>

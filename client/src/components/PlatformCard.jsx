@@ -72,7 +72,7 @@ const getStatsDisplay = (platform, stats) => {
           value: stats.totalSolved || 0,
           icon: FiCheckCircle,
         },
-        { label: "Rating", value: ranking.rating || "Unrated", icon: FiTrendingUp },
+        { label: "Rating", value: ranking.rating ? Math.round(ranking.rating) : "Unrated", icon: FiTrendingUp },
         { label: "Percentile", value: ranking.topPercentage ? `${ranking.topPercentage}%` : "N/A", icon: FiTarget },
         { label: "Contests", value: ranking.attendedContestsCount || 0, icon: FiActivity },
       ];

@@ -334,7 +334,19 @@ export const platformService = {
     // For now, return the full data as stats to ensure frontend compatibility
     // but we can add platform-specific normalization if needed
     switch (platform) {
-      case "leetcode":
+      case "leetcode": {
+        const stats = { ...data };
+        if (stats.contestRanking && typeof stats.contestRanking.rating === 'number') {
+          stats.contestRanking.rating = Math.round(stats.contestRanking.rating);
+        }
+        if (stats.contestHistory && Array.isArray(stats.contestHistory)) {
+          stats.contestHistory = stats.contestHistory.map(h => ({
+            ...h,
+            rating: typeof h.rating === 'number' ? Math.round(h.rating) : h.rating
+          }));
+        }
+        return stats;
+      }
       case "codeforces":
       case "github":
       case "codechef":

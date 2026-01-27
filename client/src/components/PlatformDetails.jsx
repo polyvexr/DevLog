@@ -176,14 +176,14 @@ export function ContestHistoryList({
                 </div>
                 <div className="text-right">
                   <div className="text-2xl font-black text-white">
-                    {contest.newRating || contest.rating}
+                    {Math.round(contest.newRating || contest.rating)}
                   </div>
                   {ratingChange !== null && (
                     <div
                       className="text-sm font-bold"
                       style={{ color: changeColor }}
                     >
-                      {ratingChange >= 0 ? "+" : ""}{ratingChange}
+                      {ratingChange >= 0 ? "+" : ""}{Math.round(ratingChange)}
                     </div>
                   )}
                 </div>
