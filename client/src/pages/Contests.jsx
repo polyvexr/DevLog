@@ -34,7 +34,7 @@ export default function Contests() {
       setLoading(true);
       const response = await api.get(`/contests?platforms=${selectedPlatforms.join(",")}&days=60`);
       if (response.data.success) {
-        setContests(response.data.contests);
+        setContests(response.data.data?.contests || []);
       }
       setError(null);
     } catch {

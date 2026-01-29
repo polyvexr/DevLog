@@ -30,19 +30,18 @@ export const protect = catchAsync(async (req, res, next) => {
  * Attempts to authenticate but allows request to proceed without token
  * Useful for endpoints that can be accessed by both authenticated and unauthenticated users
  */
-export const optionalAuth = async (req, res, next) => {
-  try {
-    const token = req.headers.authorization?.split(" ")[1];
-    if (!token) {
-      // No token - proceed without authentication
-      return next();
-    }
+export const optionalAuth = catchAsync(async (req, res, next) => {
+  const token = req.headers.authorization?.split(" ")[1];
+  if (!token) {
+    return next();
+  }
 
+  try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = await User.findById(decoded.id).select("-password");
+    req.user = await User.findById(decoded.id).select("-password").lean();
     next();
   } catch (err) {
     // Invalid token - proceed without authentication
     next();
   }
-};
+});

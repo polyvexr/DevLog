@@ -10,11 +10,12 @@ import ApiError from "../utils/ApiError.js";
  * Reduces multiple API calls to a single request
  */
 export const getDashboardData = catchAsync(async (req, res) => {
-  const userId = req.user.id;
+  const userId = req.user._id;
 
-  // Parallel fetch all dashboard data
-  const [user, platformStats, upcomingContests] = await Promise.all([
-    User.findById(userId).select("name email profile publicProfile cooldowns").lean(),
+  const user = req.user;
+
+  // Parallel fetch dashboard data
+  const [platformStats, upcomingContests] = await Promise.all([
     PlatformStat.find({ userId }).select("platform username data stats lastUpdated lastManualRefresh").lean(),
     Contest.find({
       startTime: {
@@ -27,10 +28,6 @@ export const getDashboardData = catchAsync(async (req, res) => {
       .select("platform name startTime duration url division")
       .lean()
   ]);
-
-  if (!user) {
-    throw new ApiError(404, "User not found");
-  }
 
   // Calculate summary stats
   const summary = calculateSummary(platformStats);
