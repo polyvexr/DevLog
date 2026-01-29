@@ -5,10 +5,12 @@ import {
 import { platformService } from "../services/platformService.js";
 import { telegramService } from "../services/telegramService.js";
 import connectDB from "../config/db.js";
+import catchAsync from "../utils/catchAsync.js";
+import ApiResponse from "../utils/ApiResponse.js";
+import ApiError from "../utils/ApiError.js";
 
 /**
  * Cron Controller - Endpoints for Lambda/serverless cron triggers
- * These endpoints should be protected with an API key in production
  */
 
 /**
@@ -19,102 +21,76 @@ const authorizeCron = (req) => {
   const authHeader = req.headers["authorization"];
   const bearerToken = authHeader?.startsWith("Bearer ") ? authHeader.split(" ")[1] : null;
 
-  // Check if either X-Cron-Secret, Authorization: Bearer, or ?x-cron-secret matches
-  if (!process.env.CRON_SECRET) return true; // Don't block if secret not configured (dev)
+  if (!process.env.CRON_SECRET) return true; // Dev mode
 
   return cronSecret === process.env.CRON_SECRET || bearerToken === process.env.CRON_SECRET;
 };
 
 /**
- * POST/GET /api/cron/sync
- * Process pending sync jobs (every 1 minute on Pro, daily on Hobby)
+ * Process pending sync jobs
  */
-export const handleSyncCron = async (req, res) => {
-  try {
-    if (!authorizeCron(req)) {
-      return res.status(401).json({ error: "Unauthorized" });
-    }
-
-    // Ensure DB is connected before processing
-    await connectDB();
-
-    const result = await processSyncJobs();
-    res.json({ success: true, ...result });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+export const handleSyncCron = catchAsync(async (req, res) => {
+  if (!authorizeCron(req)) {
+    throw new ApiError(401, "Unauthorized");
   }
-};
+
+  await connectDB();
+  const result = await processSyncJobs();
+  res.status(200).json(new ApiResponse(200, result, "Sync cron completed"));
+});
 
 /**
- * POST/GET /api/cron/contests
- * Fetch contests from all platforms (hourly or admin-triggered)
+ * Fetch contests from all platforms
  */
-export const handleContestsCron = async (req, res) => {
-  try {
-    const isAuthenticated = req.user && req.user.role === "admin";
+export const handleContestsCron = catchAsync(async (req, res) => {
+  const isAdmin = req.user?.role === "admin";
 
-    // Allow access if: valid cron secret OR authenticated admin
-    if (!authorizeCron(req) && !isAuthenticated) {
-      return res.status(401).json({ error: "Unauthorized" });
-    }
-
-    // Ensure DB is connected before processing
-    await connectDB();
-
-    const result = await fetchContests();
-    res.json({ success: true, ...result });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+  if (!authorizeCron(req) && !isAdmin) {
+    throw new ApiError(401, "Unauthorized");
   }
-};
+
+  await connectDB();
+  const result = await fetchContests();
+  res.status(200).json(new ApiResponse(200, result, "Contests cron completed"));
+});
 
 /**
- * POST/GET /api/cron/all
  * Unified endpoint for Hobby plan - runs both sync and contests
  */
-export const handleUnifiedCron = async (req, res) => {
-  try {
-    if (!authorizeCron(req)) {
-      return res.status(401).json({ error: "Unauthorized" });
-    }
-
-    // Ensure DB is connected before processing
-    await connectDB();
-
-    const startTime = Date.now();
-
-    // 1. Schedule jobs for everyone (adds to queue if not already there today)
-    const scheduleResult = await platformService.scheduleGlobalSync();
-
-    // 2. Process a batch of sync jobs from the queue
-    const syncResult = await processSyncJobs({ batchSize: 50 });
-
-    // 3. Fetch upcoming contests
-    const contestsResult = await fetchContests();
-
-    const finalResult = {
-      success: true,
-      executionMs: Date.now() - startTime,
-      schedule: scheduleResult,
-      sync: syncResult,
-      contests: contestsResult
-    };
-
-    // 4. Send Telegram notification (MUST await on Vercel or it will be killed)
-    await telegramService.sendSyncReport(finalResult).catch(err => {
-      console.error("Telegram notification failed:", err.message);
-    });
-
-    res.json(finalResult);
-  } catch (error) {
-    // Send failure notification to Telegram
-    await telegramService.sendFailureNotification(error.message).catch(err => {
-      console.error("Telegram failure notification failed:", err.message);
-    });
-
-    res.status(500).json({ error: error.message });
+export const handleUnifiedCron = catchAsync(async (req, res) => {
+  if (!authorizeCron(req)) {
+    throw new ApiError(401, "Unauthorized");
   }
-};
+
+  await connectDB();
+  const startTime = Date.now();
+
+  // 1. Schedule jobs for everyone
+  const scheduleResult = await platformService.scheduleGlobalSync();
+
+  // 2. Process a batch of sync jobs
+  const syncResult = await processSyncJobs({ batchSize: 50 });
+
+  // 3. Fetch upcoming contests
+  const contestsResult = await fetchContests();
+
+  const finalResult = {
+    executionMs: Date.now() - startTime,
+    schedule: scheduleResult,
+    sync: syncResult,
+    contests: contestsResult
+  };
+
+  // 4. Send Telegram report (await to ensure it finishes on serverless)
+  try {
+    await telegramService.sendSyncReport({ success: true, ...finalResult });
+  } catch (err) {
+    console.error("Telegram report failed:", err.message);
+  }
+
+  res.status(200).json(new ApiResponse(200, finalResult, "Unified cron completed"));
+});
+
 
 
 

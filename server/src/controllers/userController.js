@@ -29,51 +29,47 @@ export const getProfile = catchAsync(async (req, res) => {
  * PUT /api/user/profile
  */
 export const updateProfile = catchAsync(async (req, res) => {
-  const { name, avatar, bio, location, website, socials, publicProfile } = req.body;
+  const { name, avatar, bio, location, website, socials, publicProfile: ppUpdate } = req.body;
+  const updates = {};
 
-  const user = await User.findById(req.user._id);
+  if (name?.trim()) updates.name = name.trim();
+
+  // Profile fields
+  const p = { avatar, bio, location, website, socials };
+  Object.keys(p).forEach(k => {
+    if (p[k] !== undefined) updates[`profile.${k}`] = p[k];
+  });
+
+  // Public profile settings
+  if (ppUpdate !== undefined) {
+    if (ppUpdate.username) {
+      // Check if username differs (enforced logic)
+      const user = await User.findById(req.user._id).select("publicProfile.username").lean();
+      if (user?.publicProfile?.username && ppUpdate.username !== user.publicProfile.username) {
+        throw new ApiError(400, "Username is locked and cannot be changed");
+      }
+    }
+
+    Object.keys(ppUpdate).forEach(k => {
+      updates[`publicProfile.${k}`] = ppUpdate[k];
+    });
+  }
+
+  const user = await User.findByIdAndUpdate(
+    req.user._id,
+    { $set: updates },
+    { new: true, runValidators: true }
+  ).lean();
+
   if (!user) {
     throw new ApiError(404, "User not found");
   }
-
-  // Update name
-  if (name && name.trim()) {
-    user.name = name.trim();
-  }
-
-  // Update profile fields
-  if (!user.profile) {
-    user.profile = {};
-  }
-
-  const profileFields = { avatar, bio, location, website, socials };
-  Object.keys(profileFields).forEach(key => {
-    if (profileFields[key] !== undefined) {
-      user.profile[key] = profileFields[key];
-    }
-  });
-
-  // Update public profile settings
-  if (publicProfile !== undefined) {
-    if (!user.publicProfile) {
-      user.publicProfile = {};
-    }
-
-    // Prevention of username change (enforced to email prefix)
-    if (publicProfile.username && publicProfile.username !== user.publicProfile.username) {
-      throw new ApiError(400, "Username is locked to your email identity and cannot be changed");
-    }
-
-    Object.assign(user.publicProfile, publicProfile);
-    user.markModified('publicProfile');
-  }
-
-  await user.save();
 
   res.status(200).json(
     new ApiResponse(200, { user: sanitizeUser(user) }, "Profile updated successfully")
   );
 });
+
 
 /**
  * Update user settings
@@ -81,26 +77,26 @@ export const updateProfile = catchAsync(async (req, res) => {
  */
 export const updateSettings = catchAsync(async (req, res) => {
   const { theme, timezone } = req.body;
+  const updates = {};
 
-  const user = await User.findById(req.user._id);
+  if (theme !== undefined) updates["settings.theme"] = theme;
+  if (timezone !== undefined) updates["settings.timezone"] = timezone;
+
+  const user = await User.findByIdAndUpdate(
+    req.user._id,
+    { $set: updates },
+    { new: true }
+  ).lean();
+
   if (!user) {
     throw new ApiError(404, "User not found");
   }
-
-  // Initialize settings if not exists
-  if (!user.settings) {
-    user.settings = {};
-  }
-
-  if (theme !== undefined) user.settings.theme = theme;
-  if (timezone !== undefined) user.settings.timezone = timezone;
-
-  await user.save();
 
   res.status(200).json(
     new ApiResponse(200, { settings: user.settings }, "Settings updated successfully")
   );
 });
+
 
 /**
  * Update user avatar
