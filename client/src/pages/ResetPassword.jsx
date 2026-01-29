@@ -19,10 +19,8 @@ export default function ResetPassword() {
     const verifyToken = async () => {
       try {
         const res = await api.get(`/auth/verify-reset-token/${token}`);
-        if (res.data.valid) {
+        if (res.data.data?.valid) {
           setValid(true);
-        } else {
-          setError(res.data.message);
         }
       } catch (err) {
         setError(err.response?.data?.message || "Invalid or expired reset link.");

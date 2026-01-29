@@ -52,7 +52,7 @@ export default function AdminDashboard() {
     try {
       setSync({ ...sync, contest: true });
       const res = await api.post("/cron/contests");
-      notify("success", `Contests Updated: ${res.data.totalFetched || 0} items`);
+      notify("success", `Contests Updated: ${res.data.data?.totalFetched || 0} items`);
     } catch {
       notify("error", "Contest sync sequence failed");
     } finally { setSync({ ...sync, contest: false }); }

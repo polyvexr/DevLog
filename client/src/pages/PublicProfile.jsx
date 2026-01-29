@@ -24,7 +24,7 @@ export default function PublicProfile() {
 
   useEffect(() => {
     api.get(`/u/${username}`)
-      .then(res => setData(res.data))
+      .then(res => setData(res.data.data))
       .catch(err => setError(err.response?.status === 404 ? "Neural node not found or restricted" : "Neural connection severed"))
       .finally(() => setLoading(false));
   }, [username]);

@@ -93,9 +93,13 @@ export function useSettings() {
             showStatus("success", "Uploading to Cloudinary...");
             const res = await api.post("/user/avatar", upData);
             if (res.data.success) {
-                setFormData(prev => ({ ...prev, avatar: res.data.url }));
-                showStatus("success", "Asset synchronized successfully");
-                refreshUser();
+                // Backend returns: { success: true, data: { url: "..." } }
+                const url = res.data.data?.url;
+                if (url) {
+                    setFormData(prev => ({ ...prev, avatar: url }));
+                    showStatus("success", "Asset synchronized successfully");
+                    refreshUser();
+                }
             }
         } catch (err) {
             console.error("Upload failure:", err);
