@@ -40,6 +40,8 @@ export const getAllUsers = catchAsync(async (req, res) => {
   res.status(200).json(new ApiResponse(200, usersWithStats));
 });
 
+import { platformService } from "../services/platformService.js";
+
 // Concurrency configuration
 const PARALLEL_CONFIG = {
   maxConcurrentUsers: 5,     // Max users to sync in parallel per platform
@@ -49,7 +51,7 @@ const PARALLEL_CONFIG = {
 /**
  * Sync a single user's platform data
  */
-async function syncSingleUser(platformStat, fetchFunction) {
+async function syncSingleUser(platformStat, platform, fetchFunction) {
   if (!platformStat.username || !platformStat.userId) {
     return { status: "skipped", reason: "Missing username or userId" };
   }
@@ -58,13 +60,14 @@ async function syncSingleUser(platformStat, fetchFunction) {
     const data = await fetchFunction(platformStat.username);
 
     if (data && Object.keys(data).length > 0 && !data.error) {
-      // Use findOneAndUpdate for better atomic updates
+      const stats = platformService.extractStats(platform, data);
+
       await PlatformStat.updateOne(
         { _id: platformStat._id },
         {
           $set: {
             data,
-            stats: data,
+            stats,
             lastUpdated: Date.now()
           }
         }
@@ -145,7 +148,7 @@ async function syncPlatformStatsParallel(platform) {
 
   const results = await parallelProcess(
     platformStats,
-    (stat) => syncSingleUser(stat, fetchFunction),
+    (stat) => syncSingleUser(stat, platform, fetchFunction),
     PARALLEL_CONFIG.maxConcurrentUsers
   );
 
@@ -206,12 +209,13 @@ export const syncPlatform = catchAsync(async (req, res) => {
   res.status(200).json(new ApiResponse(200, { results }, `${platform} sync completed`));
 });
 
-// Legacy handlers simplified
-export const syncLeetCode = (req, res) => { req.params.platform = "leetcode"; return syncPlatform(req, res); };
-export const syncCodeforces = (req, res) => { req.params.platform = "codeforces"; return syncPlatform(req, res); };
-export const syncGitHub = (req, res) => { req.params.platform = "github"; return syncPlatform(req, res); };
-export const syncCodeChef = (req, res) => { req.params.platform = "codechef"; return syncPlatform(req, res); };
-export const syncAtCoder = (req, res) => { req.params.platform = "atcoder"; return syncPlatform(req, res); };
+// Legacy handlers simplified - using the base syncPlatform handler
+export const syncLeetCode = (req, res, next) => { req.params.platform = "leetcode"; return syncPlatform(req, res, next); };
+export const syncCodeforces = (req, res, next) => { req.params.platform = "codeforces"; return syncPlatform(req, res, next); };
+export const syncGitHub = (req, res, next) => { req.params.platform = "github"; return syncPlatform(req, res, next); };
+export const syncCodeChef = (req, res, next) => { req.params.platform = "codechef"; return syncPlatform(req, res, next); };
+export const syncAtCoder = (req, res, next) => { req.params.platform = "atcoder"; return syncPlatform(req, res, next); };
+
 
 /**
  * Get sync statistics

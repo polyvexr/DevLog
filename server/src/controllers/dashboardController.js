@@ -3,6 +3,7 @@ import Contest from "../models/Contest.js";
 import User from "../models/User.js";
 import catchAsync from "../utils/catchAsync.js";
 import ApiResponse from "../utils/ApiResponse.js";
+import ApiError from "../utils/ApiError.js";
 
 /**
  * Dashboard Controller - Combined endpoint for dashboard data
@@ -105,7 +106,7 @@ function calculateSummary(platformStats) {
         break;
 
       case "codeforces":
-        const cfRating = data.rating || 0;
+        const cfRating = (data.rating || data.stats?.rating) || 0;
         if (cfRating >= 1200) {
           summary.highlights.push({
             platform: "codeforces",
@@ -131,5 +132,4 @@ function calculateSummary(platformStats) {
   return summary;
 }
 
-export default { getDashboardData };
 
