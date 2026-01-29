@@ -13,7 +13,6 @@ import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 
 // Lazy loaded pages (code splitting)
-const LinkPlatform = lazy(() => import("./pages/LinkPlatform"));
 const LeetCodeDetails = lazy(() => import("./pages/LeetCodeDetails"));
 const CodeforcesDetails = lazy(() => import("./pages/CodeforcesDetails"));
 const GitHubDetails = lazy(() => import("./pages/GitHubDetails"));
@@ -119,15 +118,6 @@ function App() {
           }
         />
 
-        {/* Platform routes */}
-        <Route
-          path="/link"
-          element={
-            <PrivateRoute>
-              <LinkPlatform />
-            </PrivateRoute>
-          }
-        />
         <Route
           path="/leetcode"
           element={

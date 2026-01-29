@@ -47,7 +47,6 @@ export default function Sidebar() {
 
   const navItems = [
     { path: "/", icon: FiBarChart2, label: "Dashboard", exact: true },
-    { path: "/link", icon: FiLink, label: "Connect Platforms" },
     { path: "/contests", icon: FiTarget, label: "Contests" },
     { path: "/settings", icon: FiSettings, label: "Settings" },
   ];
