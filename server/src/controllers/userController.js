@@ -117,6 +117,47 @@ export const updateSettings = async (req, res) => {
 };
 
 /**
+ * Update user avatar
+ * POST /api/user/avatar
+ */
+export const updateAvatar = async (req, res) => {
+  try {
+    logger.info("Avatar upload request received", { userId: req.user._id });
+
+    if (!req.file) {
+      logger.warn("Avatar upload failed: No file in request");
+      return res.status(400).json({ success: false, message: "No file uploaded" });
+    }
+
+    logger.info("File received from Multer/Cloudinary", {
+      path: req.file.path,
+      size: req.file.size,
+      mimetype: req.file.mimetype
+    });
+
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    if (!user.profile) user.profile = {};
+    user.profile.avatar = req.file.path;
+    await user.save();
+
+    logger.info("Avatar updated in database", { userId: req.user._id, url: req.file.path });
+
+    res.json({
+      success: true,
+      url: req.file.path,
+      message: "Avatar updated successfully"
+    });
+  } catch (err) {
+    logger.error("Update avatar error", { error: err.message, stack: err.stack });
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+/**
  * Update password from profile
  * PUT /api/user/password
  */

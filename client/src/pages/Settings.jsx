@@ -86,7 +86,9 @@ export default function Settings() {
         refreshUser();
       }
     } catch (err) {
-      showStatus("error", "Upload sequence failed");
+      console.error("Upload failure:", err);
+      const msg = err.response?.data?.message || "Upload sequence failed";
+      showStatus("error", msg);
     } finally {
       setUploading(false);
     }

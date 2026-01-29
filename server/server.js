@@ -61,8 +61,8 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-// Body parser with size limit (prevent DoS)
-app.use(express.json({ limit: "10kb" }));
+// Body parser with size limit
+app.use(express.json({ limit: "1mb" }));
 
 // Security middleware - helmet for HTTP headers
 app.use(helmet({
