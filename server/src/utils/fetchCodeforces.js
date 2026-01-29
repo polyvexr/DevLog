@@ -2,18 +2,21 @@ import axios from "axios";
 
 export const fetchCodeforces = async (username) => {
   try {
-    // Fetch user info
-    const userInfoRes = await axios.get(
-      `https://codeforces.com/api/user.info?handles=${username}`,
-      { timeout: 15000 }
-    );
+    // Parallel fetch all CF data
+    const [userInfoRes, submissionsRes, ratingRes] = await Promise.all([
+      axios.get(`https://codeforces.com/api/user.info?handles=${username}`, { timeout: 15000 }).catch(err => err.response),
+      axios.get(`https://codeforces.com/api/user.status?handle=${username}&from=1&count=10000`, { timeout: 20000 }).catch(err => err.response),
+      axios.get(`https://codeforces.com/api/user.rating?handle=${username}`, { timeout: 15000 }).catch(err => err.response),
+    ]);
 
-    if (userInfoRes.data.status !== "OK") return {};
+    if (!userInfoRes || userInfoRes.data?.status !== "OK") {
+      return { error: "User not found or API error" };
+    }
 
     const user = userInfoRes.data.result[0];
 
-    // Fetch user submissions
-    let submissionStats = {
+    // Process submissions
+    const submissionStats = {
       totalSubmissions: 0,
       acceptedSubmissions: 0,
       problemsSolved: 0,
@@ -22,51 +25,32 @@ export const fetchCodeforces = async (username) => {
       verdictDistribution: {},
     };
 
-    try {
-      const submissionsRes = await axios.get(
-        `https://codeforces.com/api/user.status?handle=${username}&from=1&count=10000`
-      );
+    if (submissionsRes?.data?.status === "OK") {
+      const submissions = submissionsRes.data.result;
+      submissionStats.totalSubmissions = submissions.length;
 
-      if (submissionsRes.data.status === "OK") {
-        const submissions = submissionsRes.data.result;
-        submissionStats.totalSubmissions = submissions.length;
+      const solvedProblems = new Set();
+      submissions.forEach((sub) => {
+        const verdict = sub.verdict || "UNKNOWN";
+        submissionStats.verdictDistribution[verdict] = (submissionStats.verdictDistribution[verdict] || 0) + 1;
 
-        const solvedProblems = new Set();
-        const problemRatings = {};
-        const languages = {};
-        const verdicts = {};
+        if (verdict === "OK") {
+          submissionStats.acceptedSubmissions++;
+          solvedProblems.add(`${sub.problem.contestId}-${sub.problem.index}`);
 
-        submissions.forEach((submission) => {
-          // Count verdicts
-          const verdict = submission.verdict || "UNKNOWN";
-          verdicts[verdict] = (verdicts[verdict] || 0) + 1;
+          const rating = sub.problem.rating || "Unrated";
+          submissionStats.problemsByRating[rating] = (submissionStats.problemsByRating[rating] || 0) + 1;
+        }
 
-          if (verdict === "OK") {
-            submissionStats.acceptedSubmissions++;
-            const problemId = `${submission.problem.contestId}-${submission.problem.index}`;
-            solvedProblems.add(problemId);
+        const lang = sub.programmingLanguage;
+        submissionStats.languagesUsed[lang] = (submissionStats.languagesUsed[lang] || 0) + 1;
+      });
 
-            // Count problems by rating
-            const rating = submission.problem.rating || "Unrated";
-            problemRatings[rating] = (problemRatings[rating] || 0) + 1;
-          }
-
-          // Count languages
-          const lang = submission.programmingLanguage;
-          languages[lang] = (languages[lang] || 0) + 1;
-        });
-
-        submissionStats.problemsSolved = solvedProblems.size;
-        submissionStats.problemsByRating = problemRatings;
-        submissionStats.languagesUsed = languages;
-        submissionStats.verdictDistribution = verdicts;
-      }
-    } catch (err) {
-      console.log("CF Submissions Fetch Error:", err.message);
+      submissionStats.problemsSolved = solvedProblems.size;
     }
 
-    // Fetch user rating history
-    let ratingHistory = {
+    // Process rating history
+    const ratingHistory = {
       totalContests: 0,
       bestContestRank: null,
       worstContestRank: null,
@@ -74,41 +58,33 @@ export const fetchCodeforces = async (username) => {
       ratingChanges: [],
     };
 
-    try {
-      const ratingRes = await axios.get(
-        `https://codeforces.com/api/user.rating?handle=${username}`
-      );
+    if (ratingRes?.data?.status === "OK") {
+      const contests = ratingRes.data.result;
+      ratingHistory.totalContests = contests.length;
 
-      if (ratingRes.data.status === "OK") {
-        const contests = ratingRes.data.result;
-        ratingHistory.totalContests = contests.length;
+      if (contests.length > 0) {
+        let totalRank = 0;
+        let bestRank = Infinity;
+        let worstRank = -Infinity;
 
-        if (contests.length > 0) {
-          let totalRank = 0;
-          let bestRank = contests[0].rank;
-          let worstRank = contests[0].rank;
+        ratingHistory.ratingChanges = contests.map((c) => {
+          totalRank += c.rank;
+          bestRank = Math.min(bestRank, c.rank);
+          worstRank = Math.max(worstRank, c.rank);
 
-          contests.forEach((contest) => {
-            totalRank += contest.rank;
-            if (contest.rank < bestRank) bestRank = contest.rank;
-            if (contest.rank > worstRank) worstRank = contest.rank;
+          return {
+            contestName: c.contestName,
+            rank: c.rank,
+            oldRating: c.oldRating,
+            newRating: c.newRating,
+            ratingChange: c.newRating - c.oldRating,
+          };
+        });
 
-            ratingHistory.ratingChanges.push({
-              contestName: contest.contestName,
-              rank: contest.rank,
-              oldRating: contest.oldRating,
-              newRating: contest.newRating,
-              ratingChange: contest.newRating - contest.oldRating,
-            });
-          });
-
-          ratingHistory.bestContestRank = bestRank;
-          ratingHistory.worstContestRank = worstRank;
-          ratingHistory.averageRank = Math.round(totalRank / contests.length);
-        }
+        ratingHistory.bestContestRank = bestRank;
+        ratingHistory.worstContestRank = worstRank;
+        ratingHistory.averageRank = Math.round(totalRank / contests.length);
       }
-    } catch (err) {
-      console.log("CF Rating Fetch Error:", err.message);
     }
 
     return {
@@ -122,22 +98,16 @@ export const fetchCodeforces = async (username) => {
       organization: user.organization || "",
       country: user.country || "",
       city: user.city || "",
-      registrationTime: user.registrationTimeSeconds
-        ? new Date(user.registrationTimeSeconds * 1000).toISOString()
-        : null,
-      lastOnlineTime: user.lastOnlineTimeSeconds
-        ? new Date(user.lastOnlineTimeSeconds * 1000).toISOString()
-        : null,
+      registrationTime: user.registrationTimeSeconds ? new Date(user.registrationTimeSeconds * 1000).toISOString() : null,
+      lastOnlineTime: user.lastOnlineTimeSeconds ? new Date(user.lastOnlineTimeSeconds * 1000).toISOString() : null,
       avatar: user.avatar || user.titlePhoto || "",
 
-      // Submission statistics
       ...submissionStats,
-
-      // Rating history
       ...ratingHistory,
     };
   } catch (err) {
     console.log("CF Fetch Error:", err.message);
-    return {};
+    return { error: err.message };
   }
 };
+
