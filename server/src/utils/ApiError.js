@@ -2,10 +2,12 @@
  * Custom error class for API errors
  */
 class ApiError extends Error {
-    constructor(statusCode, message, isOperational = true, stack = "") {
+    constructor(statusCode, message, errors = [], stack = "") {
         super(message);
         this.statusCode = statusCode;
-        this.isOperational = isOperational;
+        this.errors = errors;
+        this.success = false;
+
         if (stack) {
             this.stack = stack;
         } else {

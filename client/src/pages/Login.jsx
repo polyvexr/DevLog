@@ -18,8 +18,9 @@ export default function Login() {
       setError("");
       setLoading(true);
       const res = await api.post("/auth/login", form);
-      login(res.data.token, res.data.isAdmin);
-      if (res.data.isAdmin) navigate("/admin");
+      const { token, isAdmin } = res.data.data;
+      login(token, isAdmin);
+      if (isAdmin) navigate("/admin");
       else navigate("/");
     } catch (err) {
       setError(

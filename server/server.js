@@ -150,9 +150,17 @@ app.use((req, res, next) => {
 
 // Global error handler
 app.use((err, req, res, next) => {
+  let { statusCode, message, errors } = err;
+
+  if (!statusCode) {
+    statusCode = err.name === "ValidationError" ? 400 : 500;
+  }
+
   // Log error
-  logger.error("Unhandled error", {
+  logger.error(message || "Unhandled error", {
+    statusCode,
     error: err.message,
+    errors: err.errors,
     stack: process.env.NODE_ENV === "development" ? err.stack : undefined,
     path: req.path,
     method: req.method,
@@ -160,18 +168,17 @@ app.use((err, req, res, next) => {
 
   // CORS errors
   if (err.message && err.message.includes("CORS")) {
-    return res.status(403).json({
-      success: false,
-      message: "CORS error: Origin not allowed",
-    });
+    statusCode = 403;
+    message = "CORS error: Origin not allowed";
   }
 
-  // Default error response
-  res.status(err.status || 500).json({
+  res.status(statusCode).json({
     success: false,
-    message: process.env.NODE_ENV === "production"
+    statusCode,
+    message: statusCode === 500 && process.env.NODE_ENV === "production"
       ? "Internal server error"
-      : err.message,
+      : message,
+    errors: errors || []
   });
 });
 

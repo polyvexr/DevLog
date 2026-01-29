@@ -5,50 +5,52 @@ import mongoose from "mongoose";
  * Replaces BullMQ/Redis with MongoDB-based job state management
  */
 const syncJobSchema = new mongoose.Schema({
-  userId: { 
-    type: mongoose.Schema.Types.ObjectId, 
-    ref: "User", 
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
     required: true,
-    index: true 
+    index: true
   },
-  platform: { 
-    type: String, 
-    enum: ["leetcode", "codeforces", "github", "codechef", "atcoder"], 
-    required: true 
+  platform: {
+    type: String,
+    enum: ["leetcode", "codeforces", "github", "codechef", "atcoder"],
+    required: true
   },
-  status: { 
-    type: String, 
-    enum: ["pending", "processing", "completed", "failed"], 
+  status: {
+    type: String,
+    enum: ["pending", "processing", "completed", "failed"],
     default: "pending",
-    index: true 
+    index: true
   },
-  
+
   // Idempotency - prevents duplicate processing
-  idempotencyKey: { 
-    type: String, 
-    unique: true, 
+  idempotencyKey: {
+    type: String,
+    unique: true,
     sparse: true,
-    index: true 
+    index: true
   },
-  
+
   // Execution tracking
   createdAt: { type: Date, default: Date.now },
   startedAt: { type: Date, default: null },
   completedAt: { type: Date, default: null },
-  
+
   // Retry handling with exponential backoff
   retryCount: { type: Number, default: 0 },
   maxRetries: { type: Number, default: 3 },
   nextRetryAt: { type: Date, default: null, index: true },
   lastError: { type: String, default: null },
-  
+
   // Metadata
-  triggeredBy: { 
-    type: String, 
-    enum: ["user", "admin", "cron"], 
-    default: "user" 
+  triggeredBy: {
+    type: String,
+    enum: ["user", "admin", "cron"],
+    default: "user"
   },
   executionDurationMs: { type: Number, default: null }
+}, {
+  timestamps: true
 });
 
 // Compound index for efficient cron job queries
