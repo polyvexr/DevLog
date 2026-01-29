@@ -1,4 +1,4 @@
-import { FiUser, FiMapPin, FiLink, FiCamera, FiRefreshCw, FiPlus, FiTrash2 } from "react-icons/fi";
+import { FiUser, FiMapPin, FiLink, FiCamera, FiRefreshCw, FiPlus, FiTrash2, FiEdit3 } from "react-icons/fi";
 
 export default function PersonalInfo({
     isEditing,
@@ -17,7 +17,7 @@ export default function PersonalInfo({
                     <h2 className="text-xl font-black text-white italic uppercase tracking-tighter underline decoration-blue-500/30 decoration-4">Personal Identity</h2>
                 </div>
                 <button onClick={() => setIsEditing(!isEditing)} className="p-2.5 bg-white/5 rounded-lg text-gray-400 hover:text-white transition-all">
-                    <FiUser />
+                    <FiEdit3 />
                 </button>
             </div>
 
