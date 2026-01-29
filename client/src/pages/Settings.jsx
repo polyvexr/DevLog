@@ -24,6 +24,7 @@ export default function Settings() {
   const [showPass, setShowPass] = useState({ current: false, new: false });
   const [dialog, setDialog] = useState({ open: false, platform: null });
   const [newLink, setNewLink] = useState({ platform: "leetcode", username: "" });
+  const [uploading, setUploading] = useState(false);
 
   const [formData, setFormData] = useState({
     name: "", bio: "", location: "", website: "", avatar: "", socials: [],
@@ -57,10 +58,38 @@ export default function Settings() {
     e.preventDefault();
     api.put("/user/profile", {
       name: formData.name, bio: formData.bio, location: formData.location,
-      website: formData.website, socials: formData.socials
+      website: formData.website, socials: formData.socials,
+      avatar: formData.avatar
     })
-      .then(() => { showStatus("success", "Identity updated"); setIsEditing(false); })
+      .then(() => {
+        showStatus("success", "Identity updated");
+        setIsEditing(false);
+        refreshUser();
+      })
       .catch(err => showStatus("error", err.response?.data?.message || "Update failed"));
+  };
+
+  const handleAvatarUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const upData = new FormData();
+    upData.append("avatar", file);
+
+    try {
+      setUploading(true);
+      showStatus("success", "Uploading to Cloudinary...");
+      const res = await api.post("/user/avatar", upData);
+      if (res.data.success) {
+        setFormData(prev => ({ ...prev, avatar: res.data.url }));
+        showStatus("success", "Asset synchronized successfully");
+        refreshUser();
+      }
+    } catch (err) {
+      showStatus("error", "Upload sequence failed");
+    } finally {
+      setUploading(false);
+    }
   };
 
   const linkPlatform = async (e) => {
@@ -100,7 +129,27 @@ export default function Settings() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 fade-in-scale">
         <div className="flex gap-4 items-center">
-          <Link to="/" className="p-3 bg-white/5 border border-white/10 rounded-xl hover:bg-blue-600 transition-all"><FiX /></Link>
+          <div className="flex items-center justify-between  fade-in-scale">
+            <Link
+              to="/"
+              className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-white transition-all hover:bg-blue-600 hover:border-blue-500 hover:-translate-x-1 group shadow-xl active:scale-95"
+              title="Back to Dashboard"
+            >
+              <svg
+                className="w-5 h-5 group-hover:-translate-x-0.5 transition-transform"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={3}
+                  d="M15 19l-7-7 7-7"
+                />
+              </svg>
+            </Link>
+          </div>
           <h1 className="text-4xl font-black text-white italic tracking-tighter">System<span className="animate-text-shine">Settings</span></h1>
         </div>
         {status.message && (
@@ -120,7 +169,43 @@ export default function Settings() {
           <button onClick={() => setIsEditing(!isEditing)} className="p-2.5 bg-white/5 rounded-lg text-gray-400 hover:text-white transition-all"><FiEdit3 /></button>
         </div>
 
-        <form onSubmit={handleUpdate} className="space-y-6">
+        <form onSubmit={handleUpdate} className="space-y-8">
+          {/* Avatar Upload */}
+          <div className="flex flex-col items-center gap-6 pb-4 border-b border-white/5">
+            <div className="relative group/avatar">
+              <div className={`w-32 h-32 rounded-[2.5rem] bg-gradient-to-br from-blue-600 to-purple-600 p-[2px] transition-all duration-500 ${isEditing ? "hover:scale-105 cursor-pointer shadow-[0_0_30px_rgba(37,99,235,0.3)]" : "opacity-50"}`}>
+                <div className="w-full h-full rounded-[2.4rem] bg-[#0A0A0A] overflow-hidden flex items-center justify-center relative">
+                  {formData.avatar ? (
+                    <img src={formData.avatar} className={`w-full h-full object-cover transition-all ${uploading ? "opacity-20 blur-sm" : ""}`} />
+                  ) : (
+                    <FiUser className="text-4xl text-white/10" />
+                  )}
+                  {uploading && (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <FiRefreshCw className="text-white animate-spin text-2xl" />
+                    </div>
+                  )}
+                  {isEditing && !uploading && (
+                    <div className="absolute inset-0 bg-blue-600/40 opacity-0 group-hover/avatar:opacity-100 flex items-center justify-center transition-all">
+                      <FiCamera className="text-white text-2xl" />
+                    </div>
+                  )}
+                </div>
+              </div>
+              {isEditing && (
+                <input
+                  type="file"
+                  className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                  onChange={handleAvatarUpload}
+                  accept="image/*"
+                />
+              )}
+            </div>
+            <div className="text-center">
+              <h3 className="text-[9px] font-black uppercase tracking-[0.3em] text-gray-500 mb-1">Profile Photo</h3>
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {[
               { l: "Name", k: "name", i: FiUser }, { l: "Location", k: "location", i: FiMapPin }, { l: "Website", k: "website", i: FiLink }

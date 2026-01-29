@@ -39,16 +39,6 @@ export function PlatformDetailsHeader({
             />
           </svg>
         </button>
-
-        {onUnlink && (
-          <button
-            onClick={onUnlink}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500 hover:text-white transition-all text-xs font-black uppercase tracking-widest group"
-          >
-            <FiTrash2 className="group-hover:scale-110 transition-transform" />
-            Unlink Platform
-          </button>
-        )}
       </div>
 
       <div className="mb-12 fade-in-scale">
