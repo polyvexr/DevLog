@@ -26,7 +26,7 @@ export default function Settings() {
   const [newLink, setNewLink] = useState({ platform: "leetcode", username: "" });
 
   const [formData, setFormData] = useState({
-    name: "", bio: "", location: "", website: "", avatar: "",
+    name: "", bio: "", location: "", website: "", avatar: "", socials: [],
     publicProfile: { enabled: true, showLeetCode: true, showCodeforces: true, showGitHub: true, showCodeChef: true, showAtCoder: true },
     currentPassword: "", newPassword: ""
   });
@@ -42,6 +42,7 @@ export default function Settings() {
       setFormData(prev => ({
         ...prev,
         name: u.name || "", bio: u.profile?.bio || "", location: u.profile?.location || "", website: u.profile?.website || "", avatar: u.profile?.avatar || "",
+        socials: u.profile?.socials || [],
         publicProfile: { ...prev.publicProfile, ...u.publicProfile }
       }));
     } catch (err) { showStatus("error", "Sync failure"); } finally { setLoading(false); }
@@ -54,7 +55,10 @@ export default function Settings() {
 
   const handleUpdate = (e) => {
     e.preventDefault();
-    api.put("/user/profile", { name: formData.name, bio: formData.bio, location: formData.location, website: formData.website })
+    api.put("/user/profile", {
+      name: formData.name, bio: formData.bio, location: formData.location,
+      website: formData.website, socials: formData.socials
+    })
       .then(() => { showStatus("success", "Identity updated"); setIsEditing(false); })
       .catch(err => showStatus("error", err.response?.data?.message || "Update failed"));
   };
@@ -134,6 +138,38 @@ export default function Settings() {
             <label className="text-[8px] font-black uppercase tracking-[0.2em] text-gray-500 ml-1">Bio</label>
             <textarea disabled={!isEditing} rows={2} className="w-full p-4 bg-white/5 border border-white/5 rounded-xl text-white font-medium disabled:opacity-30 resize-none" value={formData.bio} onChange={e => setFormData({ ...formData, bio: e.target.value })} />
           </div>
+
+          <div className="space-y-4">
+            <label className="text-[8px] font-black uppercase tracking-[0.2em] text-gray-500 ml-1">Social Links (Tagged)</label>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {formData.socials.map((s, i) => (
+                <div key={i} className={`flex items-center gap-2 bg-white/5 border border-white/10 p-3 rounded-xl transition-all ${!isEditing ? "opacity-30 border-white/5" : ""}`}>
+                  <div className="flex-1 flex flex-col">
+                    <span className="text-[7px] font-black text-blue-500 uppercase">{s.platform}</span>
+                    <span className="text-xs font-bold text-white truncate">{s.username}</span>
+                  </div>
+                  {isEditing && (
+                    <button type="button" onClick={() => setFormData({ ...formData, socials: formData.socials.filter((_, idx) => idx !== i) })} className="p-2 text-red-500 hover:bg-red-500/10 rounded-lg"><FiTrash2 size={12} /></button>
+                  )}
+                </div>
+              ))}
+              {isEditing && (
+                <div className="flex gap-2 bg-white/5 border border-blue-500/20 p-2 rounded-xl group focus-within:ring-1 ring-blue-500/50 transition-all">
+                  <input type="text" placeholder="Tag (e.g. LinkedIn)" className="w-1/3 bg-transparent p-1 text-[10px] font-black text-blue-400 uppercase outline-none" id="social-tag" />
+                  <input type="text" placeholder="URL of profile" className="flex-1 bg-transparent p-1 text-[10px] font-bold text-white outline-none" id="social-url" />
+                  <button type="button" onClick={() => {
+                    const tag = document.getElementById('social-tag');
+                    const url = document.getElementById('social-url');
+                    if (tag.value && url.value) {
+                      setFormData({ ...formData, socials: [...formData.socials, { platform: tag.value, username: url.value }] });
+                      tag.value = ''; url.value = '';
+                    }
+                  }} className="p-2 bg-blue-600 text-white rounded-lg hover:scale-105 active:scale-95 transition-all"><FiPlus size={12} /></button>
+                </div>
+              )}
+            </div>
+          </div>
+
           {isEditing && <button className="w-full py-4 bg-blue-600 text-white font-black text-[10px] uppercase tracking-widest rounded-xl">Commit Changes</button>}
         </form>
       </section>
