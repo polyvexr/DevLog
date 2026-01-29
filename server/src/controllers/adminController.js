@@ -6,6 +6,9 @@ import { fetchGithub } from "../utils/fetchGithub.js";
 import { fetchCodeChef } from "../utils/fetchCodeChef.js";
 import { fetchAtCoder } from "../utils/fetchAtCoder.js";
 import logger from "../utils/logger.js";
+import catchAsync from "../utils/catchAsync.js";
+import ApiResponse from "../utils/ApiResponse.js";
+import ApiError from "../utils/ApiError.js";
 
 // Platform fetch function mapping
 const platformFetchers = {
@@ -18,32 +21,24 @@ const platformFetchers = {
 
 /**
  * Get all users with their platform details
+ * Optimized to avoid N+1 queries
  */
-export const getAllUsers = async (req, res) => {
-  try {
-    const users = await User.find({}, "name email role publicProfile createdAt").lean();
+export const getAllUsers = catchAsync(async (req, res) => {
+  const users = await User.find({}, "name email role publicProfile createdAt").lean();
+  const userIds = users.map(u => u._id);
 
-    // For each user, find their platform stats
-    const usersWithStats = await Promise.all(users.map(async (user) => {
-      const platforms = await PlatformStat.find({ userId: user._id }, "platform username stats lastUpdated").lean();
-      return {
-        ...user,
-        platforms
-      };
-    }));
+  const allPlatforms = await PlatformStat.find(
+    { userId: { $in: userIds } },
+    "userId platform username stats lastUpdated"
+  ).lean();
 
-    res.json({
-      success: true,
-      data: usersWithStats
-    });
-  } catch (error) {
-    logger.error("Get all users error", { error: error.message });
-    res.status(500).json({
-      success: false,
-      message: "Failed to get all users"
-    });
-  }
-};
+  const usersWithStats = users.map(user => ({
+    ...user,
+    platforms: allPlatforms.filter(p => p.userId.toString() === user._id.toString())
+  }));
+
+  res.status(200).json(new ApiResponse(200, usersWithStats));
+});
 
 // Concurrency configuration
 const PARALLEL_CONFIG = {
@@ -53,9 +48,6 @@ const PARALLEL_CONFIG = {
 
 /**
  * Sync a single user's platform data
- * @param {object} platformStat - Platform stat document
- * @param {function} fetchFunction - Platform fetch function
- * @returns {object} Sync result
  */
 async function syncSingleUser(platformStat, fetchFunction) {
   if (!platformStat.username || !platformStat.userId) {
@@ -65,12 +57,18 @@ async function syncSingleUser(platformStat, fetchFunction) {
   try {
     const data = await fetchFunction(platformStat.username);
 
-    // Only update if we got valid data
-    if (data && Object.keys(data).length > 0) {
-      platformStat.data = data;
-      platformStat.stats = data;
-      platformStat.lastUpdated = Date.now();
-      await platformStat.save();
+    if (data && Object.keys(data).length > 0 && !data.error) {
+      // Use findOneAndUpdate for better atomic updates
+      await PlatformStat.updateOne(
+        { _id: platformStat._id },
+        {
+          $set: {
+            data,
+            stats: data,
+            lastUpdated: Date.now()
+          }
+        }
+      );
 
       return {
         status: "success",
@@ -82,7 +80,7 @@ async function syncSingleUser(platformStat, fetchFunction) {
         status: "empty",
         user: platformStat.userId?.email || "Unknown",
         username: platformStat.username,
-        reason: "No data returned from API",
+        reason: data?.error || "No data returned from API",
       };
     }
   } catch (error) {
@@ -97,20 +95,13 @@ async function syncSingleUser(platformStat, fetchFunction) {
 
 /**
  * Process items in parallel with concurrency limit
- * @param {array} items - Items to process
- * @param {function} processor - Async function to process each item
- * @param {number} concurrency - Max concurrent operations
- * @returns {array} Results
  */
 async function parallelProcess(items, processor, concurrency) {
   const results = [];
-
-  // Process in batches
   for (let i = 0; i < items.length; i += concurrency) {
     const batch = items.slice(i, i + concurrency);
     const batchResults = await Promise.allSettled(batch.map(processor));
 
-    // Extract values from settled promises
     batchResults.forEach((result, idx) => {
       if (result.status === "fulfilled") {
         results.push(result.value);
@@ -123,21 +114,15 @@ async function parallelProcess(items, processor, concurrency) {
       }
     });
   }
-
   return results;
 }
 
 /**
- * Sync all users for a specific platform (with parallel processing)
- * @param {string} platform - Platform name
- * @returns {object} Sync results
+ * Sync all users for a specific platform
  */
 async function syncPlatformStatsParallel(platform) {
   const fetchFunction = platformFetchers[platform];
-
-  if (!fetchFunction) {
-    throw new Error(`Unknown platform: ${platform}`);
-  }
+  if (!fetchFunction) throw new Error(`Unknown platform: ${platform}`);
 
   const startTime = Date.now();
   const platformStats = await PlatformStat.find({ platform }).populate("userId", "email");
@@ -158,210 +143,102 @@ async function syncPlatformStatsParallel(platform) {
     return syncResults;
   }
 
-  // Process users in parallel with concurrency limit
   const results = await parallelProcess(
     platformStats,
     (stat) => syncSingleUser(stat, fetchFunction),
     PARALLEL_CONFIG.maxConcurrentUsers
   );
 
-  // Aggregate results
   results.forEach((result) => {
-    if (result.status === "success") {
-      syncResults.success++;
-    } else if (result.status === "failed") {
-      syncResults.failed++;
-    } else if (result.status === "empty") {
-      syncResults.empty++;
-    } else if (result.status === "skipped") {
-      syncResults.skipped++;
-    }
+    syncResults[result.status]++;
     syncResults.details.push(result);
   });
 
   syncResults.duration = Date.now() - startTime;
-
-  logger.info(`Sync completed for ${platform}`, {
-    total: syncResults.total,
-    success: syncResults.success,
-    failed: syncResults.failed,
-    duration: `${syncResults.duration}ms`,
-  });
-
+  logger.info(`Sync completed for ${platform}`, { ...syncResults, details: undefined });
   return syncResults;
 }
 
 /**
- * Sync all platforms for all users (PARALLEL - all platforms at once)
+ * Sync all platforms for all users
  */
-export const syncAllPlatforms = async (req, res) => {
-  try {
-    const startTime = Date.now();
-    const allPlatforms = Object.keys(platformFetchers);
+export const syncAllPlatforms = catchAsync(async (req, res) => {
+  const startTime = Date.now();
+  const allPlatforms = Object.keys(platformFetchers);
 
-    logger.info("Starting parallel sync for all platforms", {
-      platforms: allPlatforms,
-      concurrency: PARALLEL_CONFIG.maxConcurrentPlatforms
-    });
+  logger.info("Starting parallel sync for all platforms", { platforms: allPlatforms });
 
-    // Sync ALL platforms in parallel using Promise.allSettled
-    const platformResults = await Promise.allSettled(
-      allPlatforms.map(platform => syncPlatformStatsParallel(platform))
-    );
+  const platformResults = await Promise.allSettled(
+    allPlatforms.map(platform => syncPlatformStatsParallel(platform))
+  );
 
-    // Process results
-    const results = {};
-    platformResults.forEach((result, idx) => {
-      const platform = allPlatforms[idx];
-      if (result.status === "fulfilled") {
-        results[platform] = result.value;
-      } else {
-        results[platform] = {
-          platform,
-          error: result.reason?.message || "Unknown error",
-          total: 0,
-          success: 0,
-          failed: 0
-        };
-        logger.error(`Sync failed for ${platform}`, { error: result.reason?.message });
-      }
-    });
+  const results = {};
+  const totals = { total: 0, success: 0, failed: 0, empty: 0, skipped: 0, duration: 0 };
 
-    // Calculate totals
-    const totals = {
-      total: 0,
-      success: 0,
-      failed: 0,
-      empty: 0,
-      duration: Date.now() - startTime,
-    };
+  platformResults.forEach((result, idx) => {
+    const platform = allPlatforms[idx];
+    if (result.status === "fulfilled") {
+      results[platform] = result.value;
+      totals.total += result.value.total;
+      totals.success += result.value.success;
+      totals.failed += result.value.failed;
+      totals.empty += result.value.empty;
+      totals.skipped += result.value.skipped;
+    } else {
+      results[platform] = { platform, error: result.reason?.message || "Unknown error" };
+    }
+  });
 
-    Object.values(results).forEach((result) => {
-      if (result.total) {
-        totals.total += result.total;
-        totals.success += result.success || 0;
-        totals.failed += result.failed || 0;
-        totals.empty += result.empty || 0;
-      }
-    });
-
-    logger.info("Parallel sync completed for all platforms", {
-      ...totals,
-      durationSeconds: (totals.duration / 1000).toFixed(2)
-    });
-
-    res.json({
-      success: true,
-      message: `Sync completed for all platforms in ${(totals.duration / 1000).toFixed(2)}s`,
-      data: {
-        totals,
-        platforms: results,
-      },
-    });
-  } catch (error) {
-    logger.error("Sync all platforms error", { error: error.message });
-    res.status(500).json({
-      success: false,
-      message: "Failed to sync platforms",
-    });
-  }
-};
+  totals.duration = Date.now() - startTime;
+  res.status(200).json(new ApiResponse(200, { totals, platforms: results }, "Global sync completed"));
+});
 
 /**
- * Sync specific platform for all users (with parallel user processing)
+ * Sync specific platform for all users
  */
-export const syncPlatform = async (req, res) => {
+export const syncPlatform = catchAsync(async (req, res) => {
   const { platform } = req.params;
-
   if (!platformFetchers[platform]) {
-    return res.status(400).json({
-      success: false,
-      message: `Unsupported platform: ${platform}. Supported: ${Object.keys(platformFetchers).join(", ")}`,
-    });
+    throw new ApiError(400, `Unsupported platform: ${platform}`);
   }
 
-  try {
-    const results = await syncPlatformStatsParallel(platform);
+  const results = await syncPlatformStatsParallel(platform);
+  res.status(200).json(new ApiResponse(200, { results }, `${platform} sync completed`));
+});
 
-    res.json({
-      success: true,
-      message: `${platform} sync completed in ${(results.duration / 1000).toFixed(2)}s`,
-      data: { results },
-    });
-  } catch (error) {
-    logger.error(`Sync ${platform} error`, { error: error.message });
-    res.status(500).json({
-      success: false,
-      message: `Failed to sync ${platform}`,
-    });
-  }
-};
-
-// Legacy individual platform sync endpoints (for backwards compatibility)
-export const syncLeetCode = async (req, res) => {
-  req.params.platform = "leetcode";
-  return syncPlatform(req, res);
-};
-
-export const syncCodeforces = async (req, res) => {
-  req.params.platform = "codeforces";
-  return syncPlatform(req, res);
-};
-
-export const syncGitHub = async (req, res) => {
-  req.params.platform = "github";
-  return syncPlatform(req, res);
-};
-
-export const syncCodeChef = async (req, res) => {
-  req.params.platform = "codechef";
-  return syncPlatform(req, res);
-};
-
-export const syncAtCoder = async (req, res) => {
-  req.params.platform = "atcoder";
-  return syncPlatform(req, res);
-};
+// Legacy handlers simplified
+export const syncLeetCode = (req, res) => { req.params.platform = "leetcode"; return syncPlatform(req, res); };
+export const syncCodeforces = (req, res) => { req.params.platform = "codeforces"; return syncPlatform(req, res); };
+export const syncGitHub = (req, res) => { req.params.platform = "github"; return syncPlatform(req, res); };
+export const syncCodeChef = (req, res) => { req.params.platform = "codechef"; return syncPlatform(req, res); };
+export const syncAtCoder = (req, res) => { req.params.platform = "atcoder"; return syncPlatform(req, res); };
 
 /**
  * Get sync statistics
  */
-export const getSyncStats = async (req, res) => {
-  try {
-    const totalUsers = await User.countDocuments({});
-
-    // Get counts for all platforms in parallel
-    const platformCountPromises = Object.keys(platformFetchers).map(async (platform) => ({
+export const getSyncStats = catchAsync(async (req, res) => {
+  const [totalUsers, platformCountResults, lastSyncedStats] = await Promise.all([
+    User.countDocuments({}),
+    Promise.all(Object.keys(platformFetchers).map(async (platform) => ({
       platform,
       count: await PlatformStat.countDocuments({ platform })
-    }));
-
-    const platformCountResults = await Promise.all(platformCountPromises);
-    const platformCounts = {};
-    platformCountResults.forEach(({ platform, count }) => {
-      platformCounts[platform] = count;
-    });
-
-    const lastSyncedStats = await PlatformStat.find({})
+    }))),
+    PlatformStat.find({})
       .sort({ lastUpdated: -1 })
       .limit(10)
-      .populate("userId", "email");
+      .populate("userId", "email")
+      .lean()
+  ]);
 
-    res.json({
-      success: true,
-      data: {
-        totalUsers,
-        platformCounts,
-        supportedPlatforms: Object.keys(platformFetchers),
-        parallelConfig: PARALLEL_CONFIG,
-        recentSyncs: lastSyncedStats,
-      },
-    });
-  } catch (error) {
-    logger.error("Get sync stats error", { error: error.message });
-    res.status(500).json({
-      success: false,
-      message: "Failed to get sync stats",
-    });
-  }
-};
+  const platformCounts = {};
+  platformCountResults.forEach(({ platform, count }) => { platformCounts[platform] = count; });
+
+  res.status(200).json(new ApiResponse(200, {
+    totalUsers,
+    platformCounts,
+    supportedPlatforms: Object.keys(platformFetchers),
+    parallelConfig: PARALLEL_CONFIG,
+    recentSyncs: lastSyncedStats,
+  }));
+});
+

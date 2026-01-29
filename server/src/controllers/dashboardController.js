@@ -1,82 +1,79 @@
 import PlatformStat from "../models/PlatformStat.js";
 import Contest from "../models/Contest.js";
+import User from "../models/User.js";
+import catchAsync from "../utils/catchAsync.js";
+import ApiResponse from "../utils/ApiResponse.js";
 
 /**
  * Dashboard Controller - Combined endpoint for dashboard data
  * Reduces multiple API calls to a single request
  */
-export const getDashboardData = async (req, res) => {
-  try {
-    const userId = req.user.id;
+export const getDashboardData = catchAsync(async (req, res) => {
+  const userId = req.user.id;
 
-    // Parallel fetch all dashboard data
-    const [user, platformStats, upcomingContests] = await Promise.all([
-      import("../models/User.js").then(m => m.default.findById(userId).select("name email profile publicProfile cooldowns")),
-      // Get all platform stats with summary
-      PlatformStat.find({ userId }).select("platform username data stats lastUpdated lastManualRefresh"),
-
-      // Get upcoming contests (next 7 days)
-      Contest.find({
-        startTime: {
-          $gte: new Date(),
-          $lte: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-        }
-      })
-        .sort({ startTime: 1 })
-        .limit(10)
-        .select("platform name startTime duration url division")
-    ]);
-
-    // Calculate summary stats
-    const summary = calculateSummary(platformStats);
-
-    res.json({
-      success: true,
-      data: {
-        user: {
-          id: user._id,
-          name: user.name,
-          email: user.email,
-          avatar: user.profile?.avatar,
-          publicProfile: user.publicProfile
-        },
-        summary,
-        platforms: platformStats.map(stat => {
-          const cooldown = user.cooldowns?.[stat.platform];
-          const now = new Date();
-          const isAvailable = !cooldown?.nextAvailable || new Date(cooldown.nextAvailable) <= now;
-
-          return {
-            platform: stat.platform,
-            username: stat.username,
-            stats: stat.stats,
-            data: stat.data,
-            lastUpdated: stat.lastUpdated,
-            lastManualRefresh: stat.lastManualRefresh,
-            canRefresh: isAvailable,
-            nextRefreshAvailable: isAvailable ? null : cooldown.nextAvailable
-          };
-        }),
-        upcomingContests: upcomingContests.map(contest => ({
-          id: contest._id,
-          platform: contest.platform,
-          name: contest.name,
-          startTime: contest.startTime,
-          duration: contest.duration,
-          url: contest.url,
-          division: contest.division
-        }))
+  // Parallel fetch all dashboard data
+  const [user, platformStats, upcomingContests] = await Promise.all([
+    User.findById(userId).select("name email profile publicProfile cooldowns").lean(),
+    PlatformStat.find({ userId }).select("platform username data stats lastUpdated lastManualRefresh").lean(),
+    Contest.find({
+      startTime: {
+        $gte: new Date(),
+        $lte: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
       }
-    });
-  } catch (error) {
-    console.error("Dashboard data error:", error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to fetch dashboard data",
-      error: error.message
-    });
+    })
+      .sort({ startTime: 1 })
+      .limit(10)
+      .select("platform name startTime duration url division")
+      .lean()
+  ]);
+
+  if (!user) {
+    throw new ApiError(404, "User not found");
   }
-};
+
+  // Calculate summary stats
+  const summary = calculateSummary(platformStats);
+
+  const platforms = platformStats.map(stat => {
+    const cooldown = user.cooldowns?.[stat.platform];
+    const now = new Date();
+    const isAvailable = !cooldown?.nextAvailable || new Date(cooldown.nextAvailable) <= now;
+
+    return {
+      platform: stat.platform,
+      username: stat.username,
+      stats: stat.stats,
+      data: stat.data,
+      lastUpdated: stat.lastUpdated,
+      lastManualRefresh: stat.lastManualRefresh,
+      canRefresh: isAvailable,
+      nextRefreshAvailable: isAvailable ? null : cooldown.nextAvailable
+    };
+  });
+
+  const dashboardData = {
+    user: {
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      avatar: user.profile?.avatar,
+      publicProfile: user.publicProfile
+    },
+    summary,
+    platforms,
+    upcomingContests: upcomingContests.map(contest => ({
+      id: contest._id,
+      platform: contest.platform,
+      name: contest.name,
+      startTime: contest.startTime,
+      duration: contest.duration,
+      url: contest.url,
+      division: contest.division
+    }))
+  };
+
+  res.status(200).json(new ApiResponse(200, dashboardData, "Dashboard data fetched successfully"));
+});
 
 /**
  * Calculate summary statistics from platform stats
@@ -89,30 +86,26 @@ function calculateSummary(platformStats) {
     highlights: []
   };
 
-
-
   for (const stat of platformStats) {
     summary.linkedPlatforms.push(stat.platform);
-
     const data = stat.data || {};
+
+    const solved = data.totalSolved || data.problemsSolved || data.acCount || 0;
+    summary.totalProblemsSolved += solved;
 
     switch (stat.platform) {
       case "leetcode":
-        const lcSolved = data.totalSolved || 0;
-        summary.totalProblemsSolved += lcSolved;
-        if (lcSolved >= 100) {
+        if (solved >= 100) {
           summary.highlights.push({
             platform: "leetcode",
             type: "milestone",
-            message: `${lcSolved} LeetCode problems solved`
+            message: `${solved} LeetCode problems solved`
           });
         }
         break;
 
       case "codeforces":
         const cfRating = data.rating || 0;
-        const cfSolved = data.problemsSolved || 0;
-        summary.totalProblemsSolved += cfSolved;
         if (cfRating >= 1200) {
           summary.highlights.push({
             platform: "codeforces",
@@ -123,33 +116,20 @@ function calculateSummary(platformStats) {
         break;
 
       case "github":
-        const repos = data.publicRepos || 0;
         const stars = data.totalStars || 0;
         if (stars >= 10) {
           summary.highlights.push({
             platform: "github",
             type: "stars",
-            message: `${stars} GitHub stars across ${repos} repos`
+            message: `${stars} GitHub stars across ${data.publicRepos || 0} repos`
           });
         }
-        break;
-
-      case "codechef":
-        const ccSolved = data.totalSolved || 0;
-        summary.totalProblemsSolved += ccSolved;
-        break;
-
-      case "atcoder":
-        const atSolved = data.totalSolved || data.acCount || 0;
-        summary.totalProblemsSolved += atSolved;
         break;
     }
   }
 
-
-
   return summary;
 }
 
-
 export default { getDashboardData };
+
