@@ -1,70 +1,66 @@
 import User from "../models/User.js";
 import PlatformStat from "../models/PlatformStat.js";
+import catchAsync from "../utils/catchAsync.js";
+import ApiResponse from "../utils/ApiResponse.js";
+import ApiError from "../utils/ApiError.js";
 
 /**
  * Public Profile Controller - Unauthenticated public developer profiles
  */
 
 /**
+ * Get public profile by username
  * GET /u/:username
- * Get public profile by username (no auth required)
  */
-export const getPublicProfile = async (req, res) => {
-  try {
-    const { username } = req.params;
+export const getPublicProfile = catchAsync(async (req, res) => {
+  const { username } = req.params;
 
-    // Find user by public profile username
-    const user = await User.findOne({
-      "publicProfile.username": username,
-      "publicProfile.enabled": true
-    }).select("name profile publicProfile createdAt");
+  // Find user by public profile username
+  const user = await User.findOne({
+    "publicProfile.username": username,
+    "publicProfile.enabled": true
+  }).select("name profile publicProfile createdAt").lean();
 
-    if (!user) {
-      return res.status(404).json({ error: "Profile not found" });
-    }
-
-    // Get platform stats based on privacy settings
-    const platformsToShow = [];
-    if (user.publicProfile.showLeetCode) platformsToShow.push("leetcode");
-    if (user.publicProfile.showCodeforces) platformsToShow.push("codeforces");
-    if (user.publicProfile.showGitHub) platformsToShow.push("github");
-    if (user.publicProfile.showCodeChef) platformsToShow.push("codechef");
-    if (user.publicProfile.showAtCoder) platformsToShow.push("atcoder");
-
-    const platformStats = await PlatformStat.find({
-      userId: user._id,
-      platform: { $in: platformsToShow }
-    }).select("platform username data stats lastUpdated");
-
-    // Find LeetCode stat for fallback avatar
-    const leetCodeStat = platformStats.find(p => p.platform === "leetcode");
-    // Calculate aggregate stats
-    const aggregateStats = calculateAggregateStats(platformStats);
-
-    res.json({
-      success: true,
-      profile: {
-        name: user.name,
-        username: user.publicProfile.username,
-        avatar: user.profile?.avatar || "",
-        bio: user.profile?.bio || "",
-        location: user.profile?.location || "",
-        website: user.profile?.website || "",
-        socials: user.profile?.socials || [],
-        memberSince: user.createdAt
-      },
-      platforms: platformStats.map(p => ({
-        platform: p.platform,
-        username: p.username,
-        stats: p.stats,
-        lastUpdated: p.lastUpdated
-      })),
-      aggregateStats
-    });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+  if (!user) {
+    throw new ApiError(404, "Profile not found");
   }
-};
+
+  // Determine which platforms to show
+  const platformsToShow = [];
+  const pp = user.publicProfile;
+  if (pp.showLeetCode) platformsToShow.push("leetcode");
+  if (pp.showCodeforces) platformsToShow.push("codeforces");
+  if (pp.showGitHub) platformsToShow.push("github");
+  if (pp.showCodeChef) platformsToShow.push("codechef");
+  if (pp.showAtCoder) platformsToShow.push("atcoder");
+
+  const platformStats = await PlatformStat.find({
+    userId: user._id,
+    platform: { $in: platformsToShow }
+  }).select("platform username data stats lastUpdated").lean();
+
+  const aggregateStats = calculateAggregateStats(platformStats);
+
+  res.status(200).json(new ApiResponse(200, {
+    profile: {
+      name: user.name,
+      username: pp.username,
+      avatar: user.profile?.avatar || "",
+      bio: user.profile?.bio || "",
+      location: user.profile?.location || "",
+      website: user.profile?.website || "",
+      socials: user.profile?.socials || [],
+      memberSince: user.createdAt
+    },
+    platforms: platformStats.map(p => ({
+      platform: p.platform,
+      username: p.username,
+      stats: p.stats,
+      lastUpdated: p.lastUpdated
+    })),
+    aggregateStats
+  }));
+});
 
 /**
  * Calculate aggregate stats from all platforms
@@ -78,56 +74,38 @@ function calculateAggregateStats(platformStats) {
   };
 
   for (const ps of platformStats) {
+    const s = ps.stats || {};
+    const solved = s.totalSolved || s.problemsSolved || s.acCount || 0;
+    const rating = s.rating || s.currentRating || 0;
+
     switch (ps.platform) {
       case "leetcode":
-        stats.totalProblemsSolved += ps.stats?.totalSolved || 0;
-        // Add badge for high problem count
-        if ((ps.stats?.totalSolved || 0) >= 500) {
-          stats.badges.push({ type: "leetcode_500", label: "500+ LeetCode Problems", platform: "LeetCode" });
-        }
-        if ((ps.stats?.hardSolved || 0) >= 100) {
-          stats.badges.push({ type: "leetcode_hard_100", label: "100+ Hard Problems", platform: "LeetCode" });
-        }
+        stats.totalProblemsSolved += solved;
+        if (solved >= 500) stats.badges.push({ type: "leetcode_500", label: "500+ LeetCode Problems", platform: "LeetCode" });
+        if ((s.hardSolved || 0) >= 100) stats.badges.push({ type: "leetcode_hard_100", label: "100+ Hard Problems", platform: "LeetCode" });
         break;
       case "codeforces":
-        stats.totalContests += ps.stats?.contestsParticipated || ps.stats?.totalContests || 0;
-        const cfRating = ps.stats?.rating || 0;
-        // Add rank badges
-        if (cfRating >= 2100) {
-          stats.badges.push({ type: "cf_master", label: "Codeforces Master", platform: "Codeforces" });
-        } else if (cfRating >= 1900) {
-          stats.badges.push({ type: "cf_candidate", label: "Codeforces Candidate Master", platform: "Codeforces" });
-        } else if (cfRating >= 1600) {
-          stats.badges.push({ type: "cf_expert", label: "Codeforces Expert", platform: "Codeforces" });
-        }
+        stats.totalContests += s.contestsParticipated || s.totalContests || 0;
+        if (rating >= 2100) stats.badges.push({ type: "cf_master", label: "Codeforces Master", platform: "Codeforces" });
+        else if (rating >= 1900) stats.badges.push({ type: "cf_candidate", label: "Codeforces Candidate Master", platform: "Codeforces" });
+        else if (rating >= 1600) stats.badges.push({ type: "cf_expert", label: "Codeforces Expert", platform: "Codeforces" });
         break;
       case "github":
-        const stars = ps.stats?.totalStars || 0;
-        if (stars >= 100) {
-          stats.badges.push({ type: "github_stars_100", label: "100+ GitHub Stars", platform: "GitHub" });
-        }
-        if ((ps.stats?.publicRepos || 0) >= 50) {
-          stats.badges.push({ type: "github_repos_50", label: "50+ Repositories", platform: "GitHub" });
-        }
+        const stars = s.totalStars || 0;
+        if (stars >= 100) stats.badges.push({ type: "github_stars_100", label: "100+ GitHub Stars", platform: "GitHub" });
+        if ((s.publicRepos || 0) >= 50) stats.badges.push({ type: "github_repos_50", label: "50+ Repositories", platform: "GitHub" });
         break;
       case "codechef":
-        stats.totalProblemsSolved += ps.stats?.totalSolved || 0;
-        const chefRating = ps.stats?.rating || 0;
-        if (chefRating >= 2000) {
-          stats.badges.push({ type: "codechef_5star", label: "5★ CodeChef Coder", platform: "CodeChef" });
-        }
+        stats.totalProblemsSolved += solved;
+        if (rating >= 2000) stats.badges.push({ type: "codechef_5star", label: "5★ CodeChef Coder", platform: "CodeChef" });
         break;
       case "atcoder":
-        stats.totalProblemsSolved += ps.stats?.acCount || ps.stats?.totalSolved || 0;
-        const atRating = ps.stats?.rating || 0;
-        if (atRating >= 1200) {
-          stats.badges.push({ type: "atcoder_cyan", label: "AtCoder Cyan", platform: "AtCoder" });
-        }
+        stats.totalProblemsSolved += solved;
+        if (rating >= 1200) stats.badges.push({ type: "atcoder_cyan", label: "AtCoder Cyan", platform: "AtCoder" });
         break;
     }
   }
 
-  // Common high-level badges
   if (stats.totalProblemsSolved >= 1000) {
     stats.badges.push({ type: "grandmaster_solver", label: "1000+ Total Problems", platform: "Global" });
   }
@@ -136,65 +114,43 @@ function calculateAggregateStats(platformStats) {
 }
 
 /**
+ * Update public profile settings
  * PATCH /api/user/public-profile
- * Update public profile settings (authenticated)
  */
-export const updatePublicProfile = async (req, res) => {
-  try {
-    const { enabled, username, showLeetCode, showCodeforces, showGitHub } = req.body;
+export const updatePublicProfile = catchAsync(async (req, res) => {
+  const { enabled, username, showLeetCode, showCodeforces, showGitHub, showCodeChef, showAtCoder } = req.body;
+  const updates = {};
 
-    const updates = {};
+  if (typeof enabled === "boolean") updates["publicProfile.enabled"] = enabled;
 
-    if (typeof enabled === "boolean") {
-      updates["publicProfile.enabled"] = enabled;
+  if (username !== undefined) {
+    if (username && !/^[a-zA-Z0-9_-]{3,30}$/.test(username)) {
+      throw new ApiError(400, "Username must be 3-30 characters, alphanumeric with _ or -");
     }
 
-    if (username !== undefined) {
-      // Validate username format
-      if (username && !/^[a-zA-Z0-9_-]{3,30}$/.test(username)) {
-        return res.status(400).json({
-          error: "Username must be 3-30 characters, alphanumeric with _ or -"
-        });
-      }
-
-      // Check if username is taken
-      if (username) {
-        const existing = await User.findOne({
-          "publicProfile.username": username,
-          _id: { $ne: req.user._id }
-        });
-        if (existing) {
-          return res.status(400).json({ error: "Username already taken" });
-        }
-      }
-
-      updates["publicProfile.username"] = username || null;
+    if (username) {
+      const existing = await User.findOne({
+        "publicProfile.username": username,
+        _id: { $ne: req.user._id }
+      }).lean();
+      if (existing) throw new ApiError(400, "Username already taken");
     }
-
-    if (typeof showLeetCode === "boolean") {
-      updates["publicProfile.showLeetCode"] = showLeetCode;
-    }
-    if (typeof showCodeforces === "boolean") {
-      updates["publicProfile.showCodeforces"] = showCodeforces;
-    }
-    if (typeof showGitHub === "boolean") {
-      updates["publicProfile.showGitHub"] = showGitHub;
-    }
-    if (typeof showCodeChef === "boolean") {
-      updates["publicProfile.showCodeChef"] = showCodeChef;
-    }
-    if (typeof showAtCoder === "boolean") {
-      updates["publicProfile.showAtCoder"] = showAtCoder;
-    }
-
-    const user = await User.findByIdAndUpdate(
-      req.user._id,
-      { $set: updates },
-      { new: true }
-    ).select("publicProfile");
-
-    res.json({ success: true, publicProfile: user.publicProfile });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+    updates["publicProfile.username"] = username || null;
   }
-};
+
+  const flags = { showLeetCode, showCodeforces, showGitHub, showCodeChef, showAtCoder };
+  Object.keys(flags).forEach(key => {
+    if (typeof flags[key] === "boolean") {
+      updates[`publicProfile.${key}`] = flags[key];
+    }
+  });
+
+  const user = await User.findByIdAndUpdate(
+    req.user._id,
+    { $set: updates },
+    { new: true }
+  ).select("publicProfile").lean();
+
+  res.status(200).json(new ApiResponse(200, { publicProfile: user.publicProfile }, "Public profile updated"));
+});
+
