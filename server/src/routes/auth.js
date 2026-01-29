@@ -2,9 +2,6 @@ import {
   register,
   login,
   getMe,
-  updateProfile,
-  updatePassword,
-  updateSettings,
 } from "../controllers/authController.js";
 import { validateRegister, validateLogin } from "../middleware/validation.js";
 import { authLimiter } from "../middleware/rateLimit.js";
@@ -13,15 +10,27 @@ import express from "express";
 
 const router = express.Router();
 
-// Public routes (with strict rate limiting)
+/**
+ * @route   POST /api/auth/register
+ * @desc    Register a new user
+ * @access  Public
+ */
 router.post("/register", authLimiter, validateRegister, register);
+
+/**
+ * @route   POST /api/auth/login
+ * @desc    Login user
+ * @access  Public
+ */
 router.post("/login", authLimiter, validateLogin, login);
 
-// Protected routes (require authentication)
+/**
+ * @route   GET /api/auth/me
+ * @desc    Get current user profile
+ * @access  Private
+ */
 router.get("/me", protect, getMe);
-router.put("/profile", protect, updateProfile);
-router.put("/password", protect, updatePassword);
-router.put("/settings", protect, updateSettings);
 
 export default router;
+
 

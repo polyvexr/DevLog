@@ -43,9 +43,10 @@ api.interceptors.response.use(
 
 // Auth API
 export const getMe = () => api.get("/auth/me");
-export const updateProfile = (data) => api.put("/auth/profile", data);
-export const updatePassword = (data) => api.put("/auth/password", data);
-export const updateSettings = (data) => api.put("/auth/settings", data);
+export const updateProfile = (data) => api.put("/user/profile", data);
+export const updatePassword = (data) => api.put("/user/password", data);
+export const updateSettings = (data) => api.put("/user/settings", data);
+
 
 // Stats API
 export const getAllStats = () => api.get("/stats/all");
