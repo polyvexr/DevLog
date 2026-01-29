@@ -17,10 +17,12 @@ export const AuthProvider = ({ children }) => {
 
     try {
       const response = await api.get("/auth/me");
-      if (response.data.success && response.data.user) {
-        setUser(response.data.user);
+      const userData = response.data.data?.user;
+
+      if (response.data.success && userData) {
+        setUser(userData);
         // Check admin status from server response
-        const adminStatus = response.data.user.role === "admin";
+        const adminStatus = userData.role === "admin";
         setIsAdmin(adminStatus);
         // Keep localStorage in sync for quick UI checks (but server is source of truth)
         localStorage.setItem("isAdmin", adminStatus);
@@ -61,14 +63,14 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ 
-      token, 
-      isAdmin, 
-      user, 
-      loading, 
-      login, 
+    <AuthContext.Provider value={{
+      token,
+      isAdmin,
+      user,
+      loading,
+      login,
       logout,
-      refreshUser 
+      refreshUser
     }}>
       {children}
     </AuthContext.Provider>

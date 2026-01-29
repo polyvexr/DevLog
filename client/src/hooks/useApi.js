@@ -21,7 +21,10 @@ export function usePlatformStats(platform) {
 
         if (cancelled) return;
 
-        const platformData = res.data.stats.find((s) => s.platform === platform);
+        // Backend returns: { success: true, data: { stats: [] } }
+        const stats = res.data.data?.stats || [];
+        const platformData = stats.find((s) => s.platform === platform);
+
         if (platformData) {
           setData(platformData);
         } else {
@@ -29,7 +32,7 @@ export function usePlatformStats(platform) {
         }
       } catch (err) {
         if (!cancelled) {
-          setError(err.message || "Failed to fetch data");
+          setError(err.response?.data?.message || err.message || "Failed to fetch data");
         }
       } finally {
         if (!cancelled) {
@@ -58,10 +61,11 @@ export function useDashboard() {
     try {
       setLoading(true);
       const res = await getDashboardData();
+      // Backend returns: { success: true, data: { ...dashboardData } }
       setData(res.data.data);
       setError(null);
     } catch (err) {
-      setError(err.message || "Failed to fetch dashboard");
+      setError(err.response?.data?.message || err.message || "Failed to fetch dashboard");
     } finally {
       setLoading(false);
     }
@@ -88,12 +92,13 @@ export function usePlatformRefresh() {
       setRefreshing(prev => ({ ...prev, [platform]: true }));
       const res = await api.post(`/stats/refresh/${platform}`);
 
+      // Backend returns: { success: true, data: { stat: ... }, ... }
       if (res.data.success) {
-        // Set cooldown
+        // Set cooldown local state (optional since backend also has cooldown check)
         setCooldowns(prev => ({ ...prev, [platform]: true }));
         setTimeout(() => {
           setCooldowns(prev => ({ ...prev, [platform]: false }));
-        }, 6 * 60 * 60 * 1000); // 6 hours
+        }, 6 * 60 * 1000); // Short local cooldown to prevent double clicks (6 mins, backend is 6h)
 
         onSuccess?.(res.data.data);
         return true;
