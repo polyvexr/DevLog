@@ -1,5 +1,6 @@
 import Contest from "../models/Contest.js";
 import axios from "axios";
+import * as cheerio from "cheerio";
 
 const logError = (platform, err) => console.error(`[ContestService] ${platform} error:`, err.message);
 
@@ -97,18 +98,75 @@ export const contestService = {
         });
       }
       return { fetched: list.length };
-    } catch {
-      const res = await axios.get("https://kenkoooo.com/atcoder/resources/contests.json", { timeout: 10000 });
-      const now = Date.now() / 1000;
-      const upcoming = res.data.filter(c => c.start_epoch_second > now - 3600).sort((a, b) => a.start_epoch_second - b.start_epoch_second).slice(0, 20);
-      for (const c of upcoming) {
-        const start = new Date(c.start_epoch_second * 1000);
-        await this.save("atcoder", c.id, {
-          name: c.title, startTime: start, endTime: new Date(start.getTime() + c.duration_second * 1000),
-          duration: Math.round(c.duration_second / 60), url: `https://atcoder.jp/contests/${c.id}`, rated: c.rate_change !== "-"
+    } catch (err) {
+      // Fallback: Scrape AtCoder official site (Kenkoooo API is often delayed for upcoming contests)
+      try {
+        const res = await axios.get("https://atcoder.jp/contests/", {
+          headers: { "User-Agent": "Mozilla/5.0 (compatible; DevLogBot/1.0)" },
+          timeout: 10000
         });
+        const $ = cheerio.load(res.data);
+        const contests = [];
+
+        const parseRow = (row) => {
+          const cols = $(row).find("td");
+          if (cols.length === 0) return;
+
+          let timeStr = $(cols[0]).find("a").text();
+          if (!timeStr) timeStr = $(cols[0]).text();
+
+          const nameEl = $(cols[1]).find("a").first();
+          const name = nameEl.text();
+          const urlPath = nameEl.attr("href");
+          const url = "https://atcoder.jp" + urlPath;
+
+          const durationStr = $(cols[2]).text(); // "HH:mm"
+          const ratedRange = $(cols[3]).text();
+
+          if (!name) return;
+
+          let durationMinutes = 0;
+          if (durationStr.includes(":")) {
+            const parts = durationStr.split(":");
+            if (parts.length === 2) {
+              durationMinutes = parseInt(parts[0]) * 60 + parseInt(parts[1]);
+            }
+          }
+
+          const start = new Date(timeStr);
+          if (isNaN(start.getTime())) return;
+
+          const end = new Date(start.getTime() + durationMinutes * 60000);
+          const id = urlPath.split("/").pop();
+
+          contests.push({
+            contestId: id,
+            name,
+            url,
+            startTime: start,
+            endTime: end,
+            duration: durationMinutes,
+            rated: ratedRange.trim() !== "-"
+          });
+        };
+
+        const activeH3 = $('h3:contains("Active Contests")');
+        if (activeH3.length) {
+          activeH3.nextAll("div").first().find("table tbody tr").each((i, row) => parseRow(row));
+        }
+
+        const upcomingH3 = $('h3:contains("Upcoming Contests")');
+        if (upcomingH3.length) {
+          upcomingH3.nextAll("div").first().find("table tbody tr").each((i, row) => parseRow(row));
+        }
+
+        for (const c of contests) {
+          await this.save("atcoder", c.contestId, c);
+        }
+        return { fetched: contests.length };
+      } catch (scrapeErr) {
+        throw new Error(`AtCoder fetch failed: ${scrapeErr.message}`);
       }
-      return { fetched: upcoming.length };
     }
   },
 
