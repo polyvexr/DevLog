@@ -60,14 +60,14 @@ export default function Contests() {
   };
 
   // Group contests by date
-  const groupedContests = contests.reduce((groups, contest) => {
+  const groupedContests = contests?.reduce((groups, contest) => {
     const date = new Date(contest.startTime).toDateString();
     if (!groups[date]) {
       groups[date] = [];
     }
     groups[date].push(contest);
     return groups;
-  }, {});
+  }, {}) || {};
 
   const formatDateHeader = (dateString) => {
     const date = new Date(dateString);
