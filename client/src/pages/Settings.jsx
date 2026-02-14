@@ -1,4 +1,5 @@
-import { useState, Link } from "react-router-dom";
+import { useState } from "react";
+import { Link } from "react-router-dom";
 import { useSettings } from "../hooks/useSettings";
 import FullPageLoader from "../components/FullPageLoader";
 import Dialog from "../components/Dialog";
