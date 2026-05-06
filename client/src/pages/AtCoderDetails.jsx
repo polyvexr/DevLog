@@ -14,21 +14,21 @@ export default function AtCoderDetails() {
   const { data, loading, error, stats } = usePlatformStats("atcoder");
 
   const handleUnlink = async () => {
-    if (!window.confirm("Are you sure you want to unlink AtCoder? You can re-connect after 2 days.")) return;
+    if (!window.confirm("Are you sure you want to disconnect AtCoder? You can re-link after 2 days.")) return;
     try {
       await unlinkPlatform("atcoder");
       navigate("/");
     } catch (err) {
-      alert(err.response?.data?.message || "Failed to unlink platform");
+      alert(err.response?.data?.message || "Failed to disconnect service");
     }
   };
 
   if (loading) return <FullPageLoader />;
   if (error || !data) return (
     <div className="text-center py-20 px-4">
-      <h2 className="text-3xl font-black text-white mb-4 italic uppercase">Not Connected</h2>
-      <p className="text-gray-400 mb-8 max-w-md mx-auto">This account is not yet linked. Please connect your AtCoder profile to see your stats here.</p>
-      <button onClick={() => window.location.href = '/link'} className="glass-card-premium px-8 py-3 text-cyan-400 font-black tracking-widest uppercase hover:scale-105 transition-transform active:scale-95">Connect Now</button>
+      <h2 className="text-3xl font-black text-white mb-4 italic uppercase">Service Not Linked</h2>
+      <p className="text-gray-400 mb-8 max-w-md mx-auto">This account is not yet linked. Please connect your AtCoder profile to see your information here.</p>
+      <button onClick={() => window.location.href = '/link'} className="glass-card-premium px-8 py-3 text-cyan-400 font-black tracking-widest uppercase hover:scale-105 transition-transform active:scale-95">Link Now</button>
     </div>
   );
 
@@ -69,7 +69,7 @@ export default function AtCoderDetails() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
-        <StatBox label="Contests Played" value={stats.contestsParticipated || 0} />
+        <StatBox label="Competitions Joined" value={stats.contestsParticipated || 0} />
         <StatBox label="Avg Performance" value={stats.averagePerformance || 0} valueColor="text-cyan-400" />
         <StatBox label="Best Performance" value={stats.bestPerformance || 0} valueColor="text-green-400" />
       </div>

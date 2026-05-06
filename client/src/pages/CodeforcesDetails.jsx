@@ -16,21 +16,21 @@ export default function CodeforcesDetails() {
   const { data, loading, error, stats } = usePlatformStats("codeforces");
 
   const handleUnlink = async () => {
-    if (!window.confirm("Are you sure you want to unlink Codeforces? You can re-connect after 2 days.")) return;
+    if (!window.confirm("Are you sure you want to disconnect Codeforces? You can re-link after 2 days.")) return;
     try {
       await unlinkPlatform("codeforces");
       navigate("/");
     } catch (err) {
-      alert(err.response?.data?.message || "Failed to unlink platform");
+      alert(err.response?.data?.message || "Failed to disconnect service");
     }
   };
 
   if (loading) return <FullPageLoader />;
   if (error || !data) return (
     <div className="text-center py-20 px-4">
-      <h2 className="text-3xl font-black text-white mb-4 italic uppercase">Not Connected</h2>
-      <p className="text-gray-400 mb-8 max-w-md mx-auto">This account is not yet linked. Please connect your Codeforces account to see your stats.</p>
-      <button onClick={() => window.location.href = '/link'} className="glass-card-premium px-8 py-3 text-blue-400 font-black tracking-widest uppercase hover:scale-105 transition-transform active:scale-95">Connect Now</button>
+      <h2 className="text-3xl font-black text-white mb-4 italic uppercase">Service Not Linked</h2>
+      <p className="text-gray-400 mb-8 max-w-md mx-auto">This account is not yet linked. Please connect your Codeforces account to see your information.</p>
+      <button onClick={() => window.location.href = '/link'} className="glass-card-premium px-8 py-3 text-blue-400 font-black tracking-widest uppercase hover:scale-105 transition-transform active:scale-95">Link Now</button>
     </div>
   );
 
@@ -75,7 +75,7 @@ export default function CodeforcesDetails() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
         <div>
-          <SectionHeader title="Submission Verdicts" dotColor="bg-cyan-500" />
+          <SectionHeader title="Result Summary" dotColor="bg-cyan-500" />
           <div className="grid grid-cols-2 gap-4">
             {stats.verdictDistribution && Object.entries(stats.verdictDistribution).slice(0, 6).map(([verdict, count]) => (
               <div key={verdict} className="glass-card-premium p-6 border-none ring-1 ring-white/5 hover:ring-white/20 transition-all">

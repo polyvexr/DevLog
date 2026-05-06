@@ -13,11 +13,11 @@ const AtCoderIcon = () => <span className="font-black text-sm">AT</span>;
 
 export default function Landing() {
   const platforms = [
-    { name: "LeetCode", icon: SiLeetcode, color: "from-orange-500 to-yellow-500", stats: [{ l: "Easy", v: "400+", c: "text-green-400" }, { l: "Medium", v: "500+", c: "text-yellow-400" }, { l: "Hard", v: "150+", c: "text-red-400" }] },
-    { name: "Codeforces", icon: SiCodeforces, color: "from-blue-600 to-cyan-500", custom: <div className="p-4 bg-blue-500/10 rounded-xl border border-blue-500/20"><div className="text-xl font-black text-blue-400 italic">CANDIDATE MASTER</div><div className="text-[10px] text-gray-500 uppercase font-black">1984 Rating</div></div> },
-    { name: "GitHub", icon: SiGithub, color: "from-purple-600 to-pink-500", stats: [{ l: "Repos", v: 72 }, { l: "Stars", v: "8.1K" }], github: true },
-    { name: "CodeChef", icon: SiCodechef, color: "from-amber-800 to-amber-600", stats: [{ l: "Rating", v: "2140" }, { l: "Stars", v: "5★" }, { l: "Rank", v: "#142" }] },
-    { name: "AtCoder", icon: AtCoderIcon, color: "from-gray-700 to-gray-900", stats: [{ l: "Rating", v: "1420" }, { l: "Color", v: "Cyan" }, { l: "Contests", v: 24 }] },
+    { name: "LeetCode", icon: SiLeetcode, color: "from-orange-500 to-yellow-500", stats: [{ l: "Simple", v: "400+", c: "text-green-400" }, { l: "Moderate", v: "500+", c: "text-yellow-400" }, { l: "Advanced", v: "150+", c: "text-red-400" }] },
+    { name: "Codeforces", icon: SiCodeforces, color: "from-blue-600 to-cyan-500", custom: <div className="p-4 bg-blue-500/10 rounded-xl border border-blue-500/20"><div className="text-xl font-black text-blue-400 italic">SKILLED PRACTITIONER</div><div className="text-[10px] text-gray-500 uppercase font-black">1984 Score</div></div> },
+    { name: "GitHub", icon: SiGithub, color: "from-purple-600 to-pink-500", stats: [{ l: "Projects", v: 72 }, { l: "Stars", v: "8.1K" }], github: true },
+    { name: "CodeChef", icon: SiCodechef, color: "from-amber-800 to-amber-600", stats: [{ l: "Score", v: "2140" }, { l: "Stars", v: "5★" }, { l: "Rank", v: "#142" }] },
+    { name: "AtCoder", icon: AtCoderIcon, color: "from-gray-700 to-gray-900", stats: [{ l: "Score", v: "1420" }, { l: "Color", v: "Cyan" }, { l: "Events", v: 24 }] },
   ];
 
   return (
@@ -48,7 +48,7 @@ export default function Landing() {
             Your Coding <br /> <span className="animate-text-shine">Journey.</span>
           </h1>
           <p className="text-gray-400 text-xl md:text-2xl max-w-3xl mx-auto font-medium leading-relaxed fade-in-up delay-100">
-            The all-in-one tracker for your developer stats. Connect your accounts from <span className="text-white">LeetCode</span>, <span className="text-white">Codeforces</span>, <span className="text-white">GitHub</span>, <span className="text-white">AtCoder</span>, and <span className="text-white">CodeChef</span>.
+            The all-in-one tracker for your professional progress. Link your services from <span className="text-white">LeetCode</span>, <span className="text-white">Codeforces</span>, <span className="text-white">GitHub</span>, <span className="text-white">AtCoder</span>, and <span className="text-white">CodeChef</span>.
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center fade-in-up delay-200">
             <Link to="/register" className="px-12 py-5 bg-white text-black font-black italic rounded-2xl hover:bg-blue-600 hover:text-white transition-all shadow-xl active:scale-95 group">
@@ -63,8 +63,8 @@ export default function Landing() {
         {/* Platform Display */}
         <section id="more" className="py-32">
           <div className="flex flex-col items-center mb-16 text-center">
-            <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-blue-500 mb-4">Supported Platforms</h2>
-            <div className="text-4xl font-black italic tracking-tight">One API. Multiple Realities.</div>
+            <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-blue-500 mb-4">Supported Services</h2>
+            <div className="text-4xl font-black italic tracking-tight">One System. Multiple Information Sources.</div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
             {platforms.map((p, i) => (
@@ -99,10 +99,10 @@ export default function Landing() {
         {/* Features */}
         <section className="py-24 border-t border-white/5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
           {[
-            { i: FiCpu, t: "Automatic Updates", d: "Your performance data is automatically updated to show your latest progress." },
-            { i: FiSearch, t: "Public Profiles", d: "Beautiful shareable pages that showcase your coding achievements to the world." },
-            { i: FiShield, t: "Reliable Data", d: "All statistics are fetched directly from the official platforms for accuracy." },
-            { i: FiGlobe, t: "Unified Overview", d: "Get a clear picture of where you stand with combined metrics from all sources." }
+            { i: FiCpu, t: "Regular Information Matching", d: "Your progress information is automatically updated to show your latest activity." },
+            { i: FiSearch, t: "Shared Profile Pages", d: "Beautiful shareable pages that showcase your professional journey milestones to the world." },
+            { i: FiShield, t: "Trusted Information", d: "All statistics are fetched directly from the authorized services for accuracy." },
+            { i: FiGlobe, t: "Consolidated Summary", d: "Get a clear picture of where you stand with consolidated measurements from all information points." }
           ].map((f, i) => (
             <div key={i} className="space-y-4 group">
               <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center group-hover:bg-blue-600/10 transition-colors">

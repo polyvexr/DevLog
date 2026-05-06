@@ -142,8 +142,8 @@ export default function Contests() {
             <FiFilter className="text-2xl text-purple-500" />
           </div>
           <div>
-            <h2 className="text-xl font-black text-white italic">Ecosystem Filter</h2>
-            <p className="text-xs font-black uppercase tracking-widest text-gray-500">Select Platforms to Monitor</p>
+            <h2 className="text-xl font-black text-white italic">Information Source Filter</h2>
+            <p className="text-xs font-black uppercase tracking-widest text-gray-500">Select Services to Monitor</p>
           </div>
         </div>
 
@@ -203,7 +203,7 @@ export default function Contests() {
             Arena <span className="text-gray-600">Empty</span>
           </h3>
           <p className="text-gray-500 text-xl max-w-md mx-auto mb-12 font-medium leading-relaxed">
-            No upcoming contests detected in the selected ecosystems. Try expanding your filter range.
+            No upcoming competitions detected in the selected information sources. Try expanding your filter range.
           </p>
           <button
             onClick={() => setSelectedPlatforms(["leetcode", "codeforces", "codechef", "atcoder"])}

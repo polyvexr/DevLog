@@ -97,10 +97,10 @@ export default function Settings() {
 
       <Dialog
         open={dialog.open}
-        title="Erase Record?"
-        message="All platform stats, contest history, and identity data will be purged. This action is terminal."
-        confirmText="Purge Now"
-        cancelText="Abort"
+        title="Remove Information?"
+        message="All service information, competition history, and membership information will be cleared. This action is permanent."
+        confirmText="Clear Now"
+        cancelText="Cancel"
         onConfirm={deleteAccount}
         onCancel={() => setDialog({ open: false })}
       />

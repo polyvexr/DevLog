@@ -100,7 +100,6 @@ export default function Login() {
                 <label htmlFor="password" className="block text-sm font-bold text-gray-400 uppercase tracking-widest">
                   Password
                 </label>
-                <Link
                   to="/forgot-password"
                   className="text-xs font-bold text-blue-400 hover:text-blue-300 transition-colors uppercase tracking-wider"
                 >
@@ -152,7 +151,7 @@ export default function Login() {
                 to="/register"
                 className="text-blue-400 hover:text-blue-300 font-black relative group"
               >
-                Create Account
+                Register
                 <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-400 group-hover:w-full transition-all duration-300"></span>
               </Link>
             </p>

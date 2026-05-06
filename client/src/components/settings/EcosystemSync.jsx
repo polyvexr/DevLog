@@ -12,13 +12,13 @@ export default function EcosystemSync({
         <section className="glass-card-premium p-8 space-y-8">
             <div className="flex items-center gap-4 border-b border-white/5 pb-6">
                 <div className="w-10 h-10 rounded-xl bg-orange-600/10 flex items-center justify-center border border-orange-500/20 text-orange-400"><FiLink /></div>
-                <h2 className="text-xl font-black text-white italic uppercase tracking-tighter">Ecosystem Sync</h2>
+                <h2 className="text-xl font-black text-white italic uppercase tracking-tighter">Service Information Matching</h2>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Active Links */}
                 <div className="space-y-4">
-                    <h3 className="text-[9px] font-black uppercase tracking-widest text-gray-500 mb-4">Active Nodes</h3>
+                    <h3 className="text-[9px] font-black uppercase tracking-widest text-gray-500 mb-4">Active Services</h3>
                     {platforms.map(p => {
                         const meta = platformMeta.find(m => m.id === p.platform);
                         if (!meta) return null;
@@ -42,7 +42,7 @@ export default function EcosystemSync({
 
                 {/* New Link */}
                 <form onSubmit={linkPlatform} className="p-6 bg-white/[0.02] border border-white/5 rounded-2xl space-y-4">
-                    <h3 className="text-[9px] font-black uppercase tracking-widest text-gray-500">Initialize New Link</h3>
+                    <h3 className="text-[9px] font-black uppercase tracking-widest text-gray-500">Create New Service Link</h3>
                     <select
                         className="w-full p-3 bg-white/5 border border-white/5 rounded-xl text-white text-xs font-bold appearance-none outline-none"
                         value={newLink.platform}
@@ -57,7 +57,7 @@ export default function EcosystemSync({
                         value={newLink.username}
                         onChange={e => setNewLink({ ...newLink, username: e.target.value })}
                     />
-                    <button className="w-full py-3 bg-white/10 hover:bg-white text-black font-black text-[10px] uppercase tracking-widest rounded-xl transition-all">Link Node</button>
+                    <button className="w-full py-3 bg-white/10 hover:bg-white text-black font-black text-[10px] uppercase tracking-widest rounded-xl transition-all">Link Service</button>
                 </form>
             </div>
         </section>

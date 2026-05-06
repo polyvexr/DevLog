@@ -24,8 +24,8 @@ export default function Dashboard() {
       refresh(); // Reload all data
       setMessageDialog({
         open: true,
-        title: "Stats Updated",
-        message: `${platform} stats have been refreshed successfully.`,
+        title: "Information Updated",
+        message: `${platform} information has been updated successfully.`,
         type: "success",
       });
     });
@@ -33,8 +33,8 @@ export default function Dashboard() {
     if (!success) {
       setMessageDialog({
         open: true,
-        title: "Refresh Refused",
-        message: "This node is currently on a cooldown cycle. Please try again later.",
+        title: "Update Not Available",
+        message: "The system is currently in a waiting period. Please try again later.",
         type: "warning"
       });
     }
@@ -90,7 +90,7 @@ export default function Dashboard() {
             onClick={() => navigate('/link')}
             className="px-10 py-5 bg-blue-600 hover:bg-blue-500 text-white font-black text-lg rounded-2xl transition-all shadow-2xl shadow-blue-500/30 active:scale-95 group uppercase tracking-widest"
           >
-            Connect Account <span className="inline-block group-hover:translate-x-2 transition-transform ml-2">→</span>
+            Link Service <span className="inline-block group-hover:translate-x-2 transition-transform ml-2">→</span>
           </button>
         </div>
       ) : (

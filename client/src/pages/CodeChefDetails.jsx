@@ -16,7 +16,7 @@ export default function CodeChefDetails() {
   const { data, loading, error, stats } = usePlatformStats("codechef");
 
   const handleUnlink = async () => {
-    if (!window.confirm("Are you sure you want to unlink CodeChef? You can re-connect after 2 days.")) return;
+    if (!window.confirm("Are you sure you want to disconnect CodeChef? You can re-link after 2 days.")) return;
     try {
       await unlinkPlatform("codechef");
       navigate("/");
@@ -28,9 +28,9 @@ export default function CodeChefDetails() {
   if (loading) return <FullPageLoader />;
   if (error || !data) return (
     <div className="text-center py-20 px-4">
-      <h2 className="text-3xl font-black text-white mb-4 italic uppercase">Not Connected</h2>
-      <p className="text-gray-400 mb-8 max-w-md mx-auto">This account is not yet linked. Please connect your CodeChef profile to see your stats here.</p>
-      <button onClick={() => window.location.href = '/link'} className="glass-card-premium px-8 py-3 text-amber-400 font-black tracking-widest uppercase hover:scale-105 transition-transform active:scale-95">Connect Now</button>
+      <h2 className="text-3xl font-black text-white mb-4 italic uppercase">Service Not Linked</h2>
+      <p className="text-gray-400 mb-8 max-w-md mx-auto">This account is not yet linked. Please connect your CodeChef profile to see your information here.</p>
+      <button onClick={() => window.location.href = '/link'} className="glass-card-premium px-8 py-3 text-amber-400 font-black tracking-widest uppercase hover:scale-105 transition-transform active:scale-95">Link Now</button>
     </div>
   );
 

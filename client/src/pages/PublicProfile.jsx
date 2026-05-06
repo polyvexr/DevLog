@@ -25,7 +25,7 @@ export default function PublicProfile() {
   useEffect(() => {
     api.get(`/u/${username}`)
       .then(res => setData(res.data.data))
-      .catch(err => setError(err.response?.status === 404 ? "Neural node not found or restricted" : "Neural connection severed"))
+      .catch(err => setError(err.response?.status === 404 ? "Member profile not found or restricted" : "Information link lost"))
       .finally(() => setLoading(false));
   }, [username]);
 
@@ -41,7 +41,7 @@ export default function PublicProfile() {
         <div className="w-20 h-20 bg-red-600/10 border border-red-500/20 rounded-3xl flex items-center justify-center mx-auto animate-pulse"><FiZap className="text-4xl text-red-500" /></div>
         <h1 className="text-4xl font-black text-white italic tracking-tighter uppercase">Access <span className="text-red-500">Denied</span></h1>
         <p className="text-gray-500 font-medium">{error}</p>
-        <Link to="/" className="inline-flex items-center gap-2 px-10 py-4 bg-white/5 border border-white/10 text-white font-black text-[10px] uppercase tracking-widest rounded-2xl hover:bg-white/10"><FiArrowLeft /> Return to Base</Link>
+        <Link to="/" className="inline-flex items-center gap-2 px-10 py-4 bg-white/5 border border-white/10 text-white font-black text-[10px] uppercase tracking-widest rounded-2xl hover:bg-white/10"><FiArrowLeft /> Return to Main Page</Link>
       </div>
     </div>
   );
@@ -112,16 +112,16 @@ export default function PublicProfile() {
 
         {/* Neural Metrics Grid */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
-          <MetricBox label="Identities" value={stats.platforms} icon={<FiCode />} color="blue" />
-          <MetricBox label="Neural Solves" value={stats.totalProblemsSolved} icon={<FiCheckCircle />} color="green" />
-          <MetricBox label="Engagements" value={stats.totalContests} icon={<FiActivity />} color="red" />
-          <MetricBox label="Core Stack" value={topLang} icon={<FiTrendingUp />} color="purple" />
+          <MetricBox label="Memberships" value={stats.platforms} icon={<FiCode />} color="blue" />
+          <MetricBox label="Accomplishments" value={stats.totalProblemsSolved} icon={<FiCheckCircle />} color="green" />
+          <MetricBox label="Participation" value={stats.totalContests} icon={<FiActivity />} color="red" />
+          <MetricBox label="Main Focus" value={topLang} icon={<FiTrendingUp />} color="purple" />
         </div>
 
         {/* Linked Ecosystems */}
         <div className="mb-20">
           <div className="flex items-center gap-6 mb-12">
-            <h2 className="text-[10px] font-black uppercase tracking-[0.5em] text-gray-500 whitespace-nowrap">Neural Networks Linked</h2>
+            <h2 className="text-[10px] font-black uppercase tracking-[0.5em] text-gray-500 whitespace-nowrap">Linked Services</h2>
             <div className="h-px bg-gradient-to-r from-white/5 to-transparent flex-1" />
           </div>
           <div className="grid md:grid-cols-2 gap-8">
@@ -163,7 +163,7 @@ export default function PublicProfile() {
         {stats.badges.length > 0 && (
           <div className="mb-20">
             <div className="flex items-center gap-6 mb-12">
-              <h2 className="text-[10px] font-black uppercase tracking-[0.5em] text-gray-500 whitespace-nowrap">Neural Medals Secured</h2>
+              <h2 className="text-[10px] font-black uppercase tracking-[0.5em] text-gray-500 whitespace-nowrap">Recognitions</h2>
               <div className="h-px bg-gradient-to-r from-white/5 to-transparent flex-1" />
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -185,7 +185,7 @@ export default function PublicProfile() {
         <footer className="mt-40 text-center relative border-t border-white/5 pt-20">
           <Link to="/" className="inline-block group mb-12 text-5xl md:text-7xl font-black text-white italic tracking-tighter hover:text-blue-500 transition-all duration-500">DEVLOG<span className="text-blue-600">_</span></Link>
           <div className="flex justify-center flex-wrap gap-8 text-gray-600 text-[9px] font-black uppercase tracking-[0.4em]">
-            <span>© 2026 COMMAND CENTER</span><span>SECURE TERMINAL</span><span>ALL RIGHTS RESERVED</span>
+            <span>© 2026 MANAGEMENT CENTER</span><span>MEMBER PORTAL</span><span>ALL RIGHTS RESERVED</span>
           </div>
         </footer>
       </div>
