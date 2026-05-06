@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { SidebarContext } from "./SidebarContext";
 
 export const SidebarProvider = ({ children }) => {
@@ -41,23 +41,23 @@ export const SidebarProvider = ({ children }) => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const toggleCollapse = () => setIsCollapsed((prev) => !prev);
-  const toggleMobile = () => setIsMobileOpen((prev) => !prev);
-  const closeMobile = () => setIsMobileOpen(false);
-  const togglePlatforms = () => setIsPlatformsExpanded((prev) => !prev);
+  const toggleCollapse = useCallback(() => setIsCollapsed((prev) => !prev), []);
+  const toggleMobile = useCallback(() => setIsMobileOpen((prev) => !prev), []);
+  const closeMobile = useCallback(() => setIsMobileOpen(false), []);
+  const togglePlatforms = useCallback(() => setIsPlatformsExpanded((prev) => !prev), []);
+
+  const value = useMemo(() => ({
+    isCollapsed,
+    isMobileOpen,
+    isPlatformsExpanded,
+    toggleCollapse,
+    toggleMobile,
+    closeMobile,
+    togglePlatforms,
+  }), [isCollapsed, isMobileOpen, isPlatformsExpanded, toggleCollapse, toggleMobile, closeMobile, togglePlatforms]);
 
   return (
-    <SidebarContext.Provider
-      value={{
-        isCollapsed,
-        isMobileOpen,
-        isPlatformsExpanded,
-        toggleCollapse,
-        toggleMobile,
-        closeMobile,
-        togglePlatforms,
-      }}
-    >
+    <SidebarContext.Provider value={value}>
       {children}
     </SidebarContext.Provider>
   );

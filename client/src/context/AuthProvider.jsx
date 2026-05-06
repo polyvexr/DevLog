@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { AuthContext } from "./AuthContext";
 import api from "../api/axios";
 
@@ -58,20 +58,22 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
-  const refreshUser = () => {
+  const refreshUser = useCallback(() => {
     fetchUserInfo();
-  };
+  }, [fetchUserInfo]);
+
+  const value = useMemo(() => ({
+    token,
+    isAdmin,
+    user,
+    loading,
+    login,
+    logout,
+    refreshUser
+  }), [token, isAdmin, user, loading, refreshUser]); // login and logout are stable
 
   return (
-    <AuthContext.Provider value={{
-      token,
-      isAdmin,
-      user,
-      loading,
-      login,
-      logout,
-      refreshUser
-    }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );

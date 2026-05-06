@@ -217,12 +217,11 @@ export const syncAtCoder = (req, res, next) => { req.params.platform = "atcoder"
  * Get sync statistics
  */
 export const getSyncStats = catchAsync(async (req, res) => {
-  const [totalUsers, platformCountResults, lastSyncedStats] = await Promise.all([
+  const [totalUsers, platformCountsRaw, lastSyncedStats] = await Promise.all([
     User.countDocuments({}),
-    Promise.all(Object.keys(platformFetchers).map(async (platform) => ({
-      platform,
-      count: await PlatformStat.countDocuments({ platform })
-    }))),
+    PlatformStat.aggregate([
+      { $group: { _id: "$platform", count: { $sum: 1 } } }
+    ]),
     PlatformStat.find({})
       .sort({ lastUpdated: -1 })
       .limit(10)
@@ -231,7 +230,14 @@ export const getSyncStats = catchAsync(async (req, res) => {
   ]);
 
   const platformCounts = {};
-  platformCountResults.forEach(({ platform, count }) => { platformCounts[platform] = count; });
+  platformCountsRaw.forEach(item => {
+    platformCounts[item._id] = item.count;
+  });
+  
+  // Fill in zero for missing platforms
+  Object.keys(platformFetchers).forEach(p => {
+    if (!platformCounts[p]) platformCounts[p] = 0;
+  });
 
   res.status(200).json(new ApiResponse(200, {
     totalUsers,

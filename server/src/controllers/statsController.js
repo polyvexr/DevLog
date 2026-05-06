@@ -16,10 +16,8 @@ const getNextRefreshTime = (user, platform) => {
 };
 
 export const getAllStats = catchAsync(async (req, res) => {
-  const [stats, user] = await Promise.all([
-    PlatformStat.find({ userId: req.user._id }).lean(),
-    User.findById(req.user._id).select("cooldowns").lean()
-  ]);
+  const stats = await PlatformStat.find({ userId: req.user._id }).lean();
+  const user = req.user; // Already fetched by protect middleware
 
   const enrichedStats = stats.map((stat) => {
     const nextRefreshAvailable = getNextRefreshTime(user, stat.platform);
