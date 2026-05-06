@@ -200,8 +200,17 @@ export const platformService = {
         }
 
         logger.info(`Database successfully updated for ${job.platform}`);
-      } else {
         const errorMsg = freshData?.error || "Empty data returned";
+        
+        // If it's a persistent error (like 401/404), we should still update the record 
+        // to show the error state, but mark the job as failed.
+        if (freshData?.error) {
+          await PlatformStat.updateOne(
+            { userId: job.userId, platform: job.platform },
+            { $set: { "data.error": freshData.error, "stats.error": freshData.error } }
+          );
+        }
+
         logger.warn(`Sync for ${job.platform} failed: ${errorMsg}`, {
           username: platformStat.username,
           userId: job.userId,
@@ -313,6 +322,23 @@ export const platformService = {
     });
 
     return results;
+  },
+
+  /**
+   * Save extracted stats to database
+   */
+  async saveStats(userId, platform, stats, data) {
+    const updateData = {
+      stats,
+      data,
+      lastUpdated: new Date()
+    };
+
+    return await PlatformStat.updateOne(
+      { userId, platform },
+      { $set: updateData },
+      { upsert: true }
+    );
   },
 
   /**

@@ -27,7 +27,7 @@ const userSchema = new mongoose.Schema({
 
   // Public profile settings for /u/:username route
   publicProfile: {
-    enabled: { type: Boolean, default: false },
+    enabled: { type: Boolean, default: true },
     username: { type: String, unique: true, sparse: true },
     showLeetCode: { type: Boolean, default: true },
     showCodeforces: { type: Boolean, default: true },

@@ -63,7 +63,7 @@ export default function Dashboard() {
           </p>
         </div>
 
-        {data?.user?.publicProfile?.enabled && (
+        {data?.user?.publicProfile?.username && (
           <button
             onClick={() => window.open(`/u/${data.user.publicProfile.username}`, "_blank")}
             className="flex items-center gap-3 px-8 py-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl text-white font-black text-[10px] uppercase tracking-widest transition-all active:scale-95 group shadow-2xl backdrop-blur-xl"

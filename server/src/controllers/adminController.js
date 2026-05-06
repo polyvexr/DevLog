@@ -76,7 +76,7 @@ async function syncSingleUser(platformStat, platform, fetchFunction) {
       };
     } else {
       return {
-        status: "empty",
+        status: "failed",
         user: platformStat.userId?.email || "Unknown",
         username: platformStat.username,
         reason: data?.error || "No data returned from API",

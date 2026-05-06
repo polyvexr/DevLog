@@ -1,5 +1,5 @@
+import "dotenv/config";
 import express from "express";
-import dotenv from "dotenv";
 import cors from "cors";
 import http from "http";
 import mongoose from "mongoose";
@@ -19,8 +19,6 @@ import cronRoutes from "./src/routes/cron.js";
 import dashboardRoutes from "./src/routes/dashboard.js";
 import { apiLimiter } from "./src/middleware/rateLimit.js";
 import logger from "./src/utils/logger.js";
-
-dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;

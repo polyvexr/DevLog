@@ -1,6 +1,18 @@
+import { Resend } from 'resend';
 import logger from "../utils/logger.js";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Initialize Resend lazily to avoid crashing if API key is missing during startup
+let resend = null;
+try {
+    if (process.env.RESEND_API_KEY) {
+        resend = new Resend(process.env.RESEND_API_KEY);
+    } else {
+        logger.warn("RESEND_API_KEY is missing. Email service will be disabled.");
+    }
+} catch (error) {
+    logger.error("Failed to initialize Resend client", { error: error.message });
+}
+
 const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || "delivered@resend.dev";
 const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:5173";
 
@@ -10,6 +22,11 @@ const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:5173";
  * @param {string} token - Reset token
  */
 export const sendResetPasswordEmail = async (email, token) => {
+    if (!resend) {
+        logger.error("Cannot send email: Resend client not initialized (missing API key)");
+        return { success: false, error: "Email service disabled" };
+    }
+
     const resetUrl = `${CLIENT_URL}/reset-password/${token}`;
 
     try {

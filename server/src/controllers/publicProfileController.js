@@ -17,8 +17,7 @@ export const getPublicProfile = catchAsync(async (req, res) => {
 
   // Find user by public profile username
   const user = await User.findOne({
-    "publicProfile.username": username,
-    "publicProfile.enabled": true
+    "publicProfile.username": username
   }).select("name profile publicProfile createdAt").lean();
 
   if (!user) {
