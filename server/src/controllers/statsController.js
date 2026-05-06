@@ -2,12 +2,10 @@ import PlatformStat from "../models/PlatformStat.js";
 import SyncJob from "../models/SyncJob.js";
 import User from "../models/User.js";
 import { platformService } from "../services/platformService.js";
+import { COOLDOWN_MS, SUPPORTED_PLATFORMS } from "../utils/constants.js";
 import catchAsync from "../utils/catchAsync.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import ApiError from "../utils/ApiError.js";
-
-// Cooldown duration (6 hours for V2)
-const COOLDOWN_MS = 6 * 60 * 60 * 1000;
 
 // Get next refresh available time from user cooldowns
 const getNextRefreshTime = (user, platform) => {
@@ -65,9 +63,8 @@ export const getStatsSummary = catchAsync(async (req, res) => {
  */
 export const refreshPlatformStats = catchAsync(async (req, res) => {
   const { platform } = req.params;
-  const supportedPlatforms = ["leetcode", "codeforces", "github", "codechef", "atcoder"];
-
-  if (!supportedPlatforms.includes(platform)) {
+  
+  if (!SUPPORTED_PLATFORMS.includes(platform)) {
     throw new ApiError(400, "Invalid platform");
   }
 

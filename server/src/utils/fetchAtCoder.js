@@ -1,4 +1,5 @@
 import axios from "axios";
+import logger from "./logger.js";
 
 /**
  * Fetch AtCoder user statistics
@@ -61,7 +62,7 @@ export const fetchAtCoder = async (username) => {
         else solvedByDifficulty.red++;
       });
     } catch (diffErr) {
-      console.log("AtCoder difficulty fetch failed:", diffErr.message);
+      logger.warn("AtCoder difficulty fetch failed:", { error: diffErr.message });
     }
 
     // Process contest history for display
@@ -115,8 +116,8 @@ export const fetchAtCoder = async (username) => {
         : 0,
     };
   } catch (err) {
-    console.log("AtCoder Fetch Error:", err.message);
-    return {};
+    logger.error(`AtCoder Fetch Error [${username}]:`, { error: err.message });
+    return { error: err.message };
   }
 };
 

@@ -1,7 +1,4 @@
-import { Resend } from "resend";
-import dotenv from "dotenv";
-
-dotenv.config();
+import logger from "../utils/logger.js";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || "delivered@resend.dev";
@@ -36,7 +33,7 @@ export const sendResetPasswordEmail = async (email, token) => {
 
         return { success: true, data };
     } catch (error) {
-        console.error("Failed to send reset email via Resend:", error);
+        logger.error("Failed to send reset email via Resend", { error: error.message });
         return { success: false, error };
     }
 };

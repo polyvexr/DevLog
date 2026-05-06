@@ -2,10 +2,11 @@ import { v2 as cloudinary } from 'cloudinary';
 import { CloudinaryStorage } from 'multer-storage-cloudinary';
 import multer from 'multer';
 import dotenv from 'dotenv';
+import logger from './logger.js';
 
 dotenv.config();
 
-console.log("Cloudinary Config Check:", {
+logger.info("Cloudinary Config Check:", {
     cloud: !!process.env.CLOUDINARY_CLOUD_NAME,
     key: !!process.env.CLOUDINARY_API_KEY,
     secret: !!process.env.CLOUDINARY_API_SECRET

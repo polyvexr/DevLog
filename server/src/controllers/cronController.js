@@ -88,7 +88,7 @@ export const handleUnifiedCron = catchAsync(async (req, res) => {
   try {
     await telegramService.sendSyncReport({ success: true, ...finalResult });
   } catch (err) {
-    console.error("Telegram report failed:", err.message);
+    logger.error("Telegram report failed", { error: err.message });
   }
 
   res.status(200).json(new ApiResponse(200, finalResult, "Unified cron completed"));

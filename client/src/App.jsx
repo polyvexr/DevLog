@@ -1,9 +1,13 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { lazy, Suspense, useContext } from "react";
 import { AuthContext } from "./context/AuthContext";
-import { SidebarProvider } from "./context/SidebarProvider";
-import AuthenticatedLayout from "./components/AuthenticatedLayout";
 import FullPageLoader from "./components/FullPageLoader";
+
+// Route guards and wrappers
+import PrivateRoute from "./components/routes/PrivateRoute";
+import AdminRoute from "./components/routes/AdminRoute";
+import PublicRoute from "./components/routes/PublicRoute";
+import AuthenticatedWrapper from "./components/routes/AuthenticatedWrapper";
 
 // Eagerly loaded pages (critical path)
 import Landing from "./pages/Landing";
@@ -26,57 +30,6 @@ const Settings = lazy(() => import("./pages/Settings"));
 const Contests = lazy(() => import("./pages/Contests"));
 const PublicProfile = lazy(() => import("./pages/PublicProfile"));
 
-// Private route wrapper with auth check and layout
-const PrivateRoute = ({ children }) => {
-  const { token, loading } = useContext(AuthContext);
-
-  if (loading) return <FullPageLoader />;
-
-  return token ? (
-    <SidebarProvider>
-      <AuthenticatedLayout>
-        <Suspense fallback={<FullPageLoader />}>
-          {children}
-        </Suspense>
-      </AuthenticatedLayout>
-    </SidebarProvider>
-  ) : (
-    <Navigate to="/login" />
-  );
-};
-
-// Admin route wrapper with role check
-const AdminRoute = ({ children }) => {
-  const { token, isAdmin, loading } = useContext(AuthContext);
-
-  if (loading) return <FullPageLoader />;
-  if (!token) return <Navigate to="/login" />;
-  if (!isAdmin) return <Navigate to="/" />;
-
-  return (
-    <SidebarProvider>
-      <AuthenticatedLayout>
-        <Suspense fallback={<FullPageLoader />}>
-          {children}
-        </Suspense>
-      </AuthenticatedLayout>
-    </SidebarProvider>
-  );
-};
-
-// Public route - redirects authenticated users
-const PublicRoute = ({ children }) => {
-  const { token, loading } = useContext(AuthContext);
-
-  if (loading) return <FullPageLoader />;
-
-  return token ? <Navigate to="/" replace /> : (
-    <Suspense fallback={<FullPageLoader />}>
-      {children}
-    </Suspense>
-  );
-};
-
 // Context-aware home route
 const HomeRoute = () => {
   const { token, loading } = useContext(AuthContext);
@@ -84,11 +37,9 @@ const HomeRoute = () => {
   if (loading) return <FullPageLoader />;
 
   return token ? (
-    <SidebarProvider>
-      <AuthenticatedLayout>
-        <Dashboard />
-      </AuthenticatedLayout>
-    </SidebarProvider>
+    <AuthenticatedWrapper>
+      <Dashboard />
+    </AuthenticatedWrapper>
   ) : (
     <Landing />
   );
@@ -100,12 +51,14 @@ function App() {
       <Routes>
         <Route path="/" element={<HomeRoute />} />
 
-        {/* Admin route */}
+        {/* Admin routes */}
         <Route
           path="/admin"
           element={
             <AdminRoute>
-              <AdminDashboard />
+              <AuthenticatedWrapper>
+                <AdminDashboard />
+              </AuthenticatedWrapper>
             </AdminRoute>
           }
         />
@@ -113,16 +66,21 @@ function App() {
           path="/admin/users"
           element={
             <AdminRoute>
-              <AdminUsers />
+              <AuthenticatedWrapper>
+                <AdminUsers />
+              </AuthenticatedWrapper>
             </AdminRoute>
           }
         />
 
+        {/* Protected User Details */}
         <Route
           path="/leetcode"
           element={
             <PrivateRoute>
-              <LeetCodeDetails />
+              <AuthenticatedWrapper>
+                <LeetCodeDetails />
+              </AuthenticatedWrapper>
             </PrivateRoute>
           }
         />
@@ -130,7 +88,9 @@ function App() {
           path="/codeforces"
           element={
             <PrivateRoute>
-              <CodeforcesDetails />
+              <AuthenticatedWrapper>
+                <CodeforcesDetails />
+              </AuthenticatedWrapper>
             </PrivateRoute>
           }
         />
@@ -138,7 +98,9 @@ function App() {
           path="/github"
           element={
             <PrivateRoute>
-              <GitHubDetails />
+              <AuthenticatedWrapper>
+                <GitHubDetails />
+              </AuthenticatedWrapper>
             </PrivateRoute>
           }
         />
@@ -146,7 +108,9 @@ function App() {
           path="/codechef"
           element={
             <PrivateRoute>
-              <CodeChefDetails />
+              <AuthenticatedWrapper>
+                <CodeChefDetails />
+              </AuthenticatedWrapper>
             </PrivateRoute>
           }
         />
@@ -154,27 +118,31 @@ function App() {
           path="/atcoder"
           element={
             <PrivateRoute>
-              <AtCoderDetails />
+              <AuthenticatedWrapper>
+                <AtCoderDetails />
+              </AuthenticatedWrapper>
             </PrivateRoute>
           }
         />
 
-        {/* V2 Routes */}
+        {/* System & Features */}
         <Route
           path="/contests"
           element={
             <PrivateRoute>
-              <Contests />
+              <AuthenticatedWrapper>
+                <Contests />
+              </AuthenticatedWrapper>
             </PrivateRoute>
           }
         />
-
-        {/* System Settings */}
         <Route
           path="/settings"
           element={
             <PrivateRoute>
-              <Settings />
+              <AuthenticatedWrapper>
+                <Settings />
+              </AuthenticatedWrapper>
             </PrivateRoute>
           }
         />

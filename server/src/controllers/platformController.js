@@ -1,27 +1,13 @@
 import PlatformStat from "../models/PlatformStat.js";
 import PlatformAction from "../models/PlatformAction.js";
 import User from "../models/User.js";
-import { fetchLeetCode } from "../utils/fetchLeetCode.js";
-import { fetchGithub } from "../utils/fetchGithub.js";
-import { fetchCodeforces } from "../utils/fetchCodeforces.js";
-import { fetchCodeChef } from "../utils/fetchCodeChef.js";
-import { fetchAtCoder } from "../utils/fetchAtCoder.js";
-import { platformService } from "../services/platformService.js";
+import { platformService, platformFetchers } from "../services/platformService.js";
 import logger from "../utils/logger.js";
 import catchAsync from "../utils/catchAsync.js";
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
 
 const TWO_DAYS_MS = 2 * 24 * 60 * 60 * 1000;
-
-// Platform fetch function mapping
-const platformFetchers = {
-  leetcode: fetchLeetCode,
-  codeforces: fetchCodeforces,
-  github: fetchGithub,
-  codechef: fetchCodeChef,
-  atcoder: fetchAtCoder,
-};
 
 // Internal helper for rate limiting platform changes
 async function checkMonthlyLimit(userId, platform) {

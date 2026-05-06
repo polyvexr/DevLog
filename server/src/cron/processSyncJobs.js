@@ -36,7 +36,7 @@ export async function processSyncJobs(options = {}) {
       { $set: { status: "pending", updatedAt: now } }
     );
     if (zombies.modifiedCount > 0) {
-      console.log(`Cleaned up ${zombies.modifiedCount} zombie jobs`);
+      logger.info(`Cleaned up ${zombies.modifiedCount} zombie jobs`);
     }
 
     // Find pending jobs (including retry-ready failed jobs)

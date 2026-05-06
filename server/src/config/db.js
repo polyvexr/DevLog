@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import logger from "../utils/logger.js";
 
 let isConnected = false;
 
@@ -8,8 +9,8 @@ const connectDB = async () => {
   }
 
   if (!process.env.MONGO_URI) {
-    console.error("DB Error ❌ MONGO_URI environment variable is not defined");
-    return;
+    logger.error("DB Error ❌ MONGO_URI environment variable is not defined");
+    throw new Error("MONGO_URI is required");
   }
 
   try {
@@ -18,11 +19,18 @@ const connectDB = async () => {
       socketTimeoutMS: 45000,
     };
 
-    const db = await mongoose.connect(process.env.MONGO_URI, opts);
-    isConnected = db.connections[0].readyState === 1;
-    console.log("MongoDB connected ✔");
+    const db = await mongoose.connect(process.env.MONGO_URI);
+    isConnected = true;
+    logger.info("MongoDB connected");
+    
+    mongoose.connection.on("disconnected", () => {
+      isConnected = false;
+      logger.warn("MongoDB disconnected");
+    });
+
+    return db;
   } catch (err) {
-    console.error("DB Error ❌", err.message);
+    logger.error("DB Error ❌", err.message);
     // Don't exit process in serverless
     throw err;
   }

@@ -2,7 +2,9 @@ import Contest from "../models/Contest.js";
 import axios from "axios";
 import * as cheerio from "cheerio";
 
-const logError = (platform, err) => console.error(`[ContestService] ${platform} error:`, err.message);
+import logger from "../utils/logger.js";
+
+const logError = (platform, err) => logger.error(`[ContestService] ${platform} error:`, { error: err.message });
 
 export const contestService = {
   async save(platform, contestId, data) {

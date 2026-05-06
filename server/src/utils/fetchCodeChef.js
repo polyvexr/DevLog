@@ -57,7 +57,7 @@ export const fetchCodeChef = async (username) => {
     const scraped = await scrape(username);
     return scraped || {};
   } catch (err) {
-    console.log("CodeChef Fetch Error:", err.message);
+    logger.error(`CodeChef Fetch Error [${username}]:`, { error: err.message });
     return {};
   }
 };
