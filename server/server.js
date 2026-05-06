@@ -2,6 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import http from "http";
+import mongoose from "mongoose";
 import helmet from "helmet";
 import compression from "compression";
 import connectDB from "./src/config/db.js";
@@ -41,9 +42,10 @@ const allowedOrigins = [
 
 const corsOptions = {
   origin: function (origin, callback) {
-    // Allow requests with no origin only for specific paths (handled in custom middleware after this)
+    // Reject null origins in CORS callback — prevents Access-Control-Allow-Origin: null header injection.
+    // Allowed no-origin paths (cron, health) are handled by the custom middleware below.
     if (!origin) {
-      return callback(null, true);
+      return callback(null, false);
     }
 
     if (allowedOrigins.includes(origin)) {
@@ -75,6 +77,21 @@ app.use(compression());
 
 // Rate limiting
 app.use("/api", apiLimiter);
+
+// Request logging for error responses (production observability)
+app.use((req, res, next) => {
+  const start = Date.now();
+  res.on("finish", () => {
+    if (res.statusCode >= 400) {
+      logger.warn(`${req.method} ${req.path}`, {
+        status: res.statusCode,
+        duration: Date.now() - start,
+        ip: req.ip,
+      });
+    }
+  });
+  next();
+});
 
 // Paths that allow no-origin requests (for cron jobs)
 const noOriginAllowedPaths = ["/api/cron", "/api/health", "/"];
@@ -113,13 +130,16 @@ app.get("/", (req, res) => {
 
 // Health check endpoint
 app.get("/api/health", (req, res) => {
+  const mongoState = mongoose.connection.readyState;
+  const isHealthy = mongoState === 1;
   res.json({
     success: true,
     data: {
-      status: "ok",
+      status: isHealthy ? "ok" : "degraded",
       version: "2.0.0",
       environment: process.env.NODE_ENV,
       timestamp: new Date().toISOString(),
+      mongodb: ["disconnected", "connected", "connecting", "disconnecting"][mongoState] || "unknown",
     }
   });
 });
@@ -154,6 +174,14 @@ app.use((err, req, res, next) => {
 
   if (!statusCode) {
     statusCode = err.name === "ValidationError" ? 400 : 500;
+  }
+
+  // Sanitize internal error types in production
+  if (process.env.NODE_ENV === "production") {
+    if (err.name === "CastError") {
+      statusCode = 400;
+      message = "Invalid resource ID";
+    }
   }
 
   // Log error

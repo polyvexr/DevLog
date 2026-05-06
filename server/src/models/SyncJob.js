@@ -59,4 +59,16 @@ syncJobSchema.index({ status: 1, createdAt: 1 });
 syncJobSchema.index({ platform: 1, status: 1 });
 syncJobSchema.index({ userId: 1, platform: 1, status: 1 });
 
+// Auto-delete completed jobs after 30 days
+syncJobSchema.index({ completedAt: 1 }, { 
+  expireAfterSeconds: 30 * 24 * 60 * 60,
+  partialFilterExpression: { status: "completed" }
+});
+
+// Auto-delete failed jobs after 7 days
+syncJobSchema.index({ updatedAt: 1 }, {
+  expireAfterSeconds: 7 * 24 * 60 * 60,
+  partialFilterExpression: { status: "failed" }
+});
+
 export default mongoose.model("SyncJob", syncJobSchema);

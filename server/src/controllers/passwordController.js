@@ -40,12 +40,8 @@ export const forgotPassword = catchAsync(async (req, res) => {
     console.log("=================================");
   }
 
-  const responseData = process.env.NODE_ENV === "development" ? {
-    devToken: resetToken,
-    devNote: "This token is only shown in development mode"
-  } : null;
-
-  res.status(200).json(new ApiResponse(200, responseData, "If an account exists, a reset link will be sent"));
+  // NEVER include tokens in API response body — console log only in dev
+  res.status(200).json(new ApiResponse(200, null, "If an account exists, a reset link will be sent"));
 });
 
 /**

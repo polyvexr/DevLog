@@ -1,23 +1,11 @@
 import User from "../models/User.js";
 import PlatformStat from "../models/PlatformStat.js";
-import { fetchLeetCode } from "../utils/fetchLeetCode.js";
-import { fetchCodeforces } from "../utils/fetchCodeforces.js";
-import { fetchGithub } from "../utils/fetchGithub.js";
-import { fetchCodeChef } from "../utils/fetchCodeChef.js";
-import { fetchAtCoder } from "../utils/fetchAtCoder.js";
 import logger from "../utils/logger.js";
 import catchAsync from "../utils/catchAsync.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import ApiError from "../utils/ApiError.js";
 
-// Platform fetch function mapping
-const platformFetchers = {
-  leetcode: fetchLeetCode,
-  codeforces: fetchCodeforces,
-  github: fetchGithub,
-  codechef: fetchCodeChef,
-  atcoder: fetchAtCoder,
-};
+
 
 /**
  * Get all users with their platform details
@@ -32,15 +20,23 @@ export const getAllUsers = catchAsync(async (req, res) => {
     "userId platform username stats lastUpdated"
   ).lean();
 
+  // Use Map for O(1) lookup instead of O(n) filter per user
+  const platformsByUser = new Map();
+  for (const p of allPlatforms) {
+    const key = p.userId.toString();
+    if (!platformsByUser.has(key)) platformsByUser.set(key, []);
+    platformsByUser.get(key).push(p);
+  }
+
   const usersWithStats = users.map(user => ({
     ...user,
-    platforms: allPlatforms.filter(p => p.userId.toString() === user._id.toString())
+    platforms: platformsByUser.get(user._id.toString()) || []
   }));
 
   res.status(200).json(new ApiResponse(200, usersWithStats));
 });
 
-import { platformService } from "../services/platformService.js";
+import { platformService, platformFetchers } from "../services/platformService.js";
 
 // Concurrency configuration
 const PARALLEL_CONFIG = {

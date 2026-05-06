@@ -7,12 +7,10 @@ import { fetchGithub } from "../utils/fetchGithub.js";
 import { fetchCodeChef } from "../utils/fetchCodeChef.js";
 import { fetchAtCoder } from "../utils/fetchAtCoder.js";
 import logger from "../utils/logger.js";
-
-// Cooldown duration in milliseconds (6 hours)
-const COOLDOWN_MS = 6 * 60 * 60 * 1000;
+import { SUPPORTED_PLATFORMS, COOLDOWN_MS } from "../utils/constants.js";
 
 // Platform fetch function mapping
-const platformFetchers = {
+export const platformFetchers = {
   leetcode: fetchLeetCode,
   codeforces: fetchCodeforces,
   github: fetchGithub,
@@ -28,7 +26,7 @@ export const platformService = {
    * Get list of supported platforms
    */
   getSupportedPlatforms() {
-    return Object.keys(platformFetchers);
+    return SUPPORTED_PLATFORMS;
   },
 
   /**
@@ -117,23 +115,16 @@ export const platformService = {
       job.status = "pending";
       job.nextRetryAt = null;
       job.retryCount = 0;
-      await job.save();
+      if (typeof job.save === "function") {
+        await job.save();
+      } else {
+        await SyncJob.updateOne({ _id: job._id }, { status: "pending", nextRetryAt: null, retryCount: 0 });
+      }
       return {
         queued: true,
         message: "Retrying previously failed job",
         jobId: job._id
       };
-    }
-
-    // Update user cooldown
-    if (triggeredBy === "user") {
-      await User.updateOne(
-        { _id: userId },
-        {
-          [`cooldowns.${platform}.lastRefresh`]: new Date(),
-          [`cooldowns.${platform}.nextAvailable`]: new Date(Date.now() + COOLDOWN_MS)
-        }
-      );
     }
 
     return {
@@ -153,7 +144,11 @@ export const platformService = {
       // Mark as processing
       job.status = "processing";
       job.startedAt = new Date();
-      await job.save();
+      if (typeof job.save === "function") {
+        await job.save();
+      } else {
+        await SyncJob.updateOne({ _id: job._id }, { status: "processing", startedAt: job.startedAt });
+      }
 
       // Get platform stat record
       const platformStat = await PlatformStat.findOne({
@@ -176,24 +171,8 @@ export const platformService = {
 
       // Only update if we got valid data (align with adminController logic)
       if (freshData && Object.keys(freshData).length > 0 && !freshData.error) {
-        // Log a summary of what's being saved to help debug
-        const statsSummary = job.platform === "github"
-          ? `Public Repos: ${freshData.public_repos}`
-          : `Rating: ${freshData.rating || freshData.currentRating || "N/A"}`;
-
-        logger.info(`Updating DB for ${job.platform} (${platformStat.username}): ${statsSummary}`);
-
-        // Use findOneAndUpdate for better atomic updates in serverless
-        await PlatformStat.findOneAndUpdate(
-          { _id: platformStat._id },
-          {
-            $set: {
-              data: freshData,
-              stats: this.extractStats(job.platform, freshData),
-              lastUpdated: Date.now()
-            }
-          }
-        );
+        const stats = this.extractStats(job.platform, freshData);
+        await this.saveStats(job.userId, job.platform, stats, freshData);
 
         // Auto-update user avatar from LeetCode if not set
         if (job.platform === "leetcode" && freshData.avatar) {
@@ -207,16 +186,18 @@ export const platformService = {
           }
         }
 
-        // Also update User cooldown to show the latest sync time on the UI
-        await User.findOneAndUpdate(
-          { _id: job.userId },
-          {
-            $set: {
-              [`cooldowns.${job.platform}.lastRefresh`]: new Date(),
-              [`cooldowns.${job.platform}.nextAvailable`]: new Date(Date.now() + (6 * 60 * 60 * 1000))
+        // Update cooldown for user-triggered syncs ONLY after success
+        if (job.triggeredBy === "user") {
+          await User.updateOne(
+            { _id: job.userId },
+            {
+              $set: {
+                [`cooldowns.${job.platform}.lastRefresh`]: new Date(),
+                [`cooldowns.${job.platform}.nextAvailable`]: new Date(Date.now() + COOLDOWN_MS)
+              }
             }
-          }
-        );
+          );
+        }
 
         logger.info(`Database successfully updated for ${job.platform}`);
       } else {
@@ -233,7 +214,16 @@ export const platformService = {
       job.status = "completed";
       job.completedAt = new Date();
       job.executionDurationMs = Date.now() - startTime;
-      await job.save();
+      
+      if (typeof job.save === "function") {
+        await job.save();
+      } else {
+        await SyncJob.updateOne({ _id: job._id }, { 
+          status: job.status, 
+          completedAt: job.completedAt,
+          executionDurationMs: job.executionDurationMs
+        });
+      }
 
       logger.info(`Sync job completed for ${job.platform}`, {
         jobId: job._id,

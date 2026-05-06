@@ -1,4 +1,5 @@
 import axios from "axios";
+import logger from "./logger.js";
 
 // Get GitHub headers (with optional authentication)
 const getGitHubHeaders = () => {
@@ -121,7 +122,7 @@ export const fetchGithub = async (username) => {
       organizations,
     };
   } catch (err) {
-    console.log("GitHub Fetch Error:", err.message);
+    logger.error(`GitHub Fetch Error [${username}]:`, { error: err.message });
     return { error: err.response?.status === 404 ? "User not found" : err.message };
   }
 };

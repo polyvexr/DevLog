@@ -1,5 +1,6 @@
 import PlatformStat from "../models/PlatformStat.js";
 import PlatformAction from "../models/PlatformAction.js";
+import User from "../models/User.js";
 import { fetchLeetCode } from "../utils/fetchLeetCode.js";
 import { fetchGithub } from "../utils/fetchGithub.js";
 import { fetchCodeforces } from "../utils/fetchCodeforces.js";
@@ -60,13 +61,11 @@ export const linkPlatform = catchAsync(async (req, res) => {
     const readdUsed = req.user.oneTimeReaddUsed?.get?.(platform) || req.user.oneTimeReaddUsed?.[platform];
 
     if (blocked.lastAction === "unlink" && !readdUsed) {
-      if (!req.user.oneTimeReaddUsed) req.user.oneTimeReaddUsed = {};
-      if (typeof req.user.oneTimeReaddUsed.set === "function") {
-        req.user.oneTimeReaddUsed.set(platform, true);
-      } else {
-        req.user.oneTimeReaddUsed[platform] = true;
-      }
-      await req.user.save();
+      // req.user is lean — use atomic update instead of .save()
+      await User.updateOne(
+        { _id: req.user._id },
+        { $set: { [`oneTimeReaddUsed.${platform}`]: true } }
+      );
     } else {
       throw new ApiError(429, "You can add or remove this platform at most once every 2 days.");
     }

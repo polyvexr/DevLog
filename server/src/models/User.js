@@ -75,9 +75,11 @@ const userSchema = new mongoose.Schema({
 
 // Hash password
 userSchema.pre("save", async function () {
-  // Set default public username from email if not set OR always enforce it
   if (this.email && !this.publicProfile.username) {
-    this.publicProfile.username = this.email.split('@')[0];
+    // Generate unique username: email prefix + last 4 chars of ObjectId
+    const base = this.email.split('@')[0];
+    const suffix = this._id.toString().slice(-4);
+    this.publicProfile.username = `${base}-${suffix}`;
   }
 
   // Ensure username is always the email prefix (as requested)
@@ -104,5 +106,8 @@ userSchema.methods.generateResetToken = function () {
   this.resetPasswordExpires = Date.now() + 60 * 60 * 1000; // 1 hour
   return token;
 };
+
+// Compound index for public profile lookups
+userSchema.index({ "publicProfile.username": 1, "publicProfile.enabled": 1 });
 
 export default mongoose.model("User", userSchema);

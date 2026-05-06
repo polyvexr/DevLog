@@ -21,7 +21,10 @@ const authorizeCron = (req) => {
   const authHeader = req.headers["authorization"];
   const bearerToken = authHeader?.startsWith("Bearer ") ? authHeader.split(" ")[1] : null;
 
-  if (!process.env.CRON_SECRET) return true; // Dev mode
+  if (!process.env.CRON_SECRET) {
+    // Only allow unauthenticated cron in development
+    return process.env.NODE_ENV !== "production";
+  }
 
   return cronSecret === process.env.CRON_SECRET || bearerToken === process.env.CRON_SECRET;
 };

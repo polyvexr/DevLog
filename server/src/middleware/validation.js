@@ -62,9 +62,15 @@ export const validatePlatformLink = (req, res, next) => {
     throw new ApiError(400, "Username is required");
   }
 
+  // Sanitize: alphanumeric, underscores, hyphens, dots only; max 39 chars (GitHub limit)
+  const sanitized = username.trim();
+  if (sanitized.length > 39 || !/^[a-zA-Z0-9._-]+$/.test(sanitized)) {
+    throw new ApiError(400, "Username must be 1-39 characters (letters, numbers, dots, hyphens, underscores)");
+  }
+
   // Normalize platform to lowercase
   req.body.platform = platform.toLowerCase();
-  req.body.username = username.trim();
+  req.body.username = sanitized;
 
   next();
 };

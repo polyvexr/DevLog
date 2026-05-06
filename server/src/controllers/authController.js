@@ -64,6 +64,8 @@ export const login = catchAsync(async (req, res) => {
 
   const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
     expiresIn: "7d",
+    issuer: "devlog-api",
+    audience: "devlog-client",
   });
 
   res.status(200).json(

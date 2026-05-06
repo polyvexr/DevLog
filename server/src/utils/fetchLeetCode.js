@@ -1,4 +1,5 @@
 import axios from "axios";
+import logger from "./logger.js";
 
 export const fetchLeetCode = async (username) => {
   const query = `
@@ -58,7 +59,7 @@ export const fetchLeetCode = async (username) => {
 
     const { data, errors } = res.data;
     if (errors) {
-      console.error(`LC GraphQL Errors [${username}]:`, errors.map(e => e.message).join(", "));
+      logger.warn(`LC GraphQL Errors [${username}]:`, { errors: errors.map(e => e.message) });
     }
 
     if (!data?.matchedUser) {
@@ -104,7 +105,7 @@ export const fetchLeetCode = async (username) => {
       countryName: profile.countryName
     };
   } catch (err) {
-    console.error(`LC Fetch Error [${username}]:`, err.message);
+    logger.error(`LC Fetch Error [${username}]:`, { error: err.message });
     return { error: `Network Error: ${err.message}` };
   }
 };

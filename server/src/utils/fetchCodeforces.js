@@ -1,11 +1,12 @@
 import axios from "axios";
+import logger from "./logger.js";
 
 export const fetchCodeforces = async (username) => {
   try {
     // Parallel fetch all CF data
     const [userInfoRes, submissionsRes, ratingRes] = await Promise.all([
       axios.get(`https://codeforces.com/api/user.info?handles=${username}`, { timeout: 15000 }).catch(err => err.response),
-      axios.get(`https://codeforces.com/api/user.status?handle=${username}&from=1&count=10000`, { timeout: 20000 }).catch(err => err.response),
+      axios.get(`https://codeforces.com/api/user.status?handle=${username}&from=1&count=5000`, { timeout: 20000 }).catch(err => err.response),
       axios.get(`https://codeforces.com/api/user.rating?handle=${username}`, { timeout: 15000 }).catch(err => err.response),
     ]);
 
@@ -106,7 +107,7 @@ export const fetchCodeforces = async (username) => {
       ...ratingHistory,
     };
   } catch (err) {
-    console.log("CF Fetch Error:", err.message);
+    logger.error(`CF Fetch Error [${username}]:`, { error: err.message });
     return { error: err.message };
   }
 };

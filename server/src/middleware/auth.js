@@ -11,7 +11,10 @@ export const protect = catchAsync(async (req, res, next) => {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET, {
+      issuer: "devlog-api",
+      audience: "devlog-client",
+    });
     const user = await User.findById(decoded.id).select("-password").lean();
 
     if (!user) {
@@ -37,7 +40,10 @@ export const optionalAuth = catchAsync(async (req, res, next) => {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET, {
+      issuer: "devlog-api",
+      audience: "devlog-client",
+    });
     req.user = await User.findById(decoded.id).select("-password").lean();
     next();
   } catch (err) {

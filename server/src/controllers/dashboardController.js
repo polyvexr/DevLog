@@ -41,7 +41,6 @@ export const getDashboardData = catchAsync(async (req, res) => {
       platform: stat.platform,
       username: stat.username,
       stats: stat.stats,
-      data: stat.data,
       lastUpdated: stat.lastUpdated,
       lastManualRefresh: stat.lastManualRefresh,
       canRefresh: isAvailable,
