@@ -1,6 +1,6 @@
 # DevLog
 
-A premium Developer Activity Tracker that aggregates statistics from multiple coding platforms into a single, beautiful dashboard. Track your progress on LeetCode, Codeforces, GitHub, AtCoder, and CodeChef in one place.
+A premium Professional Skill Record Tracker that combines progress information from multiple programming websites into a single, beautiful overview center. Track your progress on LeetCode, Codeforces, GitHub, AtCoder, and CodeChef in one place.
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![React](https://img.shields.io/badge/React-19-blue)
@@ -8,136 +8,147 @@ A premium Developer Activity Tracker that aggregates statistics from multiple co
 ![Tailwind](https://img.shields.io/badge/Tailwind-4-38B2AC)
 ![Node](https://img.shields.io/badge/Node-20+-339933)
 
-## 🌐 Live Demo
+## 🌐 Live Presentation
 [Check out DevLog](https://my-devlog.vercel.app)
 
 ## ✨ Features
 
-- 🔐 **Secure Authentication** - JWT-based login, registration, and password recovery.
-- 📊 **Unified Dashboard** - Aggregate stats from LeetCode, Codeforces, GitHub, AtCoder, and CodeChef.
-- 📅 **Contest Calendar** - Stay updated with upcoming contests across all platforms using CList API.
-- 👤 **Public Profiles** - Share your coding journey with a customizable public profile link.
-- 👑 **Admin Control Panel** - Role-based access to manage users and trigger manual data synchronization.
-- 🔄 **Efficient Synchronization** - Unified cron jobs (300s timeout) and manual sync to respect API rate limits.
-- 📱 **Fully Responsive** - Premium dark-themed UI built with Tailwind CSS 4.
-- 📧 **Email Notifications** - Automated emails for password resets via Resend.
-- 🤖 **Telegram Integration** - Optional notifications via Telegram Bot.
+- 🔐 **Secure Identity Verification** - Secure token-based entry, registration, and account recovery.
+- 📊 **Single Overview Area** - Consolidate information from LeetCode, Codeforces, GitHub, AtCoder, and CodeChef.
+- 📅 **Competition Schedule** - Stay updated with upcoming events across all services using the standard information interface.
+- 👤 **Open Profiles** - Share your professional journey with a customizable shared page link.
+- 👑 **Management Center** - Permission-based access to manage members and trigger manual information matching.
+- 🔄 **Smooth Information Matching** - Standardized scheduled tasks and manual updates to respect service usage boundaries.
+- 📱 **Universal Device Support** - Premium dark-themed display interface built with modern styling tools.
+- 📧 **Email Notifications** - Automated messages for account resets.
+- 🤖 **Messaging Integration** - Optional alerts via messaging services.
 
-## 🚀 Tech Stack
+## 🚀 Technical Foundation
 
-### Frontend
-- **Framework:** React 19 + Vite 7
-- **Styling:** Tailwind CSS 4 (Utility-first, high performance)
-- **Routing:** React Router 7
-- **Icons:** React Icons
-- **Charts:** Recharts for data visualization
-- **State:** Context API
+### Visual System
+- **Foundation:** React 19 + Vite 7
+- **Styling:** Tailwind CSS 4 (Performance-focused design)
+- **Navigation:** Navigation Manager 7
+- **Icons:** Visual Symbols
+- **Charts:** Information visualization tools
+- **State:** Application Memory
 
-### Backend
-- **Runtime:** Node.js (ES Modules)
-- **Framework:** Express 5
-- **Database:** MongoDB + Mongoose
-- **Auth:** JWT + BcryptJS
-- **Security:** Helmet, CORS, Express Rate Limit
-- **Mailing:** Resend
-- **Logging:** Winston
-- **Notifications:** Telegram Bot API
+### Core Processing System
+- **Runtime:** Execution Environment (Modern Standards)
+- **Structure:** Web Foundation 5
+- **Records System:** Information Storage + Organization Tool
+- **Entry Security:** Identity Verification + Security Scrambling
+- **Safety:** Security Headers, Shared Resource Rules, Usage Restrictions
+- **Mailing:** Email Service
+- **Logging:** Activity Record Keeping
+- **Notifications:** Alert Service Interface
 
 ## 🛠️ Installation & Setup
 
-### Prerequisites
-- Node.js (v20 or higher)
-- MongoDB (Local or Atlas)
-- npm or yarn
+### Requirements
+- Execution Environment (v20 or higher)
+- Records System (Local or Cloud)
+- Package manager
 
-### 1. Clone the Repository
+### 1. Copy the Project
 ```bash
 git clone https://github.com/Shankar-CSE/DevLog.git
 cd DevLog
 ```
 
-### 2. Backend Setup
+### 2. Internal System Setup
 ```bash
 cd server
 npm install
 ```
-Create a `.env` file in the `server` directory using `.env.example`:
+Create a configuration file in the `server` directory using the template:
 ```env
 PORT=5000
 NODE_ENV=development
-MONGO_URI=your_mongodb_uri
-JWT_SECRET=your_jwt_secret
+MONGO_URI=your_storage_link
+JWT_SECRET=your_security_key
 CLIENT_URL=http://localhost:5173
-RESEND_API_KEY=your_resend_key
+RESEND_API_KEY=your_email_key
 RESEND_FROM_EMAIL=your_email
-CRON_SECRET=your_cron_secret
+CRON_SECRET=your_schedule_key
 CLIST_API_KEY=username:api_key
-TELEGRAM_BOT_TOKEN=your_bot_token
+TELEGRAM_BOT_TOKEN=your_alert_token
 TELEGRAM_CHAT_ID=your_chat_id
 ```
-Start the development server:
+Start the creation server:
 ```bash
 npm run dev
 ```
 
-### 3. Frontend Setup
+### 3. Visual System Setup
 ```bash
 cd ../client
 npm install
 npm run dev
 ```
-Create a `.env` file in the `client` directory:
+Create a configuration file in the `client` directory:
 ```env
 VITE_BACKEND_URL=http://localhost:5000/api
 ```
 
-## 📂 Project Structure
+## 📂 Project Organization
 
 ```
 DevLog/
-├── client/                # Frontend React application
+├── client/                # Visual interface application
 │   ├── src/
-│   │   ├── api/          # Axios instance & API calls
-│   │   ├── components/   # UI components (PlatformCard, StatCard, etc.)
-│   │   ├── context/      # Auth & Sidebar Context Providers
-│   │   ├── hooks/        # Custom hooks (useApi, useSidebar)
-│   │   ├── pages/        # Dashboard, Details, Auth Pages, etc.
-│   │   ├── App.jsx       # Root component & Routing
-│   │   └── index.css     # Global styles (Tailwind 4)
-│   └── vercel.json        # Frontend deployment config
-├── server/                # Backend Express application
+│   │   ├── api/          # Connection tools & data requests
+│   │   ├── components/   # Visual elements (Card, Item, etc.)
+│   │   ├── context/      # Security & Sidebar Memory
+│   │   ├── hooks/        # Custom functions
+│   │   ├── pages/        # Overview, Details, Login Pages, etc.
+│   │   ├── App.jsx       # Main component & Navigation
+│   │   └── index.css     # General styling
+│   └── vercel.json        # Publishing configuration
+├── server/                # Core processing application
 │   ├── src/
-│   │   ├── config/       # DB connection & Logger setup
-│   │   ├── controllers/  # API business logic
-│   │   ├── cron/         # Scheduled tasks (Sync, Contests)
-│   │   ├── middleware/   # Auth, AdminAuth, RateLimiting
-│   │   ├── models/       # Mongoose Schemas (User, Stats, Contests)
-│   │   ├── routes/       # Express Route definitions
-│   │   ├── services/     # External integrations (Email, Telegram)
-│   │   └── utils/        # Fetchers (LeetCode, GitHub, etc.) & Cache
-│   ├── api/              # Vercel Serverless Entry (index.js)
-│   ├── scripts/          # Admin & Migration scripts
-│   └── vercel.json        # Backend deployment & Cron schedule
-└── DOCUMENTATION.md      # Comprehensive technical documentation
+│   │   ├── config/       # Storage connection & Record setup
+│   │   ├── controllers/  # Logic management
+│   │   ├── cron/         # Scheduled tasks
+│   │   ├── middleware/   # Security & Safety checks
+│   │   ├── models/       # Information Structures
+│   │   ├── routes/       # Navigation definitions
+│   │   ├── services/     # External connections (Email, Alerts)
+│   │   └── utils/        # Data Fetchers & Temporary Memory
+│   ├── api/              # Entry Point
+│   ├── scripts/          # Management & Transfer scripts
+│   └── vercel.json        # Publishing & Schedule settings
+└── DOCUMENTATION.md      # Comprehensive professional documentation
 ```
 
-## 🕒 Cron Jobs & Syncing
+## 🕒 Scheduled Tasks & Updates
 
-DevLog uses a unified cron endpoint to manage data synchronization:
-- **Endpoint:** `/api/cron/all`
-- **Schedule:** Runs daily at midnight (UTC+5:30) via Vercel Crons.
-- **Vercel Timeout:** Configured for 300s to handle long-running sync operations.
-- **Manual Sync:** Admins can trigger a full sync from the Admin Dashboard.
-- **User Sync:** Users can refresh individual platform stats with a cooldown period.
+DevLog uses a unified access point to manage information matching:
+- **Access Point:** `/api/cron/all`
+- **Schedule:** Runs daily at midnight via automated publishing services.
+- **Waiting Time:** Configured for 300s to handle long-running updates.
+- **Manual Matching:** Managers can trigger a full update from the Management Area.
+- **User Update:** Users can refresh individual service records with a waiting period.
 
-## 🤝 Contributing
+## 🤝 Helping Out
 
 Contributions are welcome! Please follow these steps:
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+1. Copy the Project
+2. Create your Work Branch (`git checkout -b feature/AmazingFeature`)
+3. Save your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Upload to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Review Request
+
+## 📄 Usage Rules
+
+Distributed under the MIT License. See `LICENSE` for more information.
+
+## 📞 Reach Out
+
+Shankar - [GitHub](https://github.com/Shankar-CSE)
+
+Project Link: [https://github.com/Shankar-CSE/DevLog](https://github.com/Shankar-CSE/DevLog)
+Open a Pull Request
 
 ## 📄 License
 

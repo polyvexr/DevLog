@@ -1,134 +1,134 @@
 # DevLog - Complete Project Documentation
 
-> A comprehensive developer activity tracking dashboard that aggregates statistics from LeetCode, Codeforces, and GitHub.
+> A comprehensive professional activity tracking overview center that combines information from LeetCode, Codeforces, and GitHub.
 
 ---
 
 ## Table of Contents
 
 - [Project Overview](#project-overview)
-- [Architecture](#architecture)
-- [Technology Stack](#technology-stack)
-- [Project Structure](#project-structure)
-- [Backend Documentation](#backend-documentation)
+- [System Structure](#system-structure)
+- [Set of Tools Used](#set-of-tools-used)
+- [Project Organization](#project-organization)
+- [Internal System Records](#internal-system-records)
   - [Server Entry Point](#server-entry-point)
-  - [Database Configuration](#database-configuration)
-  - [Models](#models)
-  - [Controllers](#controllers)
-  - [Middleware](#middleware)
-  - [External API Utilities](#external-api-utilities)
-- [Frontend Documentation](#frontend-documentation)
+  - [Storage Settings](#storage-settings)
+  - [Information Structures](#information-structures)
+  - [Logic Managers](#logic-managers)
+  - [Safety & Processing Checks](#safety--processing-checks)
+  - [External Service Connectors](#external-service-connectors)
+- [Visual Interface Records](#visual-interface-records)
   - [Application Entry](#application-entry)
-  - [Routing Configuration](#routing-configuration)
-  - [Context Providers](#context-providers)
-  - [API Client](#api-client)
-  - [Components](#components)
+  - [Navigation Setup](#navigation-setup)
+  - [Global Memory Systems](#global-memory-systems)
+  - [Connection Tool](#connection-tool)
+  - [Visual Elements](#visual-elements)
   - [Pages](#pages)
-- [Database Schema](#database-schema)
-- [API Reference](#api-reference)
-- [Authentication & Authorization](#authentication--authorization)
-- [Features Deep Dive](#features-deep-dive)
-- [Styling & Design System](#styling--design-system)
+- [Record Layout](#record-layout)
+- [Standard Interface Reference](#standard-interface-reference)
+- [Identity Verification & Access Permissions](#identity-verification--access-permissions)
+- [Detailed Look at Features](#detailed-look-at-features)
+- [Visual Design Standards](#visual-design-standards)
 - [Environment Configuration](#environment-configuration)
-- [Deployment Guide](#deployment-guide)
-- [Security Considerations](#security-considerations)
-- [Scripts](#scripts)
-- [Contributing](#contributing)
+- [Publishing Instructions](#publishing-instructions)
+- [Safety Precautions](#safety-precautions)
+- [Utility Commands](#utility-commands)
+- [Helping Out](#helping-out)
 
 ---
 
 ## Project Overview
 
-**DevLog** is a comprehensive developer activity tracking dashboard that aggregates statistics from multiple major coding platforms:
+**DevLog** is a comprehensive professional activity tracking overview center that combines information from multiple major programming websites:
 
-| Platform | Description |
+| Service | Description |
 |----------|-------------|
-| **LeetCode** | Competitive programming and interview preparation |
-| **Codeforces** | Competitive programming contests |
-| **GitHub** | Open source contributions and repositories |
-| **AtCoder** | Japanese competitive programming platform |
-| **CodeChef** | Indian competitive programming platform |
+| **LeetCode** | Professional programming and interview preparation |
+| **Codeforces** | Programming events and contests |
+| **GitHub** | Open source collaboration and project storage |
+| **AtCoder** | Japanese programming platform |
+| **CodeChef** | Indian programming platform |
 
 ### Core Value Proposition
 
-- **Unified Dashboard**: Single interface to view all coding activities.
-- **Progress Tracking**: Monitor growth across platforms over time.
-- **Contest Calendar**: Stay updated with upcoming contests from CList API.
-- **Public Profiles**: Showcase your stats to others via a dedicated URL.
-- **Admin Control**: Manual and automated synchronization to manage API rate limits.
-- **Real-time Stats**: Detailed statistics including problems solved, ratings, and contributions.
-- **Telegram Notifications**: Get notified about your progress and contest schedules.
+- **Unified Overview Center**: Single interface to view all programming activities.
+- **Progress Tracking**: Monitor growth across services over time.
+- **Competition Schedule**: Stay updated with upcoming events from the standard interface.
+- **Open Profiles**: Showcase your information to others via a dedicated link.
+- **Management Center**: Manual and automated updates to manage service usage boundaries.
+- **Real-time Stats**: Detailed information including tasks completed, ratings, and contributions.
+- **Messaging Alerts**: Get notified about your progress and event schedules.
 
 ---
 
-## Architecture
+## System Structure
 
-### High-Level Architecture
+### High-Level System Structure
 
 ```
 ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
 │                 │     │                 │     │                 │
-│  React Client   │────▶│  Express API    │────▶│    MongoDB      │
-│  (Vite + React) │     │  (Node.js)      │     │   (Database)    │
+│  Visual Client  │────▶│  Core System    │────▶│    Storage      │
+│  (Modern Web)   │     │  (Execution)    │     │   (Records)     │
 │                 │     │                 │     │                 │
 └─────────────────┘     └────────┬────────┘     └─────────────────┘
                                  │
                                  ▼
                     ┌────────────────────────┐
-                    │   External APIs        │
-                    │  - LeetCode GraphQL    │
-                    │  - Codeforces API      │
-                    │  - GitHub REST API     │
+                    │   External Services    │
+                    │  - LeetCode Data       │
+                    │  - Codeforces Data     │
+                    │  - GitHub Data         │
                     └────────────────────────┘
 ```
 
-### Data Flow
+### Information Flow
 
-1. **User Authentication** → JWT token issued
-2. **Platform Linking** → Username stored, initial data fetch
-3. **Stats Display** → Cached data from MongoDB
-4. **Manual Refresh** → Admin/User triggered sync with cooldown
-5. **Admin Sync** → Bulk synchronization for all users
+1. **Identity Verification** → Secure token issued
+2. **Account Linking** → Username stored, initial data fetch
+3. **Information Display** → Cached records from storage
+4. **Manual Update** → Manager/User triggered matching with waiting period
+5. **Admin Update** → Bulk information matching for all members
 
 ---
 
-## Technology Stack
+## Set of Tools Used
 
-### Frontend
+### Visual System
 
-| Technology | Version | Purpose |
+| Tool | Version | Purpose |
 |------------|---------|---------|
-| React | 19.x | UI Framework |
-| Vite | 7.x | Build Tool & Dev Server |
-| React Router | 7.x | Client-side Routing |
-| Axios | 1.x | HTTP Client |
-| Tailwind CSS | 4.x | Utility-first CSS |
-| React Icons | 5.x | Icon Library |
+| React | 19.x | Visual Framework |
+| Vite | 7.x | Build Tool & Creation Server |
+| React Router | 7.x | Client-side Navigation |
+| Axios | 1.x | Connection Tool |
+| Tailwind CSS | 4.x | Design Tool |
+| React Icons | 5.x | Symbol Library |
 
-### Backend
+### Internal System
 
-| Technology | Version | Purpose |
+| Tool | Version | Purpose |
 |------------|---------|---------|
-| Node.js | 20.x+ | Runtime Environment |
-| Express | 5.x | Web Framework |
-| MongoDB | 7.x+ | Database |
-| Mongoose | 9.x | ODM |
-| JWT | - | Authentication |
-| Bcrypt | 3.x | Password Hashing |
+| Node.js | 20.x+ | Execution Environment |
+| Express | 5.x | Web Foundation |
+| MongoDB | 7.x+ | Records System |
+| Mongoose | 9.x | Organization Tool |
+| JWT | - | Identity Verification |
+| Bcrypt | 3.x | Security Scrambling |
 
-### External APIs
+### External Service Interfaces
 
-| Platform | API Type | Endpoint |
+| Service | Interface Type | Access Point |
 |----------|----------|----------|
-| LeetCode | GraphQL | `https://leetcode.com/graphql` |
-| Codeforces | REST | `https://codeforces.com/api/` |
-| GitHub | REST | `https://api.github.com/` |
-| AtCoder | Scraping | `https://atcoder.jp/users/` |
-| CodeChef | REST/Scraping | `https://www.codechef.com/users/` |
+| LeetCode | Data Query | `https://leetcode.com/graphql` |
+| Codeforces | Request | `https://codeforces.com/api/` |
+| GitHub | Request | `https://api.github.com/` |
+| AtCoder | Information Scan | `https://atcoder.jp/users/` |
+| CodeChef | Request/Scan | `https://www.codechef.com/users/` |
 
 ---
 
-## Project Structure
+## Project Organization
 
 ### Complete Directory Tree
 
@@ -138,120 +138,120 @@ DevLog/
 ├── README.md
 ├── DOCUMENTATION.md
 │
-├── client/                          # Frontend Application
-│   ├── .env.example                 # Environment template
-│   ├── eslint.config.js             # ESLint configuration
-│   ├── index.html                   # HTML entry point
-│   ├── package.json                 # Dependencies
-│   ├── vite.config.js               # Vite configuration
+├── client/                          # Visual Application
+│   ├── .env.example                 # Settings template
+│   ├── eslint.config.js             # Rule configuration
+│   ├── index.html                   # Entry point
+│   ├── package.json                 # Project tools
+│   ├── vite.config.js               # Creation settings
 │   │
 │   └── src/
-│       ├── App.jsx                  # Root component & routing
-│       ├── main.jsx                 # Application entry
-│       ├── index.css                # Global styles & animations
+│       ├── App.jsx                  # Root component & navigation
+│       ├── main.jsx                 # Application start
+│       ├── index.css                # General styles & animations
 │       │
 │       ├── api/
-│       │   └── axios.js             # API client configuration
+│       │   └── axios.js             # Connection settings
 │       │
 │       ├── components/
-│       │   ├── AuthenticatedLayout.jsx  # Protected route layout
-│       │   ├── ContestCard.jsx          # Contest display component
-│       │   ├── FullPageLoader.jsx       # Global loading state
-│       │   ├── PlatformCard.jsx         # Platform stats card
-│       │   ├── PlatformDetails.jsx      # Detailed platform stats
-│       │   └── Sidebar.jsx              # Navigation sidebar
+│       │   ├── AuthenticatedLayout.jsx  # Secure area layout
+│       │   ├── ContestCard.jsx          # Event display element
+│       │   ├── FullPageLoader.jsx       # General waiting state
+│       │   ├── PlatformCard.jsx         # Service information card
+│       │   ├── PlatformDetails.jsx      # Detailed service information
+│       │   └── Sidebar.jsx              # Navigation menu
 │       │
 │       ├── context/
-│       │   ├── AuthProvider.jsx         # Auth state provider
-│       │   └── SidebarProvider.jsx      # Sidebar state provider
+│       │   ├── AuthProvider.jsx         # Identity state provider
+│       │   └── SidebarProvider.jsx      # Menu state provider
 │       │
 │       ├── hooks/
-│       │   ├── useApi.js                # Global API handling hook
-│       │   └── useSidebar.js            # Sidebar custom hook
+│       │   ├── useApi.js                # Global connection hook
+│       │   └── useSidebar.js            # Menu custom function
 │       │
 │       └── pages/
-│           ├── AdminDashboard.jsx       # Admin control panel
-│           ├── AdminUsers.jsx           # User management for admins
-│           ├── Dashboard.jsx            # Main dashboard
-│           ├── Contests.jsx             # Contest calendar page
-│           ├── PublicProfile.jsx        # Public stats page
-│           ├── Settings.jsx             # User settings & profile
-│           ├── LeetCodeDetails.jsx      # Platform specific pages...
+│           ├── AdminDashboard.jsx       # Management control panel
+│           ├── AdminUsers.jsx           # Member management
+│           ├── Dashboard.jsx            # Main overview
+│           ├── Contests.jsx             # Event schedule page
+│           ├── PublicProfile.jsx        # Shared information page
+│           ├── Settings.jsx             # User preferences & profile
+│           ├── LeetCodeDetails.jsx      # Service specific pages...
 │           └── ...
 │
-└── server/                          # Backend Application
-    ├── .env                         # Environment variables
-    ├── .env.example                 # Environment template
-    ├── server.js                    # Application entry
+└── server/                          # Internal Application
+    ├── .env                         # Secret settings
+    ├── .env.example                 # Settings template
+    ├── server.js                    # Application start
     ├── api/
-    │   └── index.js                 # Vercel serverless entry
+    │   └── index.js                 # Entry point
     │
     ├── src/
     │   ├── config/
-    │   │   ├── db.js                # MongoDB connection
-    │   │   └── logger.js            # Winston logger setup
+    │   │   ├── db.js                # Storage connection
+    │   │   └── logger.js            # Record keeping setup
     │   │
     │   ├── controllers/
-    │   │   ├── adminController.js   # Admin operations
-    │   │   ├── contestController.js # Contest data management
-    │   │   ├── cronController.js    # Sync orchestrator
-    │   │   ├── statsController.js   # User statistics
+    │   │   ├── adminController.js   # Management operations
+    │   │   ├── contestController.js # Event data management
+    │   │   ├── cronController.js    # Update orchestrator
+    │   │   ├── statsController.js   # Member information
     │   │   └── ...
     │   │
     │   ├── cron/
-    │   │   ├── index.js             # Cron entry point
-    │   │   ├── fetchContests.js     # Background contest fetcher
-    │   │   └── processSyncJobs.js   # User data sync worker
+    │   │   ├── index.js             # Schedule entry point
+    │   │   ├── fetchContests.js     # Background event fetcher
+    │   │   └── processSyncJobs.js   # Information matching worker
     │   │
     │   ├── middleware/
-    │   │   ├── auth.js              # JWT verification
-    │   │   └── adminAuth.js         # Admin authorization
+    │   │   ├── auth.js              # Identity verification
+    │   │   └── adminAuth.js         # Manager permissions
     │   │
     │   ├── models/
-    │   │   ├── User.js              # User & Role schema
-    │   │   ├── PlatformStat.js      # Cached platform data
-    │   │   ├── Contest.js           # Contest calendar data
-    │   │   └── SyncJob.js           # Tracking sync status
+    │   │   ├── User.js              # Member & Role structure
+    │   │   ├── PlatformStat.js      # Cached service data
+    │   │   ├── Contest.js           # Event schedule data
+    │   │   └── SyncJob.js           # Tracking update status
     │   │
-    │   ├── routes/                  # Express routing...
+    │   ├── routes/                  # Navigation paths...
     │   │
     │   ├── services/
-    │   │   ├── emailService.js      # Resend integration
-    │   │   ├── telegramService.js   # Telegram bot integration
-    │   │   └── platformService.js   # Core sync logic
+    │   │   ├── emailService.js      # Email integration
+    │   │   ├── telegramService.js   # Messaging alert integration
+    │   │   └── platformService.js   # Core matching logic
     │   │
     │   └── utils/
-    │       ├── fetchLeetCode.js     # Platform fetchers...
-    │       └── cache.js             # Utility for caching
+    │       ├── fetchLeetCode.js     # Service fetchers...
+    │       └── cache.js             # Utility for temporary memory
     │
-    └── scripts/                     # Utility & Migration scripts
+    └── scripts/                     # Utility & Transfer commands
 ```
 
 ---
 
-## Backend Documentation
+## Internal System Records
 
 ### Server Entry Point
 
 **File**: `server/server.js`
 
 ```javascript
-// Core setup
+// General setup
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import http from "http";
 
-// Configuration
+// Settings
 const PORT = process.env.PORT || 5000;
 const app = express();
 
-// Middleware stack
-app.use("/api", apiLimiter);      // Rate limiting
-app.use(express.json());           // JSON parsing
-app.use(cors(corsOptions));        // CORS handling
+// Processing stack
+app.use("/api", apiLimiter);      // Usage restriction
+app.use(express.json());           // Data reading
+app.use(cors(corsOptions));        // Shared resource rules
 
-// Route mounting
+// Access point mounting
 app.use("/api/auth", authRoutes);
 app.use("/api/auth", passwordRoutes);
 app.use("/api/platforms", platformRoutes);
@@ -262,17 +262,17 @@ app.use("/api/user", userRoutes);
 
 ---
 
-### Database Configuration
+### Storage Settings
 
 **File**: `server/src/config/db.js`
 
-MongoDB connection using Mongoose with connection pooling and retry logic.
+Storage connection using organization tools with shared resources and retry logic.
 
 ---
 
-### Models
+### Information Structures
 
-#### User Model
+#### Member Model
 
 **File**: `server/src/models/User.js`
 
@@ -289,21 +289,21 @@ const userSchema = new mongoose.Schema({
 });
 ```
 
-**Methods**:
+**Actions**:
 
-| Method | Description |
+| Action | Description |
 |--------|-------------|
-| `matchPassword` | Compare password with hash |
-| `generateResetToken` | Generate password reset token |
+| `matchPassword` | Compare password with secure record |
+| `generateResetToken` | Create password reset token |
 
 **Features**:
-- Pre-save password hashing with bcrypt
-- Password comparison method
-- Reset token generation with crypto
+- Automatic security scrambling for passwords
+- Password comparison tool
+- Reset token creation with security tools
 
 ---
 
-#### PlatformStat Model
+#### Service Information Structure
 
 **File**: `server/src/models/PlatformStat.js`
 
@@ -321,7 +321,7 @@ const platformStatSchema = new mongoose.Schema({
 
 ---
 
-#### PlatformAction Model
+#### Service Action Structure
 
 **File**: `server/src/models/PlatformAction.js`
 
@@ -336,7 +336,7 @@ const platformActionSchema = new mongoose.Schema({
 
 ---
 
-#### Contest Model
+#### Event Structure
 
 **File**: `server/src/models/Contest.js`
 
@@ -353,7 +353,7 @@ const contestSchema = new mongoose.Schema({
 
 ---
 
-#### SyncJob Model
+#### Update Task Structure
 
 **File**: `server/src/models/SyncJob.js`
 
@@ -371,90 +371,90 @@ const syncJobSchema = new mongoose.Schema({
 
 ---
 
-### Controllers
+### Logic Managers
 
-#### Authentication Controller
+#### Identity Verification Manager
 
 **File**: `server/src/controllers/authController.js`
 
-| Function | Description |
+| Action | Description |
 |----------|-------------|
-| `register` | Create new user account |
-| `login` | Authenticate user, return JWT |
-| `getMe` | Get current user profile |
-| `updateProfile` | Update user information |
+| `register` | Create new member account |
+| `login` | Verify identity, return secure token |
+| `getMe` | Get current member profile |
+| `updateProfile` | Update member information |
 | `updatePassword` | Change password |
-| `updateSettings` | Update user preferences |
+| `updateSettings` | Update member preferences |
 
 ---
 
-#### Admin Controller
+#### Management Area Manager
 
 **File**: `server/src/controllers/adminController.js`
 
-| Function | Description |
+| Action | Description |
 |----------|-------------|
-| `syncAllPlatforms` | Sync all platforms for all users |
-| `syncLeetCode` | Sync only LeetCode data |
-| `syncCodeforces` | Sync only Codeforces data |
-| `syncGitHub` | Sync only GitHub data |
-| `getSyncStats` | Get admin dashboard statistics |
-| `getAllUsers` | List and manage all registered users |
+| `syncAllPlatforms` | Match all services for all members |
+| `syncLeetCode` | Match only LeetCode information |
+| `syncCodeforces` | Match only Codeforces information |
+| `syncGitHub` | Match only GitHub information |
+| `getSyncStats` | Get management overview information |
+| `getAllUsers` | List and manage all registered members |
 
 ---
 
-#### Contest Controller
+#### Event Manager
 
 **File**: `server/src/controllers/contestController.js`
 
-| Function | Description |
+| Action | Description |
 |----------|-------------|
-| `getUpcomingContests` | Retrieve upcoming contests from DB |
-| `refreshContests` | Trigger background fetch from CList |
+| `getUpcomingContests` | Retrieve upcoming events from storage |
+| `refreshContests` | Trigger background fetch from external source |
 
 ---
 
-#### Cron Controller
+#### Schedule Manager
 
 **File**: `server/src/controllers/cronController.js`
 
-| Function | Description |
+| Action | Description |
 |----------|-------------|
-| `handleUnifiedCron` | Orchestrates daily sync and contest fetching |
-| `triggerSyncQueue` | Manually starts the background sync worker |
+| `handleUnifiedCron` | Orchestrates daily matching and event fetching |
+| `triggerSyncQueue` | Manually starts the background matching worker |
 
 ---
 
-#### Public Profile Controller
+#### Shared Page Manager
 
 **File**: `server/src/controllers/publicProfileController.js`
 
-| Function | Description |
+| Action | Description |
 |----------|-------------|
-| `getPublicProfile` | Fetches public stats for a specific username |
-| `getPublicStats` | Returns specific platform stats for public view |
+| `getPublicProfile` | Fetches public information for a specific member |
+| `getPublicStats` | Returns specific service information for public view |
 
 ---
 
-#### Dashboard Controller
+#### Overview Manager
 
 **File**: `server/src/controllers/dashboardController.js`
 
-| Function | Description |
+| Action | Description |
 |----------|-------------|
-| `getUserDashboard` | Aggregates all user stats for the home page |
+| `getUserDashboard` | Combines all member information for the home page |
 
 ---
 
-#### Stats Controller
+#### Information Manager
 
 **File**: `server/src/controllers/statsController.js`
 
-| Function | Description |
+| Action | Description |
 |----------|-------------|
-| `getAllStats` | Get all platform stats for user |
-| `getStatsSummary` | Get aggregated summary |
-| `refreshPlatformStats` | Manual refresh with cooldown |
+| `getAllStats` | Get all service information for member |
+| `getStatsSummary` | Get consolidated summary |
+| `refreshPlatformStats` | Manual update with waiting period |
 
 **Progress Calculation**:
 
@@ -465,123 +465,123 @@ const calculateProgress = (platform, stats) => {
       // Progress = (solved / total) * 100
       return Math.min(Math.round((totalSolved / 3250) * 100), 100);
     case "codeforces":
-      // Progress = (rating / 3000) * 100 (grandmaster target)
+      // Progress = (rating / 3000) * 100 (target level)
       return Math.min(Math.round((rating / 3000) * 100), 100);
     case "github":
-      // Based on repositories, stars, commits
-      // Custom algorithm
+      // Based on projects, stars, contributions
+      // Custom method
   }
 };
 ```
 
 ---
 
-#### Platform Controller
+#### Service Manager
 
 **File**: `server/src/controllers/platformController.js`
 
-| Function | Description |
+| Action | Description |
 |----------|-------------|
-| `linkPlatform` | Link external platform account |
-| `getPlatforms` | Get linked platforms |
-| `unlinkPlatform` | Remove platform connection |
+| `linkPlatform` | Link external service account |
+| `getPlatforms` | Get linked services |
+| `unlinkPlatform` | Remove service connection |
 
 ---
 
-#### User Controller
+#### Member Information Manager
 
 **File**: `server/src/controllers/userController.js`
 
-| Function | Description |
+| Action | Description |
 |----------|-------------|
-| `getProfile` | Get user profile data |
+| `getProfile` | Get member information |
 | `updateProfile` | Update profile information |
-| `updatePassword` | Change user password |
-| `deleteAccount` | Delete user account |
+| `updatePassword` | Change member password |
+| `deleteAccount` | Remove member account |
 
 ---
 
-#### Password Controller
+#### Password Manager
 
 **File**: `server/src/controllers/passwordController.js`
 
-| Function | Description |
+| Action | Description |
 |----------|-------------|
-| `forgotPassword` | Send reset email |
-| `resetPassword` | Reset with token |
+| `forgotPassword` | Send reset message |
+| `resetPassword` | Reset with secure token |
 | `verifyResetToken` | Validate reset token |
 
 ---
 
-### Middleware
+### Safety & Processing Checks
 
-#### Authentication Middleware
+#### Identity Verification Check
 
 **File**: `server/src/middleware/auth.js`
 
 ```javascript
 export const protect = async (req, res, next) => {
-  // Extract token from Authorization header
-  // Verify JWT
-  // Attach user to request
+  // Extract token from verification area
+  // Verify secure token
+  // Attach member to request
   // Handle errors
 };
 ```
 
 ---
 
-#### Admin Authorization
+#### Manager Permission Check
 
 **File**: `server/src/middleware/adminAuth.js`
 
 ```javascript
 export const adminAuth = (req, res, next) => {
-  // Check if user email matches ADMIN_EMAIL env var
+  // Check if member email matches MANAGER_EMAIL setting
   // Grant or deny access
 };
 ```
 
 ---
 
-#### Rate Limiting
+#### Usage Restriction
 
 **File**: `server/src/middleware/rateLimit.js`
 
 ```javascript
 export const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP
+  max: 100, // limit each IP address
 });
 
 export const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 5, // stricter for auth endpoints
+  max: 5, // stricter for security access points
 });
 ```
 
 ---
 
-#### Validation Middleware
+#### Validation Check
 
 **File**: `server/src/middleware/validation.js`
 
 ```javascript
 export const validatePlatformLink = (req, res, next) => {
-  // Validate platform enum
+  // Validate service type
   // Validate username format
-  // Sanitize input
+  // Clean up input
 };
 ```
 
 ---
 
-### External API Utilities
+### External Service Connectors
 
-#### LeetCode Fetcher
+#### LeetCode Connector
 
 **File**: `server/src/utils/fetchLeetCode.js`
 
-**GraphQL Query Structure**:
+**Data Request Structure**:
 
 ```graphql
 query userProfile($username: String!) {
@@ -603,14 +603,14 @@ query userProfile($username: String!) {
 }
 ```
 
-**Returned Data Structure**:
+**Information Returned**:
 
 ```javascript
 {
   // Profile
   username, realName, avatar, ranking, reputation,
   
-  // Submissions
+  // Tasks Completed
   submissionsByDifficulty: {
     easy: { solved, total, submissions },
     medium: { solved, total, submissions },
@@ -619,17 +619,17 @@ query userProfile($username: String!) {
   },
   totalSolved, acceptanceRate,
   
-  // Tags & Languages
+  // Topics & Languages
   tagStats, languageStats,
   
-  // Streak & Calendar
+  // Consistency & Calendar
   streakData: { currentStreak, totalActiveDays, activeYears },
   
-  // Contest
+  // Competition
   contestRanking: { rating, globalRanking, topPercentage, badge },
   contestHistory: [...],
   
-  // Badges
+  // Achievements
   badges, upcomingBadges, activeBadge,
   
   // Recent Activity
@@ -639,19 +639,19 @@ query userProfile($username: String!) {
 
 ---
 
-#### Codeforces Fetcher
+#### Codeforces Connector
 
 **File**: `server/src/utils/fetchCodeforces.js`
 
-**API Endpoints Used**:
+**Service Access Points Used**:
 
-| Endpoint | Purpose |
+| Access Point | Purpose |
 |----------|---------|
-| `user.info?handles={username}` | User profile |
-| `user.status?handle={username}` | Submission history |
+| `user.info?handles={username}` | Member information |
+| `user.status?handle={username}` | Task history |
 | `user.rating?handle={username}` | Rating changes |
 
-**Returned Data Structure**:
+**Information Returned**:
 
 ```javascript
 {
@@ -659,32 +659,32 @@ query userProfile($username: String!) {
   handle, rank, rating, maxRank, maxRating,
   avatar, titlePhoto, contribution,
   
-  // Submissions
+  // Tasks Completed
   totalSubmissions, acceptedSubmissions, problemsSolved,
   problemsByRating: { "800": 10, "900": 15, ... },
   languagesUsed: { "C++": 50, "Python": 20, ... },
   verdictDistribution: { "OK": 100, "WRONG_ANSWER": 20, ... },
   
-  // Contests
+  // Events
   totalContests, ratingChanges: [...]
 }
 ```
 
 ---
 
-#### GitHub Fetcher
+#### GitHub Connector
 
 **File**: `server/src/utils/fetchGithub.js`
 
-**API Endpoints Used**:
+**Service Access Points Used**:
 
-| Endpoint | Purpose |
+| Access Point | Purpose |
 |----------|---------|
-| `/users/{username}` | User profile |
-| `/users/{username}/repos` | Repository list |
+| `/users/{username}` | Member information |
+| `/users/{username}/repos` | Project list |
 | `/users/{username}/events` | Activity feed |
 
-**Returned Data Structure**:
+**Information Returned**:
 
 ```javascript
 {
@@ -692,7 +692,7 @@ query userProfile($username: String!) {
   login, name, bio, company, location, email,
   avatar, followers, following, publicRepos,
   
-  // Repository Stats
+  // Project Information
   totalStars, totalForks, totalWatchers,
   languagesUsed: { "JavaScript": 10, "Python": 5, ... },
   topRepositories: [...],
@@ -706,7 +706,7 @@ query userProfile($username: String!) {
 
 ---
 
-## Frontend Documentation
+## Visual Interface Records
 
 ### Application Entry
 
@@ -726,20 +726,20 @@ ReactDOM.createRoot(document.getElementById("root")).render(
 
 ---
 
-### Routing Configuration
+### Navigation Setup
 
 **File**: `client/src/App.jsx`
 
-#### Route Types
+#### Area Types
 
-| Route Type | Component | Description |
+| Area Type | Component | Description |
 |------------|-----------|-------------|
-| `PrivateRoute` | Wrapper | Requires authentication |
-| `AdminRoute` | Wrapper | Requires admin role |
-| `PublicRoute` | Wrapper | Redirects if authenticated |
-| `HomeRoute` | Conditional | Dashboard or Landing |
+| `PrivateRoute` | Wrapper | Requires identity verification |
+| `AdminRoute` | Wrapper | Requires manager permission |
+| `PublicRoute` | Wrapper | Redirects if already verified |
+| `HomeRoute` | Conditional | Overview or Welcome Page |
 
-#### Route Definitions
+#### Path Definitions
 
 ```jsx
 <Routes>
@@ -753,37 +753,37 @@ ReactDOM.createRoot(document.getElementById("root")).render(
   <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
   <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
   <Route path="/forgot-password" element={<ForgotPassword />} />
-  <Route path="/reset-password/:token" element={<ResetPassword />} />
+  <Route path="/reset-pass  <Route path="/reset-password/:token" element={<ResetPassword />} />
   <Route path="*" element={<NotFound />} />
 </Routes>
 ```
 
 ---
 
-### Context Providers
+### Global Memory Systems
 
-#### AuthContext
+#### Identity Verification Memory
 
 **Files**: `client/src/context/AuthContext.js`, `client/src/context/AuthProvider.jsx`
 
 ```jsx
 const AuthContext = createContext();
 
-// Provider State
+// Memory State
 const [token, setToken] = useState(localStorage.getItem("token"));
 const [isAdmin, setIsAdmin] = useState(localStorage.getItem("isAdmin") === "true");
 
-// Exposed Methods
+// Provided Actions
 const login = (token, isAdmin) => { ... };
 const logout = () => { ... };
 
-// Context Value
+// Memory Value
 <AuthContext.Provider value={{ token, isAdmin, login, logout }}>
 ```
 
 ---
 
-#### SidebarProvider
+#### Navigation Menu Memory
 
 **File**: `client/src/context/SidebarProvider.jsx`
 
@@ -793,7 +793,7 @@ const [isCollapsed, setIsCollapsed] = useState(false);
 const [isMobileOpen, setIsMobileOpen] = useState(false);
 const [isPlatformsExpanded, setIsPlatformsExpanded] = useState(true);
 
-// Methods
+// Actions
 const toggleCollapse = () => { ... };
 const closeMobile = () => { ... };
 const togglePlatforms = () => { ... };
@@ -801,7 +801,7 @@ const togglePlatforms = () => { ... };
 
 ---
 
-### API Client
+### Connection Tool
 
 **File**: `client/src/api/axios.js`
 
@@ -810,7 +810,7 @@ const api = axios.create({
   baseURL: import.meta.env.VITE_BACKEND_URL || "http://localhost:5000/api",
 });
 
-// Request interceptor - attach JWT
+// Request interceptor - attach secure token
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
   if (token) config.headers.Authorization = `Bearer ${token}`;
@@ -818,50 +818,50 @@ api.interceptors.request.use((config) => {
 });
 ```
 
-**Exported API Functions**:
+**Exported Connection Actions**:
 
-| Function | Description |
+| Action | Description |
 |----------|-------------|
-| `getMe()` | Get current user |
-| `updateProfile(data)` | Update profile |
-| `getAllStats()` | Get all platform stats |
-| `getStatsSummary()` | Get summary stats |
-| `refreshPlatformStats(platform)` | Refresh platform data |
+| `getMe()` | Get current member |
+| `updateProfile(data)` | Update profile information |
+| `getAllStats()` | Get all service information |
+| `getStatsSummary()` | Get consolidated information |
+| `refreshPlatformStats(platform)` | Update service information |
 
 ---
 
-### Components
+### Visual Elements
 
-#### AuthenticatedLayout
+#### Secure Layout
 
 **File**: `client/src/components/AuthenticatedLayout.jsx`
 
-Wrapper component for authenticated pages providing:
-- Responsive sidebar navigation
-- Mobile hamburger menu
+Wrapper element for secure pages providing:
+- Adjustable navigation menu
+- Mobile access menu
 - Header with branding
-- Main content area
+- Main information area
 
 ---
 
-#### PlatformCard
+#### Service Card
 
 **File**: `client/src/components/PlatformCard.jsx`
 
-**Props**:
+**Settings**:
 
-| Prop | Type | Description |
+| Setting | Type | Description |
 |------|------|-------------|
-| `platform` | `"leetcode" \| "codeforces" \| "github"` | Platform type |
-| `stats` | `Object` | Platform statistics |
-| `username` | `String` | Platform username |
-| `progress` | `Number (0-100)` | Progress percentage |
-| `canRefresh` | `Boolean` | Refresh availability |
-| `nextRefreshAvailable` | `Date` | Next refresh time |
-| `onRefresh` | `Function` | Refresh callback |
-| `onClick` | `Function` | Click callback |
+| `platform` | `"leetcode" \| "codeforces" \| "github"` | Service type |
+| `stats` | `Object` | Service information |
+| `username` | `String` | Service username |
+| `progress` | `Number (0-100)` | Completion percentage |
+| `canRefresh` | `Boolean` | Update availability |
+| `nextRefreshAvailable` | `Date` | Next update time |
+| `onRefresh` | `Function` | Update action |
+| `onClick` | `Function` | Select action |
 
-**Platform Configuration**:
+**Service Setup**:
 
 ```javascript
 const platformConfig = {
@@ -880,201 +880,201 @@ const platformConfig = {
 
 ---
 
-#### Dialog Component
+#### Message Box Element
 
 **File**: `client/src/components/Dialog.jsx`
 
-Modal dialog for confirmations with:
-- Backdrop blur effect
-- Animated entry/exit
-- Customizable title, message, buttons
-- Warning icon styling
+Visual message box for confirmations with:
+- Blurred background effect
+- Smooth entry/exit movement
+- Customizable title, message, and buttons
+- Warning symbol styling
 
 ---
 
-#### Loader Component
+#### Waiting Symbol Element
 
 **File**: `client/src/components/Loader.jsx`
 
-Cinematic loading spinner with:
-- Layered animated rings
-- Core glow effect
-- Status text
+Visual waiting symbol with:
+- Layered moving rings
+- Central glow effect
+- Status message
 
 ---
 
-#### Sidebar Component
+#### Navigation Menu Element
 
 **File**: `client/src/components/Sidebar.jsx`
 
-Navigation sidebar featuring:
-- Collapsible design
-- Platform sub-menu with expansion
-- Active route highlighting
-- Admin route visibility
-- Logout functionality
+Navigation menu featuring:
+- Adjustable design
+- Service sub-menu with expansion
+- Active path highlighting
+- Manager path visibility
+- Account exit action
 
 ---
 
-#### SummarySection
+#### Summary Area
 
 **File**: `client/src/components/SummarySection.jsx`
 
-Dashboard summary cards showing:
-- Platforms tracked count
-- Total problems solved
-- Combined rating
+Overview summary cards showing:
+- Services tracked count
+- Total tasks completed
+- Combined level
 - Activity score
 
 ---
 
-### Pages
+### Viewable Pages
 
-#### Landing Page
+#### Welcome Page
 
 **File**: `client/src/pages/Landing.jsx`
 
 **Sections**:
-1. Hero section with animated background
-2. Platform showcase (LeetCode, Codeforces, GitHub)
-3. Features grid
+1. Main introduction area with animated background
+2. Service showcase (LeetCode, Codeforces, GitHub)
+3. Features overview
 4. "How It Works" steps
-5. Call-to-action
+5. Engagement button
 6. Footer
 
 **Visual Elements**:
-- Animated blob backgrounds
-- Floating code particles
-- Glass-morphism cards
-- Gradient text effects
-- Hover animations
+- Moving background shapes
+- Floating decorative particles
+- Blurred card designs
+- Colorful text effects
+- Interaction animations
 
 ---
 
-#### Dashboard
+#### Overview Center
 
 **File**: `client/src/pages/Dashboard.jsx`
 
-Main authenticated dashboard with:
-- Summary statistics section
-- Platform filter buttons
-- Platform cards grid
-- Individual refresh controls
-- Navigate to detail pages
+Main secure overview with:
+- Consolidated information section
+- Service filtering buttons
+- Service cards grid
+- Individual update controls
+- Access to detailed information pages
 
 ---
 
-#### Platform Detail Pages
+### Service Detailed Information Pages
 
-##### LeetCodeDetails
+##### LeetCode Details
 
 **File**: `client/src/pages/LeetCodeDetails.jsx`
 
-**Displayed Data**:
-- Username and avatar
-- Global ranking and reputation
-- Submissions by difficulty (Easy/Medium/Hard)
-- Contest rating and history
-- Streak data
-- Language statistics
-- Badges collection
+**Displayed Information**:
+- Username and profile image
+- Global standing and reputation
+- Tasks completed by difficulty
+- Competition level and history
+- Consistency data
+- Language information
+- Achievement collection
 
-##### CodeforcesDetails
+##### Codeforces Details
 
 **File**: `client/src/pages/CodeforcesDetails.jsx`
 
-**Displayed Data**:
+**Displayed Information**:
 - Username and rank
-- Current and max rating
-- Problems solved count
+- Current and maximum level
+- Tasks completed count
 - Contribution score
-- Contest history with rating changes
-- Rating evolution timeline
+- Event history with level changes
+- Level progress timeline
 
-##### GitHubDetails
+##### GitHub Details
 
 **File**: `client/src/pages/GitHubDetails.jsx`
 
-**Displayed Data**:
-- Profile with avatar
+**Displayed Information**:
+- Profile with image
 - Bio, company, location
-- Followers/following counts
-- Repository statistics
-- Top repositories list
-- Language distribution
+- Interaction counts
+- Project statistics
+- Top projects list
+- Programming language distribution
 - Recent activity
 
 ---
 
-#### Admin Dashboard
+#### Management Area
 
 **File**: `client/src/pages/AdminDashboard.jsx`
 
 **Features**:
-- Global statistics (total users, platform counts)
-- Sync controls for each platform
-- "Sync All" button
-- Sync results display
-- Success/failure tracking table
+- General statistics (total members, service counts)
+- Matching controls for each service
+- "Match All" button
+- Update results display
+- Performance tracking table
 
 ---
 
-#### Profile Page
+#### Personal Profile Page
 
 **File**: `client/src/pages/Profile.jsx`
 
 **Sections**:
-1. Profile information editing
+1. Member information editing
 2. Password change form
-3. Account deletion with confirmation
-4. Success/error messages
+3. Account removal with confirmation
+4. Result messages
 
 ---
 
-#### Authentication Pages
+#### Entry Verification Pages
 
 | Page | File | Description |
 |------|------|-------------|
-| Login | `client/src/pages/Login.jsx` | Email/password login form |
-| Register | `client/src/pages/Register.jsx` | New user registration |
-| ForgotPassword | `client/src/pages/ForgotPassword.jsx` | Password reset request |
-| ResetPassword | `client/src/pages/ResetPassword.jsx` | Password reset with token |
+| Login | `client/src/pages/Login.jsx` | Email/password entry form |
+| Register | `client/src/pages/Register.jsx` | New member registration |
+| Forgot Password | `client/src/pages/ForgotPassword.jsx` | Password reset request |
+| Reset Password | `client/src/pages/ResetPassword.jsx` | Password reset with token |
 
 ---
 
-#### LinkPlatform
+#### Link Service
 
 **File**: `client/src/pages/LinkPlatform.jsx`
 
-Platform connection interface:
-- Platform dropdown (LeetCode, Codeforces, GitHub)
+Service connection interface:
+- Service selection (LeetCode, Codeforces, GitHub)
 - Username input
-- Link button
+- Connection button
 - Error handling
 
 ---
 
-#### NotFound
+#### Page Not Found
 
 **File**: `client/src/pages/NotFound.jsx`
 
-404 error page with:
-- Large "404" display
-- Error message
+Error page with:
+- Large "404" message
+- Error explanation
 - Home navigation button
 
 ---
 
-## Database Schema
+### Record Layout
 
-### Users Collection
+#### Members Information Group
 
 ```javascript
 {
   _id: ObjectId,
   name: String,
-  email: String (unique, lowercase),
-  password: String (bcrypt hashed),
+  email: String (unique),
+  password: String (secured),
   oneTimeReaddUsed: Map<String, Boolean>,
   resetPasswordToken: String,
   resetPasswordExpires: Date,
@@ -1082,27 +1082,27 @@ Platform connection interface:
 }
 ```
 
-### PlatformStats Collection
+#### Service Information Group
 
 ```javascript
 {
   _id: ObjectId,
-  userId: ObjectId (ref: User),
+  userId: ObjectId (ref: Member),
   platform: "leetcode" | "codeforces" | "github",
   username: String,
-  data: Object (raw API response),
-  stats: Object (processed statistics),
+  data: Object (raw information),
+  stats: Object (processed information),
   lastUpdated: Date,
   lastManualRefresh: Date
 }
 ```
 
-### PlatformActions Collection
+#### Service Actions Group
 
 ```javascript
 {
   _id: ObjectId,
-  userId: ObjectId (ref: User),
+  userId: ObjectId (ref: Member),
   platform: "leetcode" | "codeforces" | "github",
   action: "link" | "unlink",
   meta: Object,
@@ -1113,108 +1113,108 @@ Platform connection interface:
 
 ---
 
-## API Reference
+### Standard Interface Reference
 
-### Authentication Routes
+#### Identity Verification Routes
 
-**Base Path**: `/api/auth`
+**Main Path**: `/api/auth`
 
-| Method | Endpoint | Description | Auth Required |
+| Action Type | Access Point | Description | Identity Verification Needed |
 |--------|----------|-------------|---------------|
-| `POST` | `/register` | Register new user | No |
-| `POST` | `/login` | User login | No |
-| `GET` | `/me` | Get current user | Yes |
-| `PUT` | `/profile` | Update profile | Yes |
+| `POST` | `/register` | Register new member | No |
+| `POST` | `/login` | Member login | No |
+| `GET` | `/me` | Get current member | Yes |
+| `PUT` | `/profile` | Update profile information | Yes |
 | `PUT` | `/password` | Change password | Yes |
-| `PUT` | `/settings` | Update settings | Yes |
+| `PUT` | `/settings` | Update preferences | Yes |
 
 ---
 
-### Password Routes
+#### Password Routes
 
-**Base Path**: `/api/auth`
+**Main Path**: `/api/auth`
 
-| Method | Endpoint | Description | Auth Required |
+| Action Type | Access Point | Description | Identity Verification Needed |
 |--------|----------|-------------|---------------|
-| `POST` | `/forgot-password` | Request reset email | No |
+| `POST` | `/forgot-password` | Request reset message | No |
 | `GET` | `/verify-reset-token/:token` | Validate token | No |
 | `POST` | `/reset-password/:token` | Reset password | No |
 
 ---
 
-### Platform Routes
+#### Service Routes
 
-**Base Path**: `/api/platforms`
+**Main Path**: `/api/platforms`
 
-| Method | Endpoint | Description | Auth Required |
+| Action Type | Access Point | Description | Identity Verification Needed |
 |--------|----------|-------------|---------------|
-| `POST` | `/link` | Link platform account | Yes |
-| `GET` | `/` | Get linked platforms | Yes |
-| `DELETE` | `/:platform` | Unlink platform | Yes |
+| `POST` | `/link` | Link service account | Yes |
+| `GET` | `/` | Get linked services | Yes |
+| `DELETE` | `/:platform` | Unlink service | Yes |
 
 ---
 
-### Stats Routes
+#### Information Routes
 
-**Base Path**: `/api/stats`
+**Main Path**: `/api/stats`
 
-| Method | Endpoint | Description | Auth Required |
+| Action Type | Access Point | Description | Identity Verification Needed |
 |--------|----------|-------------|---------------|
-| `GET` | `/all` | Get all platform stats | Yes |
-| `GET` | `/summary` | Get aggregated summary | Yes |
-| `POST` | `/refresh/:platform` | Manual refresh | Yes |
+| `GET` | `/all` | Get all service information | Yes |
+| `GET` | `/summary` | Get consolidated summary | Yes |
+| `POST` | `/refresh/:platform` | Manual update | Yes |
 
 ---
 
-### User Routes
+#### Member Routes
 
-**Base Path**: `/api/user`
+**Main Path**: `/api/user`
 
-| Method | Endpoint | Description | Auth Required |
+| Action Type | Access Point | Description | Identity Verification Needed |
 |--------|----------|-------------|---------------|
-| `GET` | `/profile` | Get profile | Yes |
-| `PUT` | `/profile` | Update profile | Yes |
+| `GET` | `/profile` | Get member information | Yes |
+| `PUT` | `/profile` | Update information | Yes |
 | `PUT` | `/password` | Change password | Yes |
-| `DELETE` | `/account` | Delete account | Yes |
+| `DELETE` | `/account` | Remove account | Yes |
 
 ---
 
-### Admin Routes
+#### Management Routes
 
-**Base Path**: `/api/admin`
+**Main Path**: `/api/admin`
 
-| Method | Endpoint | Description | Auth Required | Admin Required |
+| Action Type | Access Point | Description | Identity Verification Needed | Manager Permission Needed |
 |--------|----------|-------------|---------------|----------------|
-| `POST` | `/sync/all` | Sync all platforms | Yes | Yes |
-| `POST` | `/sync/leetcode` | Sync LeetCode | Yes | Yes |
-| `POST` | `/sync/codeforces` | Sync Codeforces | Yes | Yes |
-| `POST` | `/sync/github` | Sync GitHub | Yes | Yes |
-| `GET` | `/stats` | Get admin stats | Yes | Yes |
+| `POST` | `/sync/all` | Match all services | Yes | Yes |
+| `POST` | `/sync/leetcode` | Match LeetCode | Yes | Yes |
+| `POST` | `/sync/codeforces` | Match Codeforces | Yes | Yes |
+| `POST` | `/sync/github` | Match GitHub | Yes | Yes |
+| `GET` | `/stats` | Get management information | Yes | Yes |
 
 ---
 
-### Health Check
+#### System Status Check
 
-| Method | Endpoint | Description |
+| Action Type | Access Point | Description |
 |--------|----------|-------------|
-| `GET` | `/api/health` | Server health status |
+| `GET` | `/api/health` | Overall system status |
 
 ---
 
-## Authentication & Authorization
+### Identity Verification & Access Permissions
 
-### JWT Authentication Flow
+#### Secure Access Flow
 
 ```
-1. User submits credentials
-2. Server validates and generates JWT
-3. Client stores token in localStorage
-4. Token attached to all requests via interceptor
-5. Server middleware validates token
-6. User object attached to request
+1. Member submits credentials
+2. Server validates and creates secure token
+3. Client stores token in local memory
+4. Token attached to all requests via automated tool
+5. Server checks token validity
+6. Member information attached to request
 ```
 
-### Token Structure
+#### Secure Token Structure
 
 ```javascript
 {
@@ -1224,15 +1224,15 @@ Platform connection interface:
 }
 ```
 
-### Admin Authorization
+#### Manager Permissions
 
-Admin is determined by email matching `ADMIN_EMAIL` environment variable:
+Manager status is determined by matching the email with the `MANAGER_EMAIL` setting:
 
 ```javascript
 const isAdmin = email.toLowerCase() === process.env.ADMIN_EMAIL?.toLowerCase();
 ```
 
-### Protected Routes (Frontend)
+#### Secure Areas (Visual System)
 
 ```jsx
 const PrivateRoute = ({ children }) => {
@@ -1260,68 +1260,68 @@ const AdminRoute = ({ children }) => {
 
 ---
 
-## Features Deep Dive
+### Detailed Look at Features
 
-### Platform Linking Process
+#### Service Linking Process
 
-1. **User selects platform** from dropdown
-2. **Enters username** for that platform
-3. **API validates** username by fetching data
-4. **Initial stats** are fetched and stored
-5. **PlatformAction** logged for audit
-6. **User redirected** to dashboard
+1. **Member selects service** from menu
+2. **Enters username** for that service
+3. **Internal system checks** username by fetching information
+4. **Initial information** is fetched and stored
+5. **Service Action** recorded for tracking
+6. **Member redirected** to overview center
 
-### Stats Refresh Mechanism
+#### Information Matching System
 
-**User Refresh** (with cooldown):
+**Member Update** (with waiting period):
 
 ```javascript
-// 15-minute cooldown per platform
+// 15-minute waiting period per service
 const REFRESH_COOLDOWN = 15 * 60 * 1000;
 
-// Check eligibility
+// Check if update is allowed
 const canRefresh = !lastManualRefresh || 
   (Date.now() - lastManualRefresh > REFRESH_COOLDOWN);
 ```
 
-**Admin Bulk Sync**:
+**Manager Bulk Matching**:
 
 ```javascript
-// No cooldown for admin
-// Iterates all PlatformStat documents
-// Updates each with fresh data
+// No waiting period for manager
+// Checks all service information records
+// Updates each with fresh information
 // Returns success/failure counts
 ```
 
-### Progress Calculation
+#### Progress Calculation
 
-| Platform | Formula | Target |
+| Service | Method | Target |
 |----------|---------|--------|
-| **LeetCode** | `(totalSolved / 3250) * 100` | ~3250 problems |
-| **Codeforces** | `(rating / 3000) * 100` | Grandmaster (3000) |
-| **GitHub** | Composite score | Repos, stars, activity |
+| **LeetCode** | `(totalSolved / 3250) * 100` | ~3250 tasks |
+| **Codeforces** | `(rating / 3000) * 100` | High Level (3000) |
+| **GitHub** | Combined total | Projects, stars, activity |
 
-### Password Reset Flow
+#### Password Reset Flow
 
-1. User requests reset → email sent with token
-2. Token hashed and stored with expiry
-3. User clicks link → token verified
-4. User enters new password
-5. Password updated, token invalidated
+1. Member requests reset → email sent with secure token
+2. Token secured and stored with expiration time
+3. Member clicks link → token verified
+4. Member enters new password
+5. Password updated, token deactivated
 
 ---
 
-## Styling & Design System
+### Visual Design Standards
 
-### CSS Architecture
+#### Design System Structure
 
 **File**: `client/src/index.css`
 
-### Design Tokens
+#### Design Values
 
 ```css
 :root {
-  /* Colors defined via Tailwind */
+  /* Colors defined via styling tool */
   --bg-primary: #0a0a0f;
   --bg-card: rgba(255, 255, 255, 0.02);
   --text-primary: #ffffff;
@@ -1331,7 +1331,7 @@ const canRefresh = !lastManualRefresh ||
 }
 ```
 
-### Custom Animations
+#### Visual Motion Effects
 
 ```css
 @keyframes blob {
@@ -1357,7 +1357,7 @@ const canRefresh = !lastManualRefresh ||
 }
 ```
 
-### Custom Classes
+#### Visual Templates
 
 ```css
 .glass-card {
@@ -1385,9 +1385,9 @@ const canRefresh = !lastManualRefresh ||
 }
 ```
 
-### Platform-Specific Gradients
+#### Service Gradients
 
-| Platform | Gradient |
+| Service | Gradient |
 |----------|----------|
 | **LeetCode** | `linear-gradient(135deg, #ffa116, #ffb84d)` |
 | **Codeforces** | `linear-gradient(135deg, #1f8acb, #4cb3f0)` |
@@ -1395,43 +1395,43 @@ const canRefresh = !lastManualRefresh ||
 
 ---
 
-## Environment Configuration
+### System Settings
 
-### Server Environment Variables
+#### Internal System Settings
 
 **File**: `server/.env`
 
 ```env
-# Server Configuration
+# System Configuration
 PORT=5000
 NODE_ENV=development
 
-# Database
+# Storage
 MONGO_URI=mongodb://localhost:27017/devlog
 
-# Authentication
-JWT_SECRET=your_super_secret_jwt_key
+# Identity Verification
+JWT_SECRET=your_super_secure_key
 
-# CORS
+# Shared Resource Rules
 CLIENT_URL=http://localhost:5173
 CORS_ALLOW_CREDENTIALS=true
 
-# Email Service (Resend)
+# Email Service
 RESEND_API_KEY=re_xxxxxxxxxxxx
 RESEND_FROM_EMAIL=delivered@resend.dev
 
-# Vercel Cron
-CRON_SECRET=your_cron_secret
+# Scheduled Tasks
+CRON_SECRET=your_schedule_secret
 
-# External APIs
+# External Services
 CLIST_API_KEY=username:api_key
 
-# Telegram (Optional)
-TELEGRAM_BOT_TOKEN=your_bot_token
+# Messaging Alerts (Optional)
+TELEGRAM_BOT_TOKEN=your_alert_token
 TELEGRAM_CHAT_ID=your_chat_id
 ```
 
-### Client Environment Variables
+#### Visual System Settings
 
 **File**: `client/.env`
 
@@ -1441,74 +1441,117 @@ VITE_BACKEND_URL=http://localhost:5000/api
 
 ---
 
-## Deployment Guide
+### Publishing Instructions
 
-### Prerequisites
+#### Requirements
 
-- Node.js 20.x or higher
-- MongoDB 7.x or MongoDB Atlas
-- CList API Account for contest data
-- Resend API Key for email functionality
+- Execution Environment 20.x or higher
+- Records System (Local or Cloud)
+- External Service Account for event data
+- Email Service Key for messaging functionality
 
-### Server Deployment (Vercel)
+#### Publishing the Internal System
 
-The server is optimized for Vercel Serverless Functions.
+The system is optimized for automated publishing services.
 
-1.  Push your code to GitHub.
-2.  Connect your repository to Vercel.
-3.  Set the **Root Directory** to `server`.
-4.  Configure environment variables in the Vercel Dashboard.
-5.  Vercel will automatically use `vercel.json` for routing and cron jobs.
+1.  Upload your code.
+2.  Connect your storage.
+3.  Set the main folder to `server`.
+4.  Configure system settings in the management panel.
+5.  The service will automatically use the publishing settings for navigation and scheduled tasks.
 
-### Client Deployment (Vercel)
+#### Publishing the Visual System
 
-1.  Connect the same repository to a new Vercel project.
-2.  Set the **Root Directory** to `client`.
-3.  Set the **Build Command** to `npm run build`.
-4.  Set the **Output Directory** to `dist`.
-5.  Add `VITE_BACKEND_URL` to the environment variables.
+1.  Connect the same storage to a new publishing project.
+2.  Set the main folder to `client`.
+3.  Set the creation command to `npm run build`.
+4.  Set the final folder to `dist`.
+5.  Add the internal system address to the settings.
 
-### Production Considerations
+#### Public Launch Advice
 
-| Consideration | Recommendation |
+| Advice | Recommendation |
 |---------------|----------------|
-| **HTTPS** | Configure SSL/TLS |
-| **Environment Variables** | Use secure secrets |
-| **Rate Limiting** | Adjust limits for production |
-| **CORS** | Restrict to production domains |
-| **Database** | Use MongoDB Atlas or managed instance |
-| **Logging** | Implement proper logging |
-| **Monitoring** | Add health checks and monitoring |
+| **Security** | Configure secure connection |
+| **Settings** | Use secure keys |
+| **Usage Limits** | Adjust limits for public use |
+| **Resource Rules** | Restrict to public domains |
+| **Storage** | Use cloud-based records |
+| **Record Keeping** | Implement proper activity logs |
+| **Status Check** | Add health checks and monitoring |
 
 ---
 
-## Security Considerations
+### Safety Precautions
 
-### Implemented Security Measures
+#### Safety Actions Taken
 
-1.  **Password Hashing** - BcryptJS with secure salt rounds.
-2.  **JWT Authentication** - Secure tokens with configurable expiry.
-3.  **Role-Based Access Control** - Strict separation between `user` and `admin`.
-4.  **Helmet.js** - Security headers to prevent XSS, Clickjacking, and other attacks.
-5.  **CORS Protection** - Strict origin whitelisting with credentials support.
-6.  **Rate Limiting** - Global API and per-route rate limits via `express-rate-limit`.
-7.  **Input Sanitization** - Body size limits and validation middleware.
-8.  **Compression** - Gzip compression for faster and safer data transfer.
-9.  **Secure Password Reset** - Cryptographically secure tokens via Resend.
+1.  **Security Scrambling** - Automatic scrambling with secure rounds.
+2.  **Identity Verification** - Secure tokens with configurable expiration.
+3.  **Permission-Based Access** - Strict separation between `member` and `manager`.
+4.  **Security Headers** - Protection to prevent common online attacks.
+5.  **Access Rules** - Strict rules for sharing resources.
+6.  **Usage Restriction** - Overall system and per-path limits.
+7.  **Data Cleaning** - Size limits and validation checks.
+8.  **Compression** - Faster and safer information transfer.
+9.  **Secure Password Reset** - Cryptographically secure methods for reset messages.
 
-### Recommendations for Production
+#### Recommendations for Public Launch
 
 | Measure | Description |
 |---------|-------------|
-| **HTTPS Only** | Enforce SSL |
-| **Helmet.js** | Add security headers |
-| **MongoDB Security** | Enable authentication |
-| **Environment Secrets** | Use secret management |
-| **Audit Logging** | Log security events |
-| **2FA** | Consider two-factor authentication |
-| **API Keys** | For external API rate limits |
+| **Secure Connection** | Enforce secure links |
+| **Security Headers** | Add extra protection |
+| **Storage Security** | Enable verification |
+| **Secret Management** | Use secure key storage |
+| **Activity Tracking** | Log security events |
+| **Extra Verification** | Consider two-factor authentication |
+| **Service Keys** | For external usage limits |
 
 ---
+
+### Utility Commands
+
+#### Management & Transfer Commands
+
+**Directory**: `server/scripts/`
+
+| Command | Usage | Description |
+|--------|---------|-------------|
+| **Make Manager** | `node scripts/makeAdmin.js email@example.com` | Promotes a member to the manager role. |
+| **Update History** | `node scripts/backfillPlatformActions.js` | Transfers old data to the new activity log. |
+| **Update Member Structure** | `node scripts/migrateUserSchema.js` | Updates member records for current layout. |
+
+---
+
+### Helping Out
+
+1. Copy the project
+2. Create work branch: `git checkout -b feature/AmazingFeature`
+3. Save changes: `git commit -m 'Add AmazingFeature'`
+4. Upload branch: `git push origin feature/AmazingFeature`
+5. Open Review Request
+
+### Presentation Rules
+
+| Area | Rule |
+|------|------------|
+| **Style Checking** | Automated checks configured |
+| **Formatting** | Standardized presentation |
+| **Component naming** | Clear and consistent names |
+| **File naming** | Standardized file names |
+
+---
+
+### Usage Rules
+
+This project is open source under the [MIT License](LICENSE).
+
+---
+
+### Support
+
+For issues, questions, or contributions:--
 
 ## Scripts
 
