@@ -18,20 +18,20 @@ export const platformFetchers = {
   atcoder: fetchAtCoder,
 };
 
-/**
- * Platform Service - Business logic for platform operations
- */
+
+ // Platform Service - Business logic for platform operations
+
 export const platformService = {
-  /**
-   * Get list of supported platforms
-   */
+
+   // Get list of supported platforms
+
   getSupportedPlatforms() {
     return SUPPORTED_PLATFORMS;
   },
 
-  /**
-   * Check if user can refresh a platform (cooldown enforcement)
-   */
+
+   // Check if user can refresh a platform (cooldown enforcement)
+
   async canRefresh(userId, platform) {
     const user = await User.findById(userId).select("cooldowns");
     if (!user) return { allowed: false, error: "User not found" };
@@ -50,9 +50,9 @@ export const platformService = {
     return { allowed: true };
   },
 
-  /**
-   * Enqueue a sync job (API endpoint handler)
-   */
+ 
+   // Enqueue a sync job (API endpoint handler)
+
   async enqueueSyncJob(userId, platform, triggeredBy = "user") {
     // Check cooldown for user-triggered refreshes
     if (triggeredBy === "user") {
@@ -134,9 +134,9 @@ export const platformService = {
     };
   },
 
-  /**
-   * Process a sync job (called by cron handler)
-   */
+ 
+   // Process a sync job (called by cron handler)
+ 
   async processSyncJob(job) {
     const startTime = Date.now();
 
@@ -257,12 +257,7 @@ export const platformService = {
     }
   },
 
-  /**
-   * Process multiple sync jobs in parallel (batch processing)
-   * @param {array} jobs - Array of sync jobs to process
-   * @param {number} concurrency - Max concurrent jobs (default: 5)
-   * @returns {object} Batch processing results
-   */
+
   async processBatchSyncJobs(jobs, concurrency = 5) {
     const results = {
       total: jobs.length,
@@ -312,9 +307,8 @@ export const platformService = {
     return results;
   },
 
-  /**
-   * Save extracted stats to database
-   */
+   // Save extracted stats to database
+   
   async saveStats(userId, platform, stats, data) {
     const updateData = {
       stats,
@@ -329,9 +323,9 @@ export const platformService = {
     );
   },
 
-  /**
-   * Extract normalized stats from raw platform data
-   */
+ 
+   // Extract normalized stats from raw platform data
+
   extractStats(platform, data) {
     if (!data || Object.keys(data).length === 0) return {};
 
@@ -361,10 +355,10 @@ export const platformService = {
     }
   },
 
-  /**
-   * Schedule sync jobs for ALL linked platforms across ALL users
-   * Used by the daily cron to populate the queue
-   */
+ 
+   // Schedule sync jobs for ALL linked platforms across ALL users
+   // Used by the daily cron to populate the queue
+   
   async scheduleGlobalSync() {
     const startTime = Date.now();
     try {

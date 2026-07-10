@@ -1,7 +1,4 @@
-/**
- * Simple in-memory cache for external API responses
- * Reduces redundant API calls and improves performance
- */
+
 
 class CacheService {
   constructor() {
@@ -9,11 +6,7 @@ class CacheService {
     this.defaultTTL = 5 * 60 * 1000; // 5 minutes default
   }
 
-  /**
-   * Get a value from cache
-   * @param {string} key - Cache key
-   * @returns {*} Cached value or null if not found/expired
-   */
+
   get(key) {
     const item = this.cache.get(key);
     
@@ -30,12 +23,7 @@ class CacheService {
     return item.value;
   }
 
-  /**
-   * Set a value in cache
-   * @param {string} key - Cache key
-   * @param {*} value - Value to cache
-   * @param {number} ttl - Time to live in milliseconds (optional)
-   */
+
   set(key, value, ttl = this.defaultTTL) {
     this.cache.set(key, {
       value,
@@ -44,24 +32,21 @@ class CacheService {
     });
   }
 
-  /**
-   * Delete a value from cache
-   * @param {string} key - Cache key
-   */
+
   delete(key) {
     this.cache.delete(key);
   }
 
-  /**
-   * Clear all cache entries
-   */
+  
+   // Clear all cache entries
+   
   clear() {
     this.cache.clear();
   }
 
-  /**
-   * Clear expired entries (for periodic cleanup)
-   */
+  
+   // Clear expired entries (for periodic cleanup)
+   
   clearExpired() {
     const now = Date.now();
     for (const [key, item] of this.cache.entries()) {
@@ -71,9 +56,9 @@ class CacheService {
     }
   }
 
-  /**
-   * Get cache stats
-   */
+  
+   //Get cache stats
+
   getStats() {
     let validCount = 0;
     let expiredCount = 0;
@@ -94,13 +79,7 @@ class CacheService {
     };
   }
 
-  /**
-   * Get or set pattern - fetch from cache or execute function
-   * @param {string} key - Cache key
-   * @param {Function} fetchFn - Function to execute if cache miss
-   * @param {number} ttl - Time to live in milliseconds (optional)
-   * @returns {Promise<*>} Cached or freshly fetched value
-   */
+
   async getOrSet(key, fetchFn, ttl = this.defaultTTL) {
     const cached = this.get(key);
     

@@ -1,14 +1,11 @@
 import axios from "axios";
 import logger from "../utils/logger.js";
 
-/**
- * Telegram Service - Sends notifications to a Telegram Bot
- */
+
+ // Telegram Service - Sends notifications to a Telegram Bot
+ 
 export const telegramService = {
-    /**
-     * Send a message to the configured Telegram chat
-     * @param {string} text - Message text (supports MarkdownV2)
-     */
+
     async sendMessage(text) {
         const token = process.env.TELEGRAM_BOT_TOKEN;
         const chatId = process.env.TELEGRAM_CHAT_ID;
@@ -41,10 +38,7 @@ export const telegramService = {
         }
     },
 
-    /**
-     * Send a formatted sync report
-     * @param {object} results - Sync results object
-     */
+
     async sendSyncReport(results) {
         const { schedule, sync, contests, executionMs } = results;
 

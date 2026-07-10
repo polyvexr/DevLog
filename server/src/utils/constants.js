@@ -1,8 +1,3 @@
-/**
- * Shared constants for DevLog API
- * Single source of truth for platform lists, cooldowns, and limits
- */
-
 export const SUPPORTED_PLATFORMS = ["leetcode", "codeforces", "github", "codechef", "atcoder"];
 
 // Cooldown duration in milliseconds (6 hours)

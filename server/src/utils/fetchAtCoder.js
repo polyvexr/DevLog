@@ -1,10 +1,10 @@
 import axios from "axios";
 import logger from "./logger.js";
 
-/**
- * Fetch AtCoder user statistics
- * Uses AtCoder Problems API and AtCoder official API
- */
+
+ // Fetch AtCoder user statistics
+ // Uses AtCoder Problems API and AtCoder official API
+
 export const fetchAtCoder = async (username) => {
   try {
     // Fetch user info and contest history in parallel

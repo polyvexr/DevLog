@@ -33,11 +33,8 @@ const logger = winston.createLogger({
   exitOnError: false,
 });
 
-// Add file transport in production
-// File logging removed for serverless deployment compatibility (read-only filesystem)
 if (process.env.NODE_ENV === "production" && !process.env.VERCEL) {
-  // Only add file logging if NOT on Vercel (or add a check for a writable dir if needed)
-  // For Vercel, Console transport is sufficient as logs are captured by the platform.
+
 }
 
 export default logger;
