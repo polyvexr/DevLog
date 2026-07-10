@@ -1,10 +1,11 @@
-import { FiLink, FiTrash2 } from "react-icons/fi";
+import { FiLink, FiTrash2, FiRefreshCw } from "react-icons/fi";
 
 export default function EcosystemSync({
   platforms,
   platformMeta,
   newLink,
   setNewLink,
+  linking,
   linkPlatform,
   unlinkPlatform
 }) {
@@ -76,8 +77,15 @@ export default function EcosystemSync({
               onChange={e => setNewLink({ ...newLink, username: e.target.value })}
               required
             />
-            <button className="w-full py-2.5 bg-[#e23e2d] hover:bg-[#cf2e2e] text-white font-mono text-xs font-semibold uppercase tracking-wider rounded transition-colors cursor-pointer">
-              Link Service
+            <button
+              type="submit"
+              disabled={linking}
+              className="w-full py-2.5 bg-[#e23e2d] hover:bg-[#cf2e2e] disabled:bg-red-950/50 disabled:text-slate-600 disabled:cursor-not-allowed text-white font-mono text-xs font-semibold uppercase tracking-wider rounded transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+            >
+              {linking ? (
+                <FiRefreshCw className="animate-spin text-sm" />
+              ) : null}
+              <span>{linking ? "Linking..." : "Link Service"}</span>
             </button>
           </div>
         </form>

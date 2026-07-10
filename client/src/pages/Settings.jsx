@@ -33,6 +33,7 @@ export default function Settings() {
     handleUpdate,
     handlePublicVisibilityToggle,
     linkPlatform,
+    linking,
     unlinkPlatform
   } = useSettings();
 
@@ -79,6 +80,7 @@ export default function Settings() {
         platformMeta={PLATFORM_META}
         newLink={newLink}
         setNewLink={setNewLink}
+        linking={linking}
         linkPlatform={(e) => {
           e.preventDefault();
           linkPlatform(newLink, () => setNewLink({ ...newLink, username: "" }));

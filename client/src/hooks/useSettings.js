@@ -9,6 +9,7 @@ export function useSettings() {
     const [loading, setLoading] = useState(true);
     const [status, setStatus] = useState({ type: "", message: "" });
     const [isEditing, setIsEditing] = useState(false);
+    const [linking, setLinking] = useState(false);
 
     const [formData, setFormData] = useState({
         name: "", bio: "", location: "", website: "", socials: [],
@@ -103,6 +104,7 @@ export function useSettings() {
 
     const linkPlatform = async (newLink, resetNewLink) => {
         if (!newLink.username) return;
+        setLinking(true);
         try {
             showStatus("success", `Connecting to ${newLink.platform}...`);
             const res = await api.post("/platforms/link", newLink);
@@ -113,6 +115,8 @@ export function useSettings() {
             }
         } catch (err) {
             showStatus("error", err.response?.data?.message || "Link failed");
+        } finally {
+            setLinking(false);
         }
     };
 
@@ -138,6 +142,7 @@ export function useSettings() {
         handleUpdate,
         handlePublicVisibilityToggle,
         linkPlatform,
+        linking,
         unlinkPlatform,
         showStatus
     };
