@@ -9,16 +9,11 @@ const connectDB = async () => {
   }
 
   if (!process.env.MONGO_URI) {
-    logger.error("DB Error ❌ MONGO_URI environment variable is not defined");
+    logger.error("DB Error MONGO_URI environment variable is not defined");
     throw new Error("MONGO_URI is required");
   }
 
   try {
-    const opts = {
-      serverSelectionTimeoutMS: 10000, // Wait 10s before failing
-      socketTimeoutMS: 45000,
-    };
-
     const db = await mongoose.connect(process.env.MONGO_URI);
     isConnected = true;
     logger.info("MongoDB connected");
@@ -30,7 +25,7 @@ const connectDB = async () => {
 
     return db;
   } catch (err) {
-    logger.error("DB Error ❌", err.message);
+    logger.error("DB Error", err.message);
     // Don't exit process in serverless
     throw err;
   }
