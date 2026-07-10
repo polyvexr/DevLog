@@ -5,7 +5,6 @@ import FullPageLoader from "./components/FullPageLoader";
 
 // Route guards and wrappers
 import PrivateRoute from "./components/routes/PrivateRoute";
-import AdminRoute from "./components/routes/AdminRoute";
 import PublicRoute from "./components/routes/PublicRoute";
 import AuthenticatedWrapper from "./components/routes/AuthenticatedWrapper";
 
@@ -21,8 +20,6 @@ const CodeforcesDetails = lazy(() => import("./pages/CodeforcesDetails"));
 const GitHubDetails = lazy(() => import("./pages/GitHubDetails"));
 const CodeChefDetails = lazy(() => import("./pages/CodeChefDetails"));
 const AtCoderDetails = lazy(() => import("./pages/AtCoderDetails"));
-const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
-const AdminUsers = lazy(() => import("./pages/AdminUsers"));
 const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const Settings = lazy(() => import("./pages/Settings"));
@@ -50,27 +47,7 @@ function App() {
       <Routes>
         <Route path="/" element={<HomeRoute />} />
 
-        {/* Admin routes */}
-        <Route
-          path="/admin"
-          element={
-            <AdminRoute>
-              <AuthenticatedWrapper>
-                <AdminDashboard />
-              </AuthenticatedWrapper>
-            </AdminRoute>
-          }
-        />
-        <Route
-          path="/admin/users"
-          element={
-            <AdminRoute>
-              <AuthenticatedWrapper>
-                <AdminUsers />
-              </AuthenticatedWrapper>
-            </AdminRoute>
-          }
-        />
+
 
         {/* Protected User Details */}
         <Route

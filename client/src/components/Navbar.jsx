@@ -4,7 +4,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { FiZap, FiSettings } from "react-icons/fi";
 
 export default function Navbar() {
-  const { logout, isAdmin } = useContext(AuthContext);
+  const { logout } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -23,20 +23,6 @@ export default function Navbar() {
         </NavLink>
 
         <div className="flex gap-4 items-center">
-          {isAdmin && (
-            <NavLink
-              to="/admin"
-              className={({ isActive }) =>
-                `font-semibold px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 ${
-                  isActive
-                    ? "bg-gradient-to-r from-yellow-600 to-orange-600 text-white shadow-lg shadow-yellow-500/50"
-                    : "text-gray-300 hover:text-white hover:bg-white/5"
-                }`
-              }
-            >
-              <FiSettings /> Admin
-            </NavLink>
-          )}
 
           <NavLink
             to="/link"

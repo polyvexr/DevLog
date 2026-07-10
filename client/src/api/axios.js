@@ -26,7 +26,6 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       // Token expired or invalid - clear auth and redirect
       localStorage.removeItem("token");
-      localStorage.removeItem("isAdmin");
 
       // Only redirect if not already on auth pages
       const currentPath = window.location.pathname;
@@ -65,13 +64,6 @@ export const getContestsByPlatform = (platform) => api.get(`/contests/${platform
 
 // Dashboard API (combined endpoint for performance)
 export const getDashboardData = () => api.get("/dashboard");
-
-// Admin API
-export const getAdminStats = () => api.get("/admin/stats");
-export const getAdminUsers = () => api.get("/admin/users");
-export const syncAllPlatforms = () => api.post("/admin/sync/all");
-export const syncPlatform = (platform) => api.post(`/admin/sync/${platform}`);
-export const triggerContestFetch = () => api.post("/cron/contests");
 
 // User API
 export const deleteAccount = () => api.delete("/user/account");

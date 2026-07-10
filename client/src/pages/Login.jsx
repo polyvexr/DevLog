@@ -30,15 +30,15 @@ export default function Login() {
         await api.post("/auth/register", form);
         // Automatically attempt auto-login right after registration
         const res = await api.post("/auth/login", { email: form.email, password: form.password });
-        const { token, isAdmin } = res.data.data;
-        login(token, isAdmin);
-        navigate(isAdmin ? "/admin" : "/");
+        const { token } = res.data.data;
+        login(token);
+        navigate("/");
       } else {
         // Submit login
         const res = await api.post("/auth/login", { email: form.email, password: form.password });
-        const { token, isAdmin } = res.data.data;
-        login(token, isAdmin);
-        navigate(isAdmin ? "/admin" : "/");
+        const { token } = res.data.data;
+        login(token);
+        navigate("/");
       }
     } catch (err) {
       setError(

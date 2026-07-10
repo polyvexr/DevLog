@@ -93,7 +93,6 @@ export default function PublicProfile() {
               <div className="flex-1 text-center lg:text-left">
                 <div className="flex flex-col lg:flex-row items-center gap-6 mb-6">
                   <h1 className="text-5xl md:text-8xl font-black text-white italic tracking-tighter leading-none">{user.name}</h1>
-                  {user.role === "admin" && <span className="px-4 py-1.5 bg-blue-600 text-white text-[9px] font-black uppercase tracking-[0.3em] rounded-full shadow-lg shadow-blue-600/30">System Admin</span>}
                 </div>
                 <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 mb-8">
                   <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-500/5 border border-blue-500/10 text-blue-400 text-[11px] font-black uppercase tracking-[0.2em] rounded-2xl"><FiTarget className="text-sm" /> @{user.username}</div>

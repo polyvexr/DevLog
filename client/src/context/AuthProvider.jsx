@@ -4,11 +4,10 @@ import api from "../api/axios";
 
 export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem("token"));
-  const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
 
-  // Fetch user info including admin status from API
+  // Fetch user info from API
   const fetchUserInfo = useCallback(async () => {
     if (!token) {
       setLoading(false);
@@ -21,11 +20,6 @@ export const AuthProvider = ({ children }) => {
 
       if (response.data.success && userData) {
         setUser(userData);
-        // Check admin status from server response
-        const adminStatus = userData.role === "admin";
-        setIsAdmin(adminStatus);
-        // Keep localStorage in sync for quick UI checks (but server is source of truth)
-        localStorage.setItem("isAdmin", adminStatus);
       }
     } catch (error) {
       // If token is invalid, clear everything
@@ -41,20 +35,16 @@ export const AuthProvider = ({ children }) => {
     fetchUserInfo();
   }, [fetchUserInfo]);
 
-  const login = (t, admin = false) => {
+  const login = (t) => {
     localStorage.setItem("token", t);
-    localStorage.setItem("isAdmin", admin);
     setToken(t);
-    setIsAdmin(admin);
     // Fetch fresh user info after login
     setTimeout(() => fetchUserInfo(), 100);
   };
 
   const logout = () => {
     localStorage.removeItem("token");
-    localStorage.removeItem("isAdmin");
     setToken(null);
-    setIsAdmin(false);
     setUser(null);
   };
 
@@ -64,13 +54,12 @@ export const AuthProvider = ({ children }) => {
 
   const value = useMemo(() => ({
     token,
-    isAdmin,
     user,
     loading,
     login,
     logout,
     refreshUser
-  }), [token, isAdmin, user, loading, refreshUser]); // login and logout are stable
+  }), [token, user, loading, refreshUser]); // login and logout are stable
 
   return (
     <AuthContext.Provider value={value}>

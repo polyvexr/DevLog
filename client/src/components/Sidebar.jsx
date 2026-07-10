@@ -22,7 +22,7 @@ const AtCoderIcon = ({ isCollapsed }) => (
 );
 
 export default function Sidebar() {
-  const { logout, isAdmin } = useContext(AuthContext);
+  const { logout } = useContext(AuthContext);
   const {
     isCollapsed,
     isMobileOpen,
@@ -207,30 +207,7 @@ export default function Sidebar() {
             )}
           </div>
 
-          {/* Admin Sub-section */}
-          {isAdmin && (
-            <div className="space-y-1 pt-4 border-t border-[#222225]">
-              {!isCollapsed && (
-                <div className="px-3 mb-3">
-                  <span className="text-[9px] font-mono font-semibold uppercase tracking-wider text-slate-600">Admin</span>
-                </div>
-              )}
-              <NavLink
-                to="/admin"
-                onClick={handleNavClick}
-                className={({ isActive }) => `
-                  flex items-center gap-3.5 px-3 py-2.5 rounded font-mono text-[10px] uppercase tracking-wider transition-all cursor-pointer
-                  ${isActive
-                    ? "bg-[#0c0c0c] border-l-2 border-[#e23e2d] text-white font-semibold"
-                    : "text-slate-500 hover:text-slate-200 hover:bg-[#0c0c0c]/40"
-                  }
-                `}
-              >
-                <FiSettings className={`text-base ${isCollapsed ? "mx-auto" : ""}`} />
-                {!isCollapsed && <span>System Config</span>}
-              </NavLink>
-            </div>
-          )}
+
         </nav>
 
         {/* Footer - Logout */}
