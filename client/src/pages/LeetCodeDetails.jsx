@@ -1,5 +1,5 @@
 import { SiLeetcode } from "react-icons/si";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { usePlatformStats } from "../hooks/useApi";
 import { unlinkPlatform } from "../api/axios";
 import FullPageLoader from "../components/FullPageLoader";
@@ -27,10 +27,17 @@ export default function LeetCodeDetails() {
 
   if (loading) return <FullPageLoader />;
   if (error || !data) return (
-    <div className="text-center py-20 px-4">
-      <h2 className="text-3xl font-black text-white mb-4 italic uppercase">Service Not Linked</h2>
-      <p className="text-gray-400 mb-8 max-w-md mx-auto">This account is not yet linked. Please connect your LeetCode account to see your information here.</p>
-      <button onClick={() => window.location.href = '/link'} className="glass-card-premium px-8 py-3 text-blue-400 font-black tracking-widest uppercase hover:scale-105 transition-transform active:scale-95">Link Now</button>
+    <div className="bg-[#121214] border border-[#222225] p-12 text-center rounded-xl space-y-6 max-w-lg mx-auto mt-12">
+      <h2 className="text-xl font-[Cormorant_Garamond] font-semibold italic text-white">Service Not Linked</h2>
+      <p className="text-slate-400 text-xs font-mono max-w-xs mx-auto leading-relaxed">
+        This account is not yet connected. Connect your LeetCode account to monitor statistics.
+      </p>
+      <button
+        onClick={() => window.location.href = '/settings'}
+        className="px-6 py-3 bg-[#e23e2d] hover:bg-[#cf2e2e] text-white font-mono text-xs font-semibold uppercase tracking-wider rounded transition-colors inline-flex items-center gap-1.5 cursor-pointer"
+      >
+        Link Account →
+      </button>
     </div>
   );
 
@@ -39,29 +46,34 @@ export default function LeetCodeDetails() {
   const medium = subDiff.medium?.solved || 0;
   const hard = subDiff.hard?.solved || 0;
   const total = stats.totalSolved || 0;
-  const efficiency = subDiff.all?.total > 0 ? ((total / subDiff.all.total) * 100).toFixed(1) : "0.0";
 
   return (
-    <div className="max-w-7xl mx-auto py-8 px-4">
-      <PlatformDetailsHeader
-        platform="leetcode"
-        username={data.username}
-        icon={SiLeetcode}
-        iconColor="#FFA116"
-        iconBgColor="#2c2c2c"
-        title="LeetCode"
-        onUnlink={handleUnlink}
-      />
+    <div className="max-w-7xl mx-auto py-8 px-4 space-y-12">
+      <div className="space-y-4">
+        <Link
+          to="/"
+          className="inline-flex items-center gap-2 font-mono text-[9px] uppercase tracking-wider text-slate-500 hover:text-slate-200 transition-colors"
+        >
+          ← Back to Dashboard
+        </Link>
+        <PlatformDetailsHeader
+          platform="leetcode"
+          username={data.username}
+          icon={SiLeetcode}
+          title="LeetCode"
+          onUnlink={handleUnlink}
+        />
+      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
-        <StatBox label="Global Rank" value={`#${stats.ranking?.toLocaleString() || "—"}`} subValue="Rank" colSpan={2} />
-        <StatBox label="Reputation" value={stats.reputation?.toLocaleString() || 0} valueColor="text-purple-400" />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatBox label="Global Rank" value={`#${stats.ranking?.toLocaleString() || "—"}`} colSpan={2} />
+        <StatBox label="Reputation" value={stats.reputation?.toLocaleString() || 0} />
         <StatBox label="Profile Name" value={stats.realName || "Anonymous"} />
       </div>
 
       <DifficultyGrid
         title="Solved Problems"
-        dotColor="bg-orange-500"
+        dotColor="bg-[#e23e2d]"
         difficulties={{
           easy: easy,
           medium: medium,
@@ -71,42 +83,42 @@ export default function LeetCodeDetails() {
       />
 
       {stats.contestRanking && (
-        <div className="mb-16">
-          <SectionHeader title="Contest Performance" dotColor="bg-purple-500" />
-          <div className="glass-card-premium p-10 bg-gradient-to-br from-white/[0.03] to-purple-500/[0.03]">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+        <div className="space-y-4">
+          <SectionHeader title="Contest Performance" dotColor="bg-[#e23e2d]" />
+          <div className="bg-[#121214] border border-[#222225] p-6 rounded-xl">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 font-mono">
               <div className="space-y-1">
-                <div className="text-[10px] font-black tracking-[0.2em] text-gray-500 uppercase">Rating</div>
-                <div className="text-4xl font-black text-purple-400 italic">{stats.contestRanking.rating ? Math.round(stats.contestRanking.rating) : "N/A"}</div>
+                <div className="text-[8px] font-semibold text-slate-500 uppercase tracking-wider">Rating</div>
+                <div className="text-2xl font-bold text-slate-200">{stats.contestRanking.rating ? Math.round(stats.contestRanking.rating) : "N/A"}</div>
               </div>
               <div className="space-y-1">
-                <div className="text-[10px] font-black tracking-[0.2em] text-gray-500 uppercase">Percentile</div>
-                <div className="text-4xl font-black text-cyan-400 italic">{stats.contestRanking.topPercentage ? `${stats.contestRanking.topPercentage}%` : "N/A"}</div>
+                <div className="text-[8px] font-semibold text-slate-500 uppercase tracking-wider">Percentile</div>
+                <div className="text-2xl font-bold text-slate-200">{stats.contestRanking.topPercentage ? `${stats.contestRanking.topPercentage}%` : "N/A"}</div>
               </div>
               <div className="space-y-1">
-                <div className="text-[10px] font-black tracking-[0.2em] text-gray-500 uppercase">Contests</div>
-                <div className="text-4xl font-black text-blue-400 italic">{stats.contestRanking.attendedContestsCount || 0}</div>
+                <div className="text-[8px] font-semibold text-slate-500 uppercase tracking-wider">Contests</div>
+                <div className="text-2xl font-bold text-slate-200">{stats.contestRanking.attendedContestsCount || 0}</div>
               </div>
               <div className="space-y-1">
-                <div className="text-[10px] font-black tracking-[0.2em] text-gray-500 uppercase">Rank</div>
-                <div className="text-4xl font-black text-white italic">#{stats.contestRanking.globalRanking?.toLocaleString() || "—"}</div>
+                <div className="text-[8px] font-semibold text-slate-500 uppercase tracking-wider">Rank</div>
+                <div className="text-2xl font-bold text-slate-200">#{stats.contestRanking.globalRanking?.toLocaleString() || "—"}</div>
               </div>
             </div>
           </div>
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
-        <div>
-          <SectionHeader title="Skills and Topics" dotColor="bg-blue-500" />
-          <div className="glass-card-premium p-8 space-y-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="space-y-6">
+          <SectionHeader title="Skills and Topics" dotColor="bg-[#e23e2d]" />
+          <div className="bg-[#121214] border border-[#222225] p-6 rounded-xl space-y-6">
             {stats.tagStats?.advanced && (
-              <div className="space-y-4">
-                <h3 className="text-xs font-black uppercase tracking-widest text-purple-400">Advanced Topics</h3>
+              <div className="space-y-3">
+                <h3 className="text-[9px] font-mono font-semibold uppercase tracking-wider text-[#e23e2d]">Advanced Topics</h3>
                 <div className="flex flex-wrap gap-2">
                   {stats.tagStats.advanced.slice(0, 8).map(tag => (
-                    <div key={tag.tagSlug} className="px-4 py-2 bg-purple-500/10 border border-purple-500/20 rounded-xl text-xs font-bold text-white">
-                      {tag.tagName} <span className="text-purple-400 ml-1">{tag.problemsSolved}</span>
+                    <div key={tag.tagSlug} className="px-3 py-1.5 bg-[#0c0c0c] border border-[#222225] rounded text-[9px] font-mono text-slate-300">
+                      {tag.tagName} <span className="text-[#e23e2d] ml-1">{tag.problemsSolved}</span>
                     </div>
                   ))}
                 </div>
@@ -119,16 +131,16 @@ export default function LeetCodeDetails() {
           </div>
         </div>
 
-        <div>
-          <SectionHeader title="Recent Activity" dotColor="bg-green-500" />
-          <div className="glass-card-premium p-4 min-h-[400px]">
+        <div className="space-y-6">
+          <SectionHeader title="Recent Activity" dotColor="bg-[#e23e2d]" />
+          <div className="bg-[#121214] border border-[#222225] rounded-xl divide-y divide-[#222225]/40 overflow-hidden">
             {stats.recentSubmissions?.slice(0, 8).map((sub, idx) => (
-              <div key={idx} className="flex items-center justify-between p-5 hover:bg-white/5 rounded-2xl transition-all group">
-                <div className="flex items-center gap-4">
-                  <div className="w-2 h-2 rounded-full bg-green-500 opacity-50 group-hover:scale-150 transition-transform"></div>
-                  <div className="font-bold text-white group-hover:text-blue-400 transition-colors truncate max-w-[220px]">{sub.title}</div>
+              <div key={idx} className="flex items-center justify-between p-4 hover:bg-[#0c0c0c]/50 transition-colors group">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-1.5 h-1.5 rounded-full bg-green-500 opacity-60"></div>
+                  <div className="font-mono text-xs text-slate-200 truncate pr-4">{sub.title}</div>
                 </div>
-                <div className="text-[10px] font-black uppercase text-gray-500 tracking-widest">
+                <div className="text-[8px] font-mono text-slate-500 uppercase tracking-wider flex-shrink-0">
                   {new Date(parseInt(sub.timestamp) * 1000).toLocaleDateString()}
                 </div>
               </div>

@@ -1,14 +1,13 @@
 import { SiCodechef } from "react-icons/si";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { usePlatformStats } from "../hooks/useApi";
 import { unlinkPlatform } from "../api/axios";
 import FullPageLoader from "../components/FullPageLoader";
 import {
   PlatformDetailsHeader,
   StatBox,
-  SectionHeader,
-  ContestHistoryList,
-  DifficultyGrid
+  DifficultyGrid,
+  ContestHistoryList
 } from "../components/PlatformDetails";
 
 export default function CodeChefDetails() {
@@ -27,10 +26,17 @@ export default function CodeChefDetails() {
 
   if (loading) return <FullPageLoader />;
   if (error || !data) return (
-    <div className="text-center py-20 px-4">
-      <h2 className="text-3xl font-black text-white mb-4 italic uppercase">Service Not Linked</h2>
-      <p className="text-gray-400 mb-8 max-w-md mx-auto">This account is not yet linked. Please connect your CodeChef profile to see your information here.</p>
-      <button onClick={() => window.location.href = '/link'} className="glass-card-premium px-8 py-3 text-amber-400 font-black tracking-widest uppercase hover:scale-105 transition-transform active:scale-95">Link Now</button>
+    <div className="bg-[#121214] border border-[#222225] p-12 text-center rounded-xl space-y-6 max-w-lg mx-auto mt-12">
+      <h2 className="text-xl font-[Cormorant_Garamond] font-semibold italic text-white">Service Not Linked</h2>
+      <p className="text-slate-400 text-xs font-mono max-w-xs mx-auto leading-relaxed">
+        This account is not yet connected. Connect your CodeChef profile to monitor statistics.
+      </p>
+      <button
+        onClick={() => window.location.href = '/settings'}
+        className="px-6 py-3 bg-[#e23e2d] hover:bg-[#cf2e2e] text-white font-mono text-xs font-semibold uppercase tracking-wider rounded transition-colors inline-flex items-center gap-1.5 cursor-pointer"
+      >
+        Link Account →
+      </button>
     </div>
   );
 
@@ -40,42 +46,47 @@ export default function CodeChefDetails() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto py-8 px-4">
-      <PlatformDetailsHeader
-        platform="codechef"
-        username={data.username}
-        icon={SiCodechef}
-        iconColor="#5B4638"
-        iconBgColor="#5B4638"
-        title="CodeChef"
-        onUnlink={handleUnlink}
-      />
+    <div className="max-w-7xl mx-auto py-8 px-4 space-y-12">
+      <div className="space-y-4">
+        <Link
+          to="/"
+          className="inline-flex items-center gap-2 font-mono text-[9px] uppercase tracking-wider text-slate-500 hover:text-slate-200 transition-colors"
+        >
+          ← Back to Dashboard
+        </Link>
+        <PlatformDetailsHeader
+          platform="codechef"
+          username={data.username}
+          icon={SiCodechef}
+          title="CodeChef"
+          onUnlink={handleUnlink}
+        />
+      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatBox
           label="Current Rating"
           value={stats.rating || 0}
           subValue={`/ ${stats.highestRating || 0} Peak`}
           colSpan={2}
-          valueColor="text-white"
         />
-        <div className="glass-card-premium p-8">
-          <div className="text-xs font-black uppercase tracking-[0.2em] text-gray-500 mb-4">Star Rating</div>
-          <div className="text-4xl font-black" style={{ color: getStarColor(stats.stars) }}>
+        <div className="bg-[#121214] border border-[#222225] p-5 rounded-xl space-y-2">
+          <div className="text-[8px] font-mono font-semibold uppercase tracking-wider text-slate-500">Star Rating</div>
+          <div className="text-3xl font-mono font-bold leading-none" style={{ color: getStarColor(stats.stars) }}>
             {"★".repeat(stats.stars || 1)}
           </div>
         </div>
         <StatBox label="Division" value={stats.division || "—"} />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <StatBox label="Global Rank" value={`#${stats.globalRank?.toLocaleString() || "—"}`} />
         <StatBox label="Country Rank" value={`#${stats.countryRank?.toLocaleString() || "—"}`} subValue={stats.countryName} />
       </div>
 
       <DifficultyGrid
         title="Solved Problems"
-        dotColor="bg-amber-500"
+        dotColor="bg-[#e23e2d]"
         difficulties={{
           total: stats.totalSolved || 0,
           easy: stats.problemsSolved?.easy || 0,
@@ -93,7 +104,6 @@ export default function CodeChefDetails() {
           date: c.date
         }))}
         platform="codechef"
-        accentColor="#5B4638"
       />
     </div>
   );

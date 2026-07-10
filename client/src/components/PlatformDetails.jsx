@@ -1,10 +1,13 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
-import { FiTrash2 } from "react-icons/fi";
+import { Link } from "react-router-dom";
+import { FiTrash2, FiCalendar } from "react-icons/fi";
 
-/**
- * PlatformDetailsHeader - Reusable header component for platform detail pages
- */
+const AtCoderIcon = () => (
+  <span className="font-bold text-[8px] text-[#e23e2d] bg-[#e23e2d]/10 px-1.5 py-0.5 rounded border border-[#e23e2d]/20 font-sans">
+    AT
+  </span>
+);
+
 export function PlatformDetailsHeader({
   platform,
   username,
@@ -15,164 +18,118 @@ export function PlatformDetailsHeader({
   isTextIcon = false,
   onUnlink
 }) {
-  const navigate = useNavigate();
-
   return (
-    <>
-      <div className="flex items-center justify-between mb-10 fade-in-scale">
-        <button
-          onClick={() => navigate("/")}
-          className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-white transition-all hover:bg-blue-600 hover:border-blue-500 hover:-translate-x-1 group shadow-xl active:scale-95"
-          title="Back to Dashboard"
-        >
-          <svg
-            className="w-5 h-5 group-hover:-translate-x-0.5 transition-transform"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={3}
-              d="M15 19l-7-7 7-7"
-            />
-          </svg>
-        </button>
-      </div>
-
-      <div className="mb-12 fade-in-scale">
-        <div className="flex items-center gap-8">
-          <div
-            className="w-24 h-24 rounded-3xl flex items-center justify-center text-4xl shadow-2xl group-hover:scale-110 transition-transform"
-            style={{
-              backgroundColor: iconBgColor,
-              boxShadow: `0 20px 40px ${iconBgColor}50`
-            }}
-          >
-            {isTextIcon ? (
-              <span className="text-2xl font-black text-white">{Icon}</span>
-            ) : (
-              <Icon className="text-white text-4xl" />
-            )}
-          </div>
-          <div>
-            <h1 className="text-5xl md:text-7xl font-black tracking-tight text-white mb-2">
-              {title} <span className="animate-text-shine">Profile</span>
-            </h1>
-            <p className="text-xl font-black tracking-widest uppercase" style={{ color: iconColor }}>
-              @{username}
-            </p>
-          </div>
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pb-6 border-b border-[#222225] mb-8">
+      <div className="flex items-center gap-4">
+        <div className="w-12 h-12 rounded bg-[#121214] border border-[#222225] flex items-center justify-center text-lg">
+          {isTextIcon ? (
+            <AtCoderIcon />
+          ) : (
+            <Icon className="text-white" />
+          )}
+        </div>
+        <div>
+          <h1 className="font-[Cormorant_Garamond] font-semibold italic text-slate-100 text-2xl leading-none">
+            {title}
+          </h1>
+          <p className="font-mono text-[10px] text-slate-500 mt-1">@{username}</p>
         </div>
       </div>
-    </>
-  );
-}
-
-/**
- * StatBox - Reusable stat display box
- */
-export function StatBox({
-  label,
-  value,
-  valueColor = "text-white",
-  subValue,
-  subValueColor = "text-gray-500",
-  colSpan = 1,
-  className = ""
-}) {
-  return (
-    <div className={`glass-card-premium p-8 ${colSpan > 1 ? `lg:col-span-${colSpan}` : ""} ${className}`}>
-      <div className="text-xs font-black uppercase tracking-[0.2em] text-gray-500 mb-4">
-        {label}
-      </div>
-      <div className="flex items-end gap-3">
-        <span className={`text-5xl font-black italic ${valueColor}`}>
-          {value}
-        </span>
-        {subValue && (
-          <span className={`font-black text-lg mb-2 ${subValueColor}`}>
-            {subValue}
-          </span>
-        )}
-      </div>
+      <button
+        onClick={onUnlink}
+        className="px-4 py-2 bg-red-950/20 border border-red-500/20 hover:bg-red-500 text-red-500 hover:text-white font-mono text-[9px] font-semibold uppercase tracking-wider rounded transition-colors cursor-pointer flex items-center gap-1.5 self-start sm:self-auto"
+      >
+        <FiTrash2 size={12} />
+        Disconnect
+      </button>
     </div>
   );
 }
 
-/**
- * SectionHeader - Reusable section header with animated dot
- */
-export function SectionHeader({ title, dotColor = "bg-blue-500" }) {
+export function StatBox({
+  label,
+  value,
+  valueColor = "text-slate-100",
+  subValue,
+  subValueColor = "text-slate-500",
+  colSpan = 1,
+  className = "",
+  children
+}) {
   return (
-    <h2 className="text-2xl font-black mb-8 text-white uppercase tracking-widest flex items-center gap-3">
-      <div className={`w-2 h-2 ${dotColor} rounded-full animate-pulse`}></div>
-      {title}
-    </h2>
+    <div className={`bg-[#121214] border border-[#222225] p-5 rounded-xl space-y-2 relative ${colSpan > 1 ? `lg:col-span-${colSpan}` : ""} ${className}`}>
+      <div className="text-[8px] font-mono font-semibold uppercase tracking-wider text-slate-500">
+        {label}
+      </div>
+      <div className="flex items-baseline gap-2">
+        <span className={`text-3xl font-mono font-bold ${valueColor}`}>
+          {value}
+        </span>
+        {subValue && (
+          <span className={`font-mono text-[10px] ${subValueColor}`}>
+            {subValue}
+          </span>
+        )}
+      </div>
+      {children}
+    </div>
   );
 }
 
-/**
- * ContestHistoryList - Reusable contest history component
- */
+export function SectionHeader({ title, dotColor = "bg-[#e23e2d]" }) {
+  return (
+    <div className="flex items-center gap-2 mb-6 mt-12 border-b border-[#222225] pb-3">
+      <div className={`w-1.5 h-1.5 ${dotColor} rounded-full`}></div>
+      <h2 className="text-xs font-mono font-semibold uppercase tracking-wider text-slate-200">
+        {title}
+      </h2>
+    </div>
+  );
+}
+
 export function ContestHistoryList({
   contests,
   platform,
-  accentColor = "#3B82F6",
+  accentColor = "#e23e2d",
   maxItems = 10
 }) {
   if (!contests || contests.length === 0) return null;
 
   return (
-    <div className="mb-16">
-      <SectionHeader title="Contest History" dotColor="bg-purple-500" />
-      <div className="glass-card-premium p-6">
-        <div className="space-y-2">
+    <div className="mb-12">
+      <SectionHeader title="Contest History" dotColor="bg-[#e23e2d]" />
+      <div className="bg-[#121214] border border-[#222225] rounded-xl overflow-hidden">
+        <div className="divide-y divide-[#222225]/40">
           {contests.slice(0, maxItems).map((contest, idx) => {
             const ratingChange = contest.newRating !== undefined
               ? contest.newRating - (contest.oldRating || 0)
               : null;
-            const changeColor = ratingChange >= 0 ? "#22C55E" : "#EF4444";
+            const changeColorClass = ratingChange >= 0 ? "text-green-500" : "text-red-500";
 
             return (
               <div
                 key={idx}
-                className="flex items-center justify-between p-5 hover:bg-white/5 rounded-2xl transition-all group"
+                className="flex items-center justify-between p-4 hover:bg-[#0c0c0c]/50 transition-colors group"
               >
-                <div className="flex items-center gap-4">
-                  <div
-                    className="w-10 h-10 rounded-xl flex items-center justify-center text-xs font-black"
-                    style={{
-                      backgroundColor: `${accentColor}15`,
-                      color: accentColor
-                    }}
-                  >
+                <div className="flex items-center gap-4 min-w-0">
+                  <div className="px-2 py-0.5 bg-[#0c0c0c] border border-[#222225] rounded font-mono text-[9px] text-[#e23e2d] font-bold">
                     #{contest.place || contest.rank}
                   </div>
-                  <div>
-                    <div className="font-bold text-white group-hover:text-blue-400 transition-colors truncate max-w-[300px]">
+                  <div className="min-w-0">
+                    <div className="font-mono text-xs text-slate-200 truncate pr-4">
                       {contest.contestName || contest.contestCode}
                     </div>
-                    {contest.performance && (
-                      <div className="text-xs text-gray-500">
-                        Perf: <span className="text-purple-400">{contest.performance}</span>
-                      </div>
-                    )}
                     {contest.date && (
-                      <div className="text-xs text-gray-500">{contest.date}</div>
+                      <div className="text-[8px] font-mono text-slate-500 uppercase tracking-wider mt-0.5">{contest.date}</div>
                     )}
                   </div>
                 </div>
-                <div className="text-right">
-                  <div className="text-2xl font-black text-white">
+                <div className="text-right flex-shrink-0">
+                  <div className="text-sm font-mono font-bold text-slate-100">
                     {Math.round(contest.newRating || contest.rating)}
                   </div>
                   {ratingChange !== null && (
-                    <div
-                      className="text-sm font-bold"
-                      style={{ color: changeColor }}
-                    >
+                    <div className={`text-[9px] font-mono font-semibold ${changeColorClass}`}>
                       {ratingChange >= 0 ? "+" : ""}{Math.round(ratingChange)}
                     </div>
                   )}
@@ -186,40 +143,30 @@ export function ContestHistoryList({
   );
 }
 
-/**
- * DifficultyGrid - Reusable difficulty breakdown grid
- */
-export function DifficultyGrid({ title, difficulties, dotColor = "bg-blue-500" }) {
+export function DifficultyGrid({ title, difficulties, dotColor = "bg-[#e23e2d]" }) {
   const difficultyConfig = {
-    easy: { color: "#22C55E", label: "Easy" },
-    medium: { color: "#EAB308", label: "Medium" },
-    hard: { color: "#EF4444", label: "Hard" },
-    challenge: { color: "#A855F7", label: "Challenge" },
-    total: { color: "white", label: "Total" }
+    easy: { colorClass: "text-green-500", label: "Easy" },
+    medium: { colorClass: "text-amber-500", label: "Medium" },
+    hard: { colorClass: "text-red-500", label: "Hard" },
+    challenge: { colorClass: "text-purple-500", label: "Challenge" },
+    total: { colorClass: "text-slate-100", label: "Total" }
   };
 
   return (
-    <div className="mb-16">
+    <div className="mb-12">
       <SectionHeader title={title} dotColor={dotColor} />
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
         {Object.entries(difficulties).map(([key, value]) => {
-          const config = difficultyConfig[key] || { color: "#6B7280", label: key };
+          const config = difficultyConfig[key] || { colorClass: "text-slate-400", label: key };
           return (
             <div
               key={key}
-              className="glass-card-premium p-8"
-              style={{ borderColor: `${config.color}20` }}
+              className="bg-[#121214] border border-[#222225] p-5 rounded-xl space-y-2"
             >
-              <div
-                className="text-xs font-black uppercase tracking-widest mb-6"
-                style={{ color: `${config.color}80` }}
-              >
+              <div className="text-[8px] font-mono font-semibold uppercase tracking-wider text-slate-500">
                 {config.label}
               </div>
-              <div
-                className="text-5xl font-black italic"
-                style={{ color: config.color }}
-              >
+              <div className={`text-3xl font-mono font-bold ${config.colorClass}`}>
                 {value}
               </div>
             </div>
@@ -230,10 +177,7 @@ export function DifficultyGrid({ title, difficulties, dotColor = "bg-blue-500" }
   );
 }
 
-/**
- * LanguageStats - Reusable language statistics display
- */
-export function LanguageStats({ languages, title = "Languages Used", dotColor = "bg-green-500" }) {
+export function LanguageStats({ languages, title = "Languages Used", dotColor = "bg-[#e23e2d]" }) {
   if (!languages || Object.keys(languages).length === 0) return null;
 
   const sortedLanguages = Object.entries(languages)
@@ -243,19 +187,19 @@ export function LanguageStats({ languages, title = "Languages Used", dotColor = 
   const maxCount = Math.max(...sortedLanguages.map(([, count]) => count));
 
   return (
-    <div className="mb-16">
+    <div className="mb-12">
       <SectionHeader title={title} dotColor={dotColor} />
-      <div className="glass-card-premium p-6">
+      <div className="bg-[#121214] border border-[#222225] p-6 rounded-xl">
         <div className="space-y-4">
           {sortedLanguages.map(([lang, count]) => (
-            <div key={lang} className="group">
-              <div className="flex justify-between mb-2">
-                <span className="text-white font-bold">{lang}</span>
-                <span className="text-gray-400">{count}</span>
+            <div key={lang} className="space-y-2">
+              <div className="flex justify-between text-xs font-mono">
+                <span className="text-slate-300 font-semibold">{lang}</span>
+                <span className="text-slate-500">{count}</span>
               </div>
-              <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+              <div className="h-1.5 bg-[#0c0c0c] border border-[#222225] rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full transition-all group-hover:opacity-80"
+                  className="h-full bg-[#e23e2d] rounded-full transition-all"
                   style={{ width: `${(count / maxCount) * 100}%` }}
                 />
               </div>
