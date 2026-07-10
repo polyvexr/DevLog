@@ -2,11 +2,9 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useSettings } from "../hooks/useSettings";
 import FullPageLoader from "../components/FullPageLoader";
-import Dialog from "../components/Dialog";
 import PersonalInfo from "../components/settings/PersonalInfo";
 import EcosystemSync from "../components/settings/EcosystemSync";
 import Visibility from "../components/settings/Visibility";
-import DangerZone from "../components/settings/DangerZone";
 import { SiLeetcode, SiCodeforces, SiGithub, SiCodechef } from "react-icons/si";
 
 const AtCoderIcon = () => (
@@ -37,11 +35,9 @@ export default function Settings() {
     handleAvatarUpload,
     handlePublicVisibilityToggle,
     linkPlatform,
-    unlinkPlatform,
-    deleteAccount
+    unlinkPlatform
   } = useSettings();
 
-  const [dialog, setDialog] = useState({ open: false });
   const [newLink, setNewLink] = useState({ platform: "leetcode", username: "" });
 
   if (loading) return <FullPageLoader />;
@@ -100,17 +96,6 @@ export default function Settings() {
         handlePublicVisibilityToggle={handlePublicVisibilityToggle}
       />
 
-      <DangerZone onDeleteClick={() => setDialog({ open: true })} />
-
-      <Dialog
-        open={dialog.open}
-        title="Remove Information?"
-        message="All service information, competition history, and membership information will be cleared. This action is permanent."
-        confirmText="Clear Now"
-        cancelText="Cancel"
-        onConfirm={deleteAccount}
-        onCancel={() => setDialog({ open: false })}
-      />
     </div>
   );
 }

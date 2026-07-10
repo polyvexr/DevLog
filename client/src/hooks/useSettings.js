@@ -20,8 +20,7 @@ export function useSettings() {
             showGitHub: true,
             showCodeChef: true,
             showAtCoder: true
-        },
-        currentPassword: "", newPassword: ""
+        }
     });
 
     const showStatus = useCallback((type, message) => {
@@ -158,15 +157,6 @@ export function useSettings() {
         }
     };
 
-    const deleteAccount = async () => {
-        try {
-            await api.delete("/user/account");
-            logout();
-        } catch (err) {
-            showStatus("error", "Failed to delete account");
-        }
-    };
-
     return {
         user,
         platforms,
@@ -182,7 +172,6 @@ export function useSettings() {
         handlePublicVisibilityToggle,
         linkPlatform,
         unlinkPlatform,
-        deleteAccount,
         showStatus
     };
 }

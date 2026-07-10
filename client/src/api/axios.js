@@ -29,7 +29,7 @@ api.interceptors.response.use(
 
       // Only redirect if not already on auth pages
       const currentPath = window.location.pathname;
-      const authPages = ["/login", "/register", "/forgot-password", "/reset-password"];
+      const authPages = ["/login", "/register"];
       const isAuthPage = authPages.some(page => currentPath.startsWith(page));
 
       if (!isAuthPage) {
@@ -43,7 +43,6 @@ api.interceptors.response.use(
 // Auth API
 export const getMe = () => api.get("/auth/me");
 export const updateProfile = (data) => api.put("/user/profile", data);
-export const updatePassword = (data) => api.put("/user/password", data);
 export const updateSettings = (data) => api.put("/user/settings", data);
 
 
@@ -64,8 +63,5 @@ export const getContestsByPlatform = (platform) => api.get(`/contests/${platform
 
 // Dashboard API (combined endpoint for performance)
 export const getDashboardData = () => api.get("/dashboard");
-
-// User API
-export const deleteAccount = () => api.delete("/user/account");
 
 export default api;

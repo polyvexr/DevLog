@@ -20,8 +20,6 @@ const CodeforcesDetails = lazy(() => import("./pages/CodeforcesDetails"));
 const GitHubDetails = lazy(() => import("./pages/GitHubDetails"));
 const CodeChefDetails = lazy(() => import("./pages/CodeChefDetails"));
 const AtCoderDetails = lazy(() => import("./pages/AtCoderDetails"));
-const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
-const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const Settings = lazy(() => import("./pages/Settings"));
 const Contests = lazy(() => import("./pages/Contests"));
 const PublicProfile = lazy(() => import("./pages/PublicProfile"));
@@ -142,22 +140,7 @@ function App() {
             </PublicRoute>
           }
         />
-        <Route
-          path="/forgot-password"
-          element={
-            <PublicRoute>
-              <ForgotPassword />
-            </PublicRoute>
-          }
-        />
-        <Route
-          path="/reset-password/:token"
-          element={
-            <PublicRoute>
-              <ResetPassword />
-            </PublicRoute>
-          }
-        />
+
 
         {/* Public profile - NO AUTH REQUIRED */}
         <Route

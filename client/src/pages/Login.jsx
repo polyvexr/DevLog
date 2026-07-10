@@ -139,20 +139,11 @@ export default function Login() {
                 required
               />
             </div>
-
             <div className="space-y-1.5">
               <div className="flex justify-between items-center">
                 <label htmlFor="password" className="block text-[9px] font-mono font-semibold uppercase tracking-wider text-slate-500">
                   Password
                 </label>
-                {!isRegister && (
-                  <Link
-                    to="/forgot-password"
-                    className="text-[9px] font-mono text-slate-500 hover:text-slate-200 transition-colors uppercase tracking-wider"
-                  >
-                    Forgot?
-                  </Link>
-                )}
               </div>
               <div className="relative">
                 <input
