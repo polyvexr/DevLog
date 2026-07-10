@@ -1,5 +1,6 @@
 import axios from "axios";
 import logger from "../utils/logger.js";
+import { TELEGRAM_SEND_MESSAGE } from "../utils/links.js";
 
 
  // Telegram Service - Sends notifications to a Telegram Bot
@@ -22,7 +23,7 @@ export const telegramService = {
         }
 
         try {
-            const url = `https://api.telegram.org/bot${token}/sendMessage`;
+            const url = TELEGRAM_SEND_MESSAGE(token);
             await axios.post(url, {
                 chat_id: chatId,
                 text,

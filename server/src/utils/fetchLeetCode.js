@@ -1,5 +1,10 @@
 import axios from "axios";
 import logger from "./logger.js";
+import {
+  LEETCODE_REFERER,
+  LEETCODE_ORIGIN,
+  LEETCODE_GRAPHQL
+} from "./links.js";
 
 export const fetchLeetCode = async (username) => {
   const query = `
@@ -45,14 +50,14 @@ export const fetchLeetCode = async (username) => {
   const headers = {
     "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
     "Content-Type": "application/json",
-    "Referer": "https://leetcode.com/",
-    "Origin": "https://leetcode.com",
+    "Referer": LEETCODE_REFERER,
+    "Origin": LEETCODE_ORIGIN,
     "Accept": "*/*",
     "Accept-Language": "en-US,en;q=0.9"
   };
 
   try {
-    const res = await axios.post("https://leetcode.com/graphql", {
+    const res = await axios.post(LEETCODE_GRAPHQL, {
       query,
       variables: { username },
     }, { headers, timeout: 30000 });

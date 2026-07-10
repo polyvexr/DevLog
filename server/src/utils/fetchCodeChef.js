@@ -1,5 +1,8 @@
 import axios from "axios";
 import * as cheerio from "cheerio";
+import logger from "./logger.js";
+
+import { CODECHEF_API_FALLBACKS, CODECHEF_USER_URL } from "./links.js";
 
 const pInt = (v) => parseInt(v?.toString().replace(/[^\d]/g, "")) || 0;
 
@@ -31,11 +34,7 @@ const norm = (d, h) => {
 };
 
 export const fetchCodeChef = async (username) => {
-  const endpoints = [
-    `https://cp-rating-api.vercel.app/codechef/${username}`,
-    `https://codechef-api.vercel.app/handle/${username}`,
-    `https://codechef-api.onrender.com/handle/${username}`
-  ];
+  const endpoints = CODECHEF_API_FALLBACKS(username);
 
   // Try API endpoints in parallel using Promise.any
   try {
@@ -63,7 +62,7 @@ export const fetchCodeChef = async (username) => {
 };
 
 async function scrape(username) {
-  const res = await axios.get(`https://www.codechef.com/users/${username}`, {
+  const res = await axios.get(CODECHEF_USER_URL(username), {
     timeout: 15000,
     headers: { "User-Agent": "Mozilla/5.0" }
   });

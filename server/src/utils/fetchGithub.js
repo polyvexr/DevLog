@@ -1,5 +1,11 @@
 import axios from "axios";
 import logger from "./logger.js";
+import {
+  GITHUB_USER_INFO,
+  GITHUB_USER_REPOS,
+  GITHUB_USER_EVENTS,
+  GITHUB_USER_ORGS
+} from "./links.js";
 
 // Get GitHub headers (with optional authentication)
 const getGitHubHeaders = () => {
@@ -22,16 +28,16 @@ export const fetchGithub = async (username) => {
 
     // Fetch basic user info first to verify user exists
     const userRes = await axios.get(
-      `https://api.github.com/users/${username}`,
+      GITHUB_USER_INFO(username),
       { timeout: 15000, headers }
     );
     const user = userRes.data;
 
     // Parallel fetch secondary data
     const [reposRes, eventsRes, orgsRes] = await Promise.all([
-      axios.get(`https://api.github.com/users/${username}/repos?per_page=100&sort=updated`, { timeout: 20000, headers }).catch(() => ({ data: [] })),
-      axios.get(`https://api.github.com/users/${username}/events/public?per_page=100`, { timeout: 15000, headers }).catch(() => ({ data: [] })),
-      axios.get(`https://api.github.com/users/${username}/orgs`, { timeout: 10000, headers }).catch(() => ({ data: [] })),
+      axios.get(GITHUB_USER_REPOS(username), { timeout: 20000, headers }).catch(() => ({ data: [] })),
+      axios.get(GITHUB_USER_EVENTS(username), { timeout: 15000, headers }).catch(() => ({ data: [] })),
+      axios.get(GITHUB_USER_ORGS(username), { timeout: 10000, headers }).catch(() => ({ data: [] })),
     ]);
 
     // Process repositories

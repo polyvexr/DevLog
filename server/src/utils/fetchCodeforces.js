@@ -1,13 +1,18 @@
 import axios from "axios";
 import logger from "./logger.js";
+import {
+  CODEFORCES_USER_INFO,
+  CODEFORCES_USER_STATUS,
+  CODEFORCES_USER_RATING
+} from "./links.js";
 
 export const fetchCodeforces = async (username) => {
   try {
     // Parallel fetch all CF data
     const [userInfoRes, submissionsRes, ratingRes] = await Promise.all([
-      axios.get(`https://codeforces.com/api/user.info?handles=${username}`, { timeout: 15000 }).catch(err => err.response),
-      axios.get(`https://codeforces.com/api/user.status?handle=${username}&from=1&count=5000`, { timeout: 20000 }).catch(err => err.response),
-      axios.get(`https://codeforces.com/api/user.rating?handle=${username}`, { timeout: 15000 }).catch(err => err.response),
+      axios.get(CODEFORCES_USER_INFO(username), { timeout: 15000 }).catch(err => err.response),
+      axios.get(CODEFORCES_USER_STATUS(username), { timeout: 20000 }).catch(err => err.response),
+      axios.get(CODEFORCES_USER_RATING(username), { timeout: 15000 }).catch(err => err.response),
     ]);
 
     if (!userInfoRes || userInfoRes.data?.status !== "OK") {

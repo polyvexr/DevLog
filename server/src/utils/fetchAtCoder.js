@@ -1,5 +1,11 @@
 import axios from "axios";
 import logger from "./logger.js";
+import {
+  ATCODER_USER_HISTORY,
+  ATCODER_USER_AC_RANK,
+  ATCODER_USER_SUBMISSIONS,
+  ATCODER_PROBLEM_MODELS
+} from "./links.js";
 
 
  // Fetch AtCoder user statistics
@@ -9,9 +15,9 @@ export const fetchAtCoder = async (username) => {
   try {
     // Fetch user info and contest history in parallel
     const [userInfoRes, contestHistoryRes, solvedProblemsRes] = await Promise.all([
-      axios.get(`https://atcoder.jp/users/${username}/history/json`, { timeout: 15000 }).catch(() => ({ data: [] })),
-      axios.get(`https://kenkoooo.com/atcoder/atcoder-api/v3/user/ac_rank?user=${username}`, { timeout: 15000 }).catch(() => ({ data: null })),
-      axios.get(`https://kenkoooo.com/atcoder/atcoder-api/v3/user/submissions?user=${username}&from_second=0`, { timeout: 15000 }).catch(() => ({ data: [] })),
+      axios.get(ATCODER_USER_HISTORY(username), { timeout: 15000 }).catch(() => ({ data: [] })),
+      axios.get(ATCODER_USER_AC_RANK(username), { timeout: 15000 }).catch(() => ({ data: null })),
+      axios.get(ATCODER_USER_SUBMISSIONS(username), { timeout: 15000 }).catch(() => ({ data: [] })),
     ]);
 
     const contestHistory = userInfoRes.data || [];
@@ -45,7 +51,7 @@ export const fetchAtCoder = async (username) => {
     // Get problem difficulties from AtCoder Problems API (can be slow)
     try {
       const difficultyRes = await axios.get(
-        `https://kenkoooo.com/atcoder/resources/problem-models.json`,
+        ATCODER_PROBLEM_MODELS,
         { timeout: 5000 } // Reduced to 5s to avoid sync timeouts
       );
       const difficulties = difficultyRes.data || {};
