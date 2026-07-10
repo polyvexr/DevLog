@@ -36,19 +36,19 @@ const norm = (d, h) => {
 export const fetchCodeChef = async (username) => {
   const endpoints = CODECHEF_API_FALLBACKS(username);
 
-  // Try API endpoints in parallel using Promise.any
-  try {
-    const data = await Promise.any(endpoints.map(async (url) => {
-      const res = await axios.get(url, { timeout: 10000 });
+  // Try API endpoints sequentially, prioritizing working ones first
+  for (const url of endpoints) {
+    try {
+      const res = await axios.get(url, { timeout: 5000 });
       if (res.data && (res.data.rating || res.data.currentRating)) {
-        return norm(res.data, username);
+        const data = norm(res.data, username);
+        if (data && data.totalSolved > 0) {
+          return data;
+        }
       }
-      throw new Error("Invalid data");
-    }));
-
-    if (data && data.totalSolved > 0) return data;
-  } catch (err) {
-    // If all APIs fail, fallback to scraping
+    } catch (err) {
+      logger.warn(`CodeChef API endpoint failed: ${url}`, { error: err.message });
+    }
   }
 
   // Fallback to scraping

@@ -96,25 +96,31 @@ export const contestService = {
   },
 
   async fetchAtcoderContests() {
-    try {
-      const res = await axios.get(CLIST_CONTESTS, {
-        params: { upcoming: true, resource: "atcoder.jp", order_by: "start", limit: 20 },
-        headers: { "Authorization": `ApiKey ${process.env.CLIST_API_KEY || ""}` },
-        timeout: 10000
-      });
-      const list = res.data?.objects || [];
-      for (const c of list) {
-        const start = new Date(c.start), end = new Date(c.end);
-        await this.save("atcoder", c.id, {
-          name: c.event, startTime: start, endTime: end, duration: Math.round((end - start) / 60000),
-          url: c.href, rated: true
-        });
-      }
-      return { fetched: list.length };
-    } catch (err) {
-      // Fallback: Scrape AtCoder official site (Kenkoooo API is often delayed for upcoming contests)
+    // Only query CLIST if API Key is configured, to avoid a guaranteed 401 failure
+    if (process.env.CLIST_API_KEY) {
       try {
-        const res = await axios.get(ATCODER_CONTESTS, {
+        const res = await axios.get(CLIST_CONTESTS, {
+          params: { upcoming: true, resource: "atcoder.jp", order_by: "start", limit: 20 },
+          headers: { "Authorization": `ApiKey ${process.env.CLIST_API_KEY}` },
+          timeout: 10000
+        });
+        const list = res.data?.objects || [];
+        for (const c of list) {
+          const start = new Date(c.start), end = new Date(c.end);
+          await this.save("atcoder", c.id, {
+            name: c.event, startTime: start, endTime: end, duration: Math.round((end - start) / 60000),
+            url: c.href, rated: true
+          });
+        }
+        return { fetched: list.length };
+      } catch (err) {
+        logger.warn("AtCoder fetch via CLIST failed, falling back to scraping", { error: err.message });
+      }
+    }
+
+    // Prioritize official scraping since it works out-of-the-box without keys
+    try {
+      const res = await axios.get(ATCODER_CONTESTS, {
           headers: { "User-Agent": "Mozilla/5.0 (compatible; DevLogBot/1.0)" },
           timeout: 10000
         });
