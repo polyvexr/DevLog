@@ -98,6 +98,10 @@ export function usePlatformRefresh() {
       return false;
     } catch (err) {
       console.error(`Failed to refresh ${platform}:`, err);
+      // Re-throw 429 cooldown errors so the caller can handle them
+      if (err.response?.status === 429) {
+        throw err;
+      }
       return false;
     } finally {
       setRefreshing(prev => ({ ...prev, [platform]: false }));

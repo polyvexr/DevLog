@@ -1,81 +1,14 @@
-import React, { useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
-import { useDashboard, usePlatformRefresh } from "../hooks/useApi";
+import { useDashboard } from "../hooks/useApi";
 import FullPageLoader from "../components/FullPageLoader";
-import Dialog from "../components/Dialog";
 import PlatformCard from "../components/PlatformCard";
 import SummarySection from "../components/SummarySection";
-import { FiBarChart2, FiZap, FiRefreshCw } from "react-icons/fi";
-import { useEffect } from "react";
+import { FiBarChart2 } from "react-icons/fi";
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const { data, loading, error, refresh } = useDashboard();
-  const { refresh: triggerRefresh } = usePlatformRefresh();
-  const [syncingAll, setSyncingAll] = useState(false);
-  const [cooldownMinutes, setCooldownMinutes] = useState(0);
-
-  useEffect(() => {
-    const platforms = data?.platforms || [];
-    if (platforms.length === 0) return;
-
-    const checkCooldown = () => {
-      const latest = platforms.reduce((latestDate, item) => {
-        if (!item.nextRefreshAvailable) return latestDate;
-        const nextDate = new Date(item.nextRefreshAvailable);
-        return !latestDate || nextDate > latestDate ? nextDate : latestDate;
-      }, null);
-
-      if (latest) {
-        const diffMs = new Date(latest) - new Date();
-        if (diffMs > 0) {
-          setCooldownMinutes(Math.ceil(diffMs / (60 * 1000)));
-          return;
-        }
-      }
-      setCooldownMinutes(0);
-    };
-
-    checkCooldown();
-    const interval = setInterval(checkCooldown, 20000);
-    return () => clearInterval(interval);
-  }, [data?.platforms]);
-
-  const [messageDialog, setMessageDialog] = useState({
-    open: false,
-    title: "",
-    message: "",
-    type: "info"
-  });
-
-  const handleSyncAll = async () => {
-    if (syncingAll || !stats.length) return;
-    setSyncingAll(true);
-    try {
-      // Refresh all linked platforms in parallel
-      const promises = stats.map(item => triggerRefresh(item.platform));
-      await Promise.all(promises);
-      
-      // Reload dashboard state
-      await refresh();
-
-      setMessageDialog({
-        open: true,
-        title: "All Services Synced",
-        message: "All connected platforms have been updated successfully.",
-        type: "success",
-      });
-    } catch (err) {
-      setMessageDialog({
-        open: true,
-        title: "Sync Warning",
-        message: "Failed to sync some platforms. Please try again later.",
-        type: "warning"
-      });
-    } finally {
-      setSyncingAll(false);
-    }
-  };
+  const { data, loading } = useDashboard();
 
   if (loading && !data) return <FullPageLoader />;
 
@@ -100,27 +33,6 @@ export default function Dashboard() {
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
-          {stats.length > 0 && (
-            <button
-              onClick={handleSyncAll}
-              disabled={syncingAll || cooldownMinutes > 0}
-              className="px-5 py-3 bg-[#e23e2d] hover:bg-[#cf2e2e] disabled:bg-red-950/50 disabled:text-slate-600 disabled:cursor-not-allowed text-white font-mono text-[9px] font-semibold uppercase tracking-wider rounded transition-colors flex items-center justify-center gap-2 cursor-pointer"
-            >
-              {syncingAll ? (
-                <FiRefreshCw size={12} className="animate-spin" />
-              ) : (
-                <FiZap size={12} />
-              )}
-              <span>
-                {syncingAll 
-                  ? "Syncing All..." 
-                  : cooldownMinutes > 0 
-                    ? `Cooldown: ${cooldownMinutes} min` 
-                    : "Sync All Stats"}
-              </span>
-            </button>
-          )}
-
           {data?.user?.publicProfile?.username && (
             <button
               onClick={() => window.open(`/u/${data.user.publicProfile.username}`, "_blank")}
@@ -164,15 +76,6 @@ export default function Dashboard() {
           ))}
         </div>
       )}
-
-      <Dialog
-        open={messageDialog.open}
-        title={messageDialog.title}
-        message={messageDialog.message}
-        type={messageDialog.type}
-        confirmText="Got it"
-        onConfirm={() => setMessageDialog(prev => ({ ...prev, open: false }))}
-      />
     </div>
   );
 }

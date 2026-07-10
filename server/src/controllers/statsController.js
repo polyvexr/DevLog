@@ -73,7 +73,13 @@ export const refreshPlatformStats = catchAsync(async (req, res) => {
   // Check cooldown
   const canRefresh = await platformService.canRefresh(req.user._id, platform);
   if (!canRefresh.allowed) {
-    throw new ApiError(429, "Data already synced and you should wait for hour before next sync");
+    const remainingMinutes = Math.ceil((canRefresh.remainingMs || 0) / (60 * 1000));
+    return res.status(429).json({
+      success: false,
+      message: `Data already synced. Please wait ${remainingMinutes} minute${remainingMinutes !== 1 ? 's' : ''} before next sync.`,
+      remainingMinutes,
+      remainingMs: canRefresh.remainingMs
+    });
   }
 
   // Process sync job
