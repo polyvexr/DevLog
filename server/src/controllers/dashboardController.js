@@ -4,47 +4,24 @@ import catchAsync from "../utils/catchAsync.js";
 import ApiResponse from "../utils/ApiResponse.js";
 
 
-let contestCache = {
-  data: null,
-  expiry: 0
-};
-const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
-
 export const getDashboardData = catchAsync(async (req, res) => {
   const userId = req.user._id;
   const user = req.user;
-  const now = Date.now();
 
   // Parallel fetch dashboard data
-  const fetchTasks = [
-    PlatformStat.find({ userId }).select("platform username data stats lastUpdated lastManualRefresh").lean()
-  ];
-
-  // Add contest fetch if cache expired
-  const useCache = contestCache.data && contestCache.expiry > now;
-  if (!useCache) {
-    fetchTasks.push(
-      Contest.find({
-        startTime: {
-          $gte: new Date(),
-          $lte: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-        }
-      })
-        .sort({ startTime: 1 })
-        .limit(10)
-        .select("platform name startTime duration url division")
-        .lean()
-    );
-  }
-
-  const results = await Promise.all(fetchTasks);
-  const platformStats = results[0];
-  
-  if (!useCache) {
-    contestCache.data = results[1];
-    contestCache.expiry = now + CACHE_TTL;
-  }
-  const upcomingContests = contestCache.data;
+  const [platformStats, upcomingContests] = await Promise.all([
+    PlatformStat.find({ userId }).select("platform username data stats lastUpdated lastManualRefresh").lean(),
+    Contest.find({
+      startTime: {
+        $gte: new Date(),
+        $lte: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+      }
+    })
+      .sort({ startTime: 1 })
+      .limit(10)
+      .select("platform name startTime duration url division")
+      .lean()
+  ]);
 
   // Calculate summary stats
   const summary = calculateSummary(platformStats);
