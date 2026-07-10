@@ -81,7 +81,5 @@ userSchema.methods.matchPassword = async function (entered) {
 };
 
 
-// Compound index for public profile lookups
-userSchema.index({ "publicProfile.username": 1 });
 
 export default mongoose.model("User", userSchema);

@@ -25,17 +25,13 @@ const allowedOrigins = [
   process.env.CLIENT_URL,
   // Production URLs
   "https://my-devlog.vercel.app",
-  "https://devlog-server.vercel.app",
   // Local development URLs
   "http://localhost:5173",
-  "http://localhost:5174",
-  "http://localhost:3000",
 ].filter(Boolean);
 
 const corsOptions = {
   origin: function (origin, callback) {
-    // Reject null origins in CORS callback — prevents Access-Control-Allow-Origin: null header injection.
-    // Allowed no-origin paths (cron, health) are handled by the custom middleware below.
+   
     if (!origin) {
       return callback(null, false);
     }
@@ -83,7 +79,7 @@ app.use((req, res, next) => {
 });
 
 // Paths that allow no-origin requests (for cron jobs)
-const noOriginAllowedPaths = ["/api/cron", "/api/health", "/"];
+const noOriginAllowedPaths = ["/api/cron", "/api/health", "/", "/favicon.ico", "/robots.txt"];
 
 // Custom CORS middleware to restrict no-origin requests
 app.use((req, res, next) => {
