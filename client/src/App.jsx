@@ -12,7 +12,6 @@ import AuthenticatedWrapper from "./components/routes/AuthenticatedWrapper";
 // Eagerly loaded pages (critical path)
 import Landing from "./pages/Landing";
 import Login from "./pages/Login";
-import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 
@@ -154,7 +153,7 @@ function App() {
           path="/register"
           element={
             <PublicRoute>
-              <Register />
+              <Login />
             </PublicRoute>
           }
         />

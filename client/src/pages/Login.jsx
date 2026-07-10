@@ -1,30 +1,48 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import api from "../api/axios";
 import { AuthContext } from "../context/AuthContext";
-import { useNavigate, Link } from "react-router-dom";
-import { FiEye, FiEyeOff } from "react-icons/fi";
+import { useNavigate, Link, useLocation } from "react-router-dom";
+import { FiEye, FiEyeOff, FiZap } from "react-icons/fi";
 
 export default function Login() {
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
-  const [form, setForm] = useState({ email: "", password: "" });
+  const location = useLocation();
+
+  const [isRegister, setIsRegister] = useState(location.pathname === "/register");
+  const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+
+  useEffect(() => {
+    setIsRegister(location.pathname === "/register");
+    setError("");
+  }, [location.pathname]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       setError("");
       setLoading(true);
-      const res = await api.post("/auth/login", form);
-      const { token, isAdmin } = res.data.data;
-      login(token, isAdmin);
-      if (isAdmin) navigate("/admin");
-      else navigate("/");
+      if (isRegister) {
+        // Submit register
+        await api.post("/auth/register", form);
+        // Automatically attempt auto-login right after registration
+        const res = await api.post("/auth/login", { email: form.email, password: form.password });
+        const { token, isAdmin } = res.data.data;
+        login(token, isAdmin);
+        navigate(isAdmin ? "/admin" : "/");
+      } else {
+        // Submit login
+        const res = await api.post("/auth/login", { email: form.email, password: form.password });
+        const { token, isAdmin } = res.data.data;
+        login(token, isAdmin);
+        navigate(isAdmin ? "/admin" : "/");
+      }
     } catch (err) {
       setError(
-        err.response?.data?.message || "Failed to login. Please try again."
+        err.response?.data?.message || (isRegister ? "Registration failed. Try again." : "Failed to login. Try again.")
       );
     } finally {
       setLoading(false);
@@ -32,56 +50,83 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen relative flex items-center justify-center px-4 py-8 overflow-hidden">
-      {/* Background blobs for depth */}
-      <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-blue-600/10 rounded-full blur-[100px] animate-blob"></div>
-      <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-purple-600/10 rounded-full blur-[100px] animate-blob animation-delay-2000"></div>
-
-      <div className="w-full max-w-lg relative z-10">
+    <div className="min-h-screen bg-[#0c0c0c] text-slate-200 flex items-center justify-center px-4 py-8 overflow-hidden select-none">
+      <div className="w-full max-w-sm space-y-6">
         <Link
           to="/"
-          className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-white transition-all hover:bg-blue-600 hover:border-blue-500 hover:-translate-x-1 group shadow-xl active:scale-95 mb-8"
+          className="inline-flex items-center gap-2 font-mono text-[9px] uppercase tracking-wider text-slate-500 hover:text-white transition-colors"
           title="Back to Home"
         >
-          <svg
-            className="w-5 h-5 group-hover:-translate-x-0.5 transition-transform"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={3}
-              d="M15 19l-7-7 7-7"
-            />
-          </svg>
+          ← Back to Home
         </Link>
 
         <form
           onSubmit={handleSubmit}
-          className="glass-card-premium p-10 md:p-12 fade-in-scale"
+          className="bg-[#121214] border border-[#222225] rounded-xl p-8 space-y-6 shadow-2xl"
           aria-live="polite"
         >
-          <div className="text-center mb-10">
-            <h2 className="text-4xl md:text-5xl font-black text-white mb-3 tracking-tight">
-              Sign In
+          <div className="text-center space-y-1.5">
+            <div className="text-base font-[Cormorant_Garamond] font-semibold italic tracking-tight flex items-center justify-center gap-1.5 text-white">
+              <FiZap className="text-[#e23e2d] text-base" />
+              <span>DevLog</span>
+            </div>
+            <h2 className="text-2xl font-[Cormorant_Garamond] font-light italic text-white tracking-tight">
+              {isRegister ? "Create Account" : "Sign In"}
             </h2>
-            <p className="text-gray-400 font-medium">
-              Continue your coding journey with DevLog
+            <p className="text-[10px] text-slate-500 font-mono">
+              {isRegister ? "Join to track your coding stats" : "Continue your coding journey"}
             </p>
           </div>
 
+          {/* Segmented control for tabs */}
+          <div className="grid grid-cols-2 p-1 bg-[#0c0c0c] border border-[#222225] rounded-lg font-mono text-[9px] uppercase tracking-wider font-semibold">
+            <button
+              type="button"
+              onClick={() => navigate("/login")}
+              className={`py-2 rounded transition-all cursor-pointer ${
+                !isRegister ? "bg-[#e23e2d] text-white" : "text-slate-500 hover:text-slate-200"
+              }`}
+            >
+              Sign In
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate("/register")}
+              className={`py-2 rounded transition-all cursor-pointer ${
+                isRegister ? "bg-[#e23e2d] text-white" : "text-slate-500 hover:text-slate-200"
+              }`}
+            >
+              Register
+            </button>
+          </div>
+
           {error && (
-            <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm flex items-center gap-3 animate-shake" role="alert">
-              <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></div>
+            <div className="p-3 rounded border border-red-500/20 bg-red-500/10 text-red-500 text-[10px] font-mono flex items-center gap-2" role="alert">
+              <div className="w-1 h-1 rounded-full bg-red-500 animate-ping" />
               {error}
             </div>
           )}
 
-          <div className="space-y-6">
-            <div className="space-y-3">
-              <label htmlFor="email" className="block text-sm font-bold text-gray-400 uppercase tracking-widest ml-1">
+          <div className="space-y-4">
+            {isRegister && (
+              <div className="space-y-1.5">
+                <label htmlFor="name" className="block text-[9px] font-mono font-semibold uppercase tracking-wider text-slate-500">
+                  Full Name
+                </label>
+                <input
+                  id="name"
+                  value={form.name}
+                  type="text"
+                  placeholder="John Doe"
+                  className="w-full px-4 py-3 bg-[#0c0c0c] border border-[#222225] rounded text-xs font-mono text-white placeholder-slate-700 focus:outline-none focus:border-[#e23e2d] transition-all"
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  required
+                />
+              </div>
+            )}
+
+            <div className="space-y-1.5">
+              <label htmlFor="email" className="block text-[9px] font-mono font-semibold uppercase tracking-wider text-slate-500">
                 Email Address
               </label>
               <input
@@ -89,45 +134,43 @@ export default function Login() {
                 value={form.email}
                 type="email"
                 placeholder="developer@example.com"
-                className="w-full px-6 py-4 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/40 transition-all font-medium"
+                className="w-full px-4 py-3 bg-[#0c0c0c] border border-[#222225] rounded text-xs font-mono text-white placeholder-slate-700 focus:outline-none focus:border-[#e23e2d] transition-all"
                 onChange={(e) => setForm({ ...form, email: e.target.value })}
                 required
               />
             </div>
 
-            <div className="space-y-3">
-              <div className="flex justify-between items-center px-1">
-                <label htmlFor="password" className="block text-sm font-bold text-gray-400 uppercase tracking-widest">
+            <div className="space-y-1.5">
+              <div className="flex justify-between items-center">
+                <label htmlFor="password" className="block text-[9px] font-mono font-semibold uppercase tracking-wider text-slate-500">
                   Password
                 </label>
-                  to="/forgot-password"
-                  className="text-xs font-bold text-blue-400 hover:text-blue-300 transition-colors uppercase tracking-wider"
-                
-                <Link>
-                  Forgot?
-                </Link>
+                {!isRegister && (
+                  <Link
+                    to="/forgot-password"
+                    className="text-[9px] font-mono text-slate-500 hover:text-slate-200 transition-colors uppercase tracking-wider"
+                  >
+                    Forgot?
+                  </Link>
+                )}
               </div>
-              <div className="relative group">
+              <div className="relative">
                 <input
                   id="password"
                   value={form.password}
                   type={showPassword ? "text" : "password"}
                   placeholder="••••••••"
-                  className="w-full px-6 py-4 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/40 transition-all font-medium"
+                  className="w-full px-4 py-3 bg-[#0c0c0c] border border-[#222225] rounded text-xs font-mono text-white placeholder-slate-700 focus:outline-none focus:border-[#e23e2d] transition-all pr-10"
                   onChange={(e) => setForm({ ...form, password: e.target.value })}
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((s) => !s)}
-                  className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white transition-colors p-1"
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-600 hover:text-slate-300 transition-colors cursor-pointer"
                   aria-label={showPassword ? "Hide password" : "Show password"}
                 >
-                  {showPassword ? (
-                    <FiEyeOff className="text-xl" />
-                  ) : (
-                    <FiEye className="text-xl" />
-                  )}
+                  {showPassword ? <FiEyeOff className="text-xs" /> : <FiEye className="text-xs" />}
                 </button>
               </div>
             </div>
@@ -136,27 +179,14 @@ export default function Login() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full mt-10 py-5 bg-blue-600 hover:bg-blue-500 disabled:bg-blue-800 disabled:cursor-not-allowed text-white font-black text-lg rounded-2xl shadow-xl shadow-blue-500/20 transition-all active:scale-[0.98] flex items-center justify-center gap-3"
+            className="w-full py-3 bg-[#e23e2d] hover:bg-[#cf2e2e] disabled:bg-red-950/50 disabled:text-slate-600 disabled:cursor-not-allowed text-white font-mono text-xs font-semibold uppercase tracking-wider rounded transition-colors flex items-center justify-center gap-2 cursor-pointer"
           >
             {loading ? (
-              <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+              <div className="w-3.5 h-3.5 border border-white/20 border-t-white rounded-full animate-spin" />
             ) : (
-              "Sign In →"
+              isRegister ? "Create Account →" : "Sign In →"
             )}
           </button>
-
-          <div className="mt-8 text-center">
-            <p className="text-gray-400 font-medium">
-              New here?{" "}
-              <Link
-                to="/register"
-                className="text-blue-400 hover:text-blue-300 font-black relative group"
-              >
-                Register
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-400 group-hover:w-full transition-all duration-300"></span>
-              </Link>
-            </p>
-          </div>
         </form>
       </div>
     </div>

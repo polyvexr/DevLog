@@ -55,7 +55,7 @@ export default function Landing() {
         <nav className="flex justify-between items-center py-6 border-b border-[#222225]">
           <div className="text-lg font-[Cormorant_Garamond] font-semibold italic tracking-tight flex items-center gap-2 text-white">
             <FiZap className="text-[#e23e2d] text-base" />
-            <span>DevLog™</span>
+            <span>DevLog</span>
           </div>
           <div className="flex items-center gap-2">
             <NavLink to="/login" label="Sign In" />
@@ -136,7 +136,7 @@ export default function Landing() {
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
             <div className="space-y-3">
               <div className="text-lg font-[Cormorant_Garamond] font-semibold italic tracking-tight flex items-center gap-2 text-white">
-                <FiZap className="text-[#e23e2d] text-base" /> DevLog™
+                <FiZap className="text-[#e23e2d] text-base" /> DevLog
               </div>
               <p className="text-slate-500 text-xs max-w-xs leading-relaxed">Connecting the dots of your coding journey across every platform.</p>
             </div>
