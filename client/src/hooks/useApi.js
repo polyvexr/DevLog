@@ -83,23 +83,15 @@ export function useDashboard() {
  */
 export function usePlatformRefresh() {
   const [refreshing, setRefreshing] = useState({});
-  const [cooldowns, setCooldowns] = useState({});
 
   const refresh = useCallback(async (platform, onSuccess) => {
-    if (refreshing[platform] || cooldowns[platform]) return false;
+    if (refreshing[platform]) return false;
 
     try {
       setRefreshing(prev => ({ ...prev, [platform]: true }));
       const res = await api.post(`/stats/refresh/${platform}`);
 
-      // Backend returns: { success: true, data: { stat: ... }, ... }
       if (res.data.success) {
-        // Set cooldown local state (optional since backend also has cooldown check)
-        setCooldowns(prev => ({ ...prev, [platform]: true }));
-        setTimeout(() => {
-          setCooldowns(prev => ({ ...prev, [platform]: false }));
-        }, 6 * 60 * 1000); // Short local cooldown to prevent double clicks (6 mins, backend is 6h)
-
         onSuccess?.(res.data.data);
         return true;
       }
@@ -110,9 +102,9 @@ export function usePlatformRefresh() {
     } finally {
       setRefreshing(prev => ({ ...prev, [platform]: false }));
     }
-  }, [refreshing, cooldowns]);
+  }, [refreshing]);
 
-  return { refresh, refreshing, cooldowns };
+  return { refresh, refreshing, cooldowns: {} };
 }
 
 

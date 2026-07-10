@@ -16,7 +16,7 @@ export default function GitHubDetails() {
   const { data, loading, error, stats } = usePlatformStats("github");
 
   const handleUnlink = async () => {
-    if (!window.confirm("Are you sure you want to disconnect GitHub? You can re-link after 2 days.")) return;
+    if (!window.confirm("Are you sure you want to disconnect GitHub?")) return;
     try {
       await unlinkPlatform("github");
       navigate("/");

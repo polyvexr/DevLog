@@ -13,7 +13,6 @@ export function useSettings() {
     const [formData, setFormData] = useState({
         name: "", bio: "", location: "", website: "", socials: [],
         publicProfile: {
-            enabled: true,
             showLeetCode: true,
             showCodeforces: true,
             showGitHub: true,

@@ -206,7 +206,7 @@ const PlatformCard = ({
           <button
             className="w-full py-2.5 bg-[#e23e2d] hover:bg-[#cf2e2e] disabled:bg-red-950/50 disabled:text-slate-600 disabled:cursor-not-allowed text-white font-mono text-[9px] font-semibold uppercase tracking-wider rounded transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
             onClick={handleRefresh}
-            disabled={!canRefresh || isRefreshing}
+            disabled={isRefreshing}
           >
             {isRefreshing ? (
               <FiRefreshCw size={12} className="animate-spin" />
@@ -215,11 +215,6 @@ const PlatformCard = ({
             )}
             {isRefreshing ? "Syncing" : "Sync Stats"}
           </button>
-          {!canRefresh && timeRemaining && (
-            <div className="absolute -top-9 left-1/2 -translate-x-1/2 px-2 py-1 bg-[#0c0c0c] border border-red-500/20 text-[#e23e2d] rounded text-[8px] font-mono whitespace-nowrap shadow-lg">
-              Cooldown: {timeRemaining}
-            </div>
-          )}
         </div>
       </div>
     </div>

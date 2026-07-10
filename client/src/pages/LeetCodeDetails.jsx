@@ -16,7 +16,7 @@ export default function LeetCodeDetails() {
   const { data, loading, error, stats } = usePlatformStats("leetcode");
 
   const handleUnlink = async () => {
-    if (!window.confirm("Are you sure you want to disconnect LeetCode? You can re-link after 2 days.")) return;
+    if (!window.confirm("Are you sure you want to disconnect LeetCode?")) return;
     try {
       await unlinkPlatform("leetcode");
       navigate("/");

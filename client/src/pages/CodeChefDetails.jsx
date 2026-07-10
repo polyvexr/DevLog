@@ -15,7 +15,7 @@ export default function CodeChefDetails() {
   const { data, loading, error, stats } = usePlatformStats("codechef");
 
   const handleUnlink = async () => {
-    if (!window.confirm("Are you sure you want to disconnect CodeChef? You can re-link after 2 days.")) return;
+    if (!window.confirm("Are you sure you want to disconnect CodeChef?")) return;
     try {
       await unlinkPlatform("codechef");
       navigate("/");
