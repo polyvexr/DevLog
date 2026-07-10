@@ -70,7 +70,6 @@ export const getDashboardData = catchAsync(async (req, res) => {
       id: user._id,
       name: user.name,
       email: user.email,
-      avatar: user.profile?.avatar,
       publicProfile: user.publicProfile
     },
     summary,

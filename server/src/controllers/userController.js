@@ -23,13 +23,13 @@ export const getProfile = catchAsync(async (req, res) => {
 
 
 export const updateProfile = catchAsync(async (req, res) => {
-  const { name, avatar, bio, location, website, socials, publicProfile: ppUpdate } = req.body;
+  const { name, bio, location, website, socials, publicProfile: ppUpdate } = req.body;
   const updates = {};
 
   if (name?.trim()) updates.name = name.trim();
 
   // Profile fields
-  const p = { avatar, bio, location, website, socials };
+  const p = { bio, location, website, socials };
   Object.keys(p).forEach(k => {
     if (p[k] !== undefined) updates[`profile.${k}`] = p[k];
   });
@@ -87,38 +87,6 @@ export const updateSettings = catchAsync(async (req, res) => {
     new ApiResponse(200, { settings: user.settings }, "Settings updated successfully")
   );
 });
-
-
-
-export const updateAvatar = catchAsync(async (req, res) => {
-  logger.info("Avatar upload request received", { userId: req.user._id });
-
-  if (!req.file) {
-    throw new ApiError(400, "No file uploaded");
-  }
-
-  logger.info("File received from Multer/Cloudinary", {
-    path: req.file.path,
-    size: req.file.size,
-    mimetype: req.file.mimetype
-  });
-
-  const user = await User.findById(req.user._id);
-  if (!user) {
-    throw new ApiError(404, "User not found");
-  }
-
-  if (!user.profile) user.profile = {};
-  user.profile.avatar = req.file.path;
-  await user.save();
-
-  logger.info("Avatar updated in database", { userId: req.user._id, url: req.file.path });
-
-  res.status(200).json(
-    new ApiResponse(200, { url: req.file.path }, "Avatar updated successfully")
-  );
-});
-
 
 export const updatePassword = catchAsync(async (req, res) => {
   const { currentPassword, newPassword } = req.body;

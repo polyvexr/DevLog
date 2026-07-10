@@ -5,10 +5,8 @@ import {
   updateProfile,
   updateSettings,
   updatePassword,
-  deleteAccount,
-  updateAvatar
+  deleteAccount
 } from "../controllers/userController.js";
-import { upload } from "../utils/cloudinary.js";
 
 const router = express.Router();
 
@@ -17,7 +15,6 @@ router.use(protect);
 
 router.get("/profile", getProfile);
 router.put("/profile", updateProfile);
-router.post("/avatar", upload.single("avatar"), updateAvatar);
 router.put("/settings", updateSettings);
 router.put("/password", updatePassword);
 router.delete("/account", deleteAccount);

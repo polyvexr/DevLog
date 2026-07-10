@@ -174,18 +174,6 @@ export const platformService = {
         const stats = this.extractStats(job.platform, freshData);
         await this.saveStats(job.userId, job.platform, stats, freshData);
 
-        // Auto-update user avatar from LeetCode if not set
-        if (job.platform === "leetcode" && freshData.avatar) {
-          const user = await User.findById(job.userId);
-          if (user && !user.profile?.avatar) {
-            await User.updateOne(
-              { _id: job.userId },
-              { $set: { "profile.avatar": freshData.avatar } }
-            );
-            logger.info(`Updated avatar for user ${job.userId} from LeetCode`);
-          }
-        }
-
         // Update cooldown for user-triggered syncs ONLY after success
         if (job.triggeredBy === "user") {
           await User.updateOne(

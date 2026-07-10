@@ -40,7 +40,6 @@ export const getPublicProfile = catchAsync(async (req, res) => {
     profile: {
       name: user.name,
       username: pp.username,
-      avatar: user.profile?.avatar || "",
       bio: user.profile?.bio || "",
       location: user.profile?.location || "",
       website: user.profile?.website || "",
