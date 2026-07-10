@@ -1,5 +1,6 @@
 import SyncJob from "../models/SyncJob.js";
 import { platformService } from "../services/platformService.js";
+import logger from "../utils/logger.js";
 
 // Rate limits per platform (per minute)
 const RATE_LIMITS = {
