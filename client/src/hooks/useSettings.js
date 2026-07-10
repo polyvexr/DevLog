@@ -72,6 +72,7 @@ export function useSettings() {
             showStatus("success", "Identity updated");
             setIsEditing(false);
             refreshUser();
+            fetchAll();
         } catch (err) {
             showStatus("error", err.response?.data?.message || "Update failed");
         }
@@ -90,8 +91,8 @@ export function useSettings() {
 
         try {
             await api.put("/user/profile", { publicProfile: updatedPP });
-            // If we want to refresh user context for the public profile link visibility
             refreshUser();
+            fetchAll();
         } catch (err) {
             showStatus("error", "Failed to update visibility");
             // Rollback

@@ -33,8 +33,8 @@ export const getPublicProfile = catchAsync(async (req, res) => {
 
   const aggregateStats = calculateAggregateStats(platformStats);
 
-  // Set public cache for 5 minutes to improve performance for shared profiles
-  res.setHeader("Cache-Control", "public, max-age=300");
+  // Disable public profile caching to ensure updates show up instantly
+  res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
 
   res.status(200).json(new ApiResponse(200, {
     profile: {

@@ -32,6 +32,21 @@ const platformConfig = {
   atcoder: { icon: AtCoderIcon, colorClass: "", label: "AtCoder", url: u => `https://atcoder.jp/users/${u}`, isTextIcon: true }
 };
 
+const getWebsiteDisplay = (url) => {
+  if (!url) return "";
+  try {
+    const absoluteUrl = url.startsWith("http://") || url.startsWith("https://") ? url : `https://${url}`;
+    return new URL(absoluteUrl).hostname.replace('www.', '');
+  } catch (err) {
+    return url;
+  }
+};
+
+const getWebsiteLink = (url) => {
+  if (!url) return "";
+  return url.startsWith("http://") || url.startsWith("https://") ? url : `https://${url}`;
+};
+
 export default function PublicProfile() {
   const { username } = useParams();
   const [data, setData] = useState(null);
@@ -109,8 +124,6 @@ export default function PublicProfile() {
             </button>
           </div>
 
-
-
           <div className="flex-1 text-center md:text-left space-y-4">
             <div className="space-y-1.5">
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#e23e2d]/10 border border-[#e23e2d]/20 text-[#e23e2d] font-mono text-[9px] font-semibold uppercase tracking-wider">
@@ -132,7 +145,7 @@ export default function PublicProfile() {
 
             <div className="flex flex-wrap justify-center md:justify-start gap-4 pt-1">
               {user.location && <StatInfo icon={<FiMapPin />} text={user.location} />}
-              {user.website && <StatInfo icon={<FiGlobe />} text={new URL(user.website).hostname.replace('www.', '')} link={user.website} />}
+              {user.website && <StatInfo icon={<FiGlobe />} text={getWebsiteDisplay(user.website)} link={getWebsiteLink(user.website)} />}
               {user.socials?.map((s, i) => (
                 <StatInfo key={i} icon={<FiLink />} text={s.platform} link={s.username?.startsWith('http') ? s.username : `https://${s.username}`} />
               ))}
