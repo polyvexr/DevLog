@@ -1,18 +1,35 @@
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
-import { FiArrowLeft, FiShare2, FiExternalLink, FiAward, FiCheckCircle, FiTarget, FiZap, FiActivity, FiMapPin, FiGlobe, FiCalendar, FiTrendingUp, FiCode, FiLink, FiStar } from "react-icons/fi";
+import {
+  FiShare2,
+  FiExternalLink,
+  FiCheckCircle,
+  FiTarget,
+  FiZap,
+  FiActivity,
+  FiMapPin,
+  FiGlobe,
+  FiCalendar,
+  FiTrendingUp,
+  FiCode,
+  FiLink,
+} from "react-icons/fi";
 import { SiLeetcode, SiCodeforces, SiGithub, SiCodechef } from "react-icons/si";
 import api from "../api/axios";
 import FullPageLoader from "../components/FullPageLoader";
 
-const AtCoderIcon = ({ className }) => <span className={`font-black text-xs ${className}`}>AT</span>;
+const AtCoderIcon = () => (
+  <span className="font-bold text-[8px] text-[#e23e2d] bg-[#e23e2d]/10 px-1.5 py-0.5 rounded border border-[#e23e2d]/20 font-sans">
+    AT
+  </span>
+);
 
 const platformConfig = {
-  leetcode: { icon: SiLeetcode, color: "#ffa116", label: "LeetCode", gradient: "from-[#ffa116] to-[#ffb84d]", url: u => `https://leetcode.com/u/${u}` },
-  codeforces: { icon: SiCodeforces, color: "#1f8acb", label: "Codeforces", gradient: "from-[#1f8acb] to-[#4cb3f0]", url: u => `https://codeforces.com/profile/${u}` },
-  github: { icon: SiGithub, color: "#ffffff", label: "GitHub", gradient: "from-[#333] to-[#666]", url: u => `https://github.com/${u}` },
-  codechef: { icon: SiCodechef, color: "#5B4638", label: "CodeChef", gradient: "from-[#5B4638] to-[#8B7355]", url: u => `https://www.codechef.com/users/${u}` },
-  atcoder: { icon: AtCoderIcon, color: "#ffffff", label: "AtCoder", gradient: "from-[#222] to-[#444]", url: u => `https://atcoder.jp/users/${u}` }
+  leetcode: { icon: SiLeetcode, colorClass: "text-orange-500", label: "LeetCode", url: u => `https://leetcode.com/u/${u}` },
+  codeforces: { icon: SiCodeforces, colorClass: "text-blue-500", label: "Codeforces", url: u => `https://codeforces.com/profile/${u}` },
+  github: { icon: SiGithub, colorClass: "text-slate-200", label: "GitHub", url: u => `https://github.com/${u}` },
+  codechef: { icon: SiCodechef, colorClass: "text-amber-600", label: "CodeChef", url: u => `https://www.codechef.com/users/${u}` },
+  atcoder: { icon: AtCoderIcon, colorClass: "", label: "AtCoder", url: u => `https://atcoder.jp/users/${u}`, isTextIcon: true }
 };
 
 export default function PublicProfile() {
@@ -30,18 +47,29 @@ export default function PublicProfile() {
   }, [username]);
 
   const handleShare = async () => {
-    if (navigator.share) try { await navigator.share({ title: `${data.profile.name}'s DevLog`, url: window.location.href }); } catch { }
-    else { navigator.clipboard.writeText(window.location.href); setCopied(true); setTimeout(() => setCopied(false), 2000); }
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: `${data.profile.name}'s DevLog`, url: window.location.href });
+      } catch { }
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
   };
 
   if (loading) return <FullPageLoader />;
   if (error) return (
-    <div className="min-h-screen bg-[#020202] flex items-center justify-center p-6 text-center">
-      <div className="glass-card-premium p-12 max-w-lg border-none ring-1 ring-white/5 space-y-8">
-        <div className="w-20 h-20 bg-red-600/10 border border-red-500/20 rounded-3xl flex items-center justify-center mx-auto animate-pulse"><FiZap className="text-4xl text-red-500" /></div>
-        <h1 className="text-4xl font-black text-white italic tracking-tighter uppercase">Access <span className="text-red-500">Denied</span></h1>
-        <p className="text-gray-500 font-medium">{error}</p>
-        <Link to="/" className="inline-flex items-center gap-2 px-10 py-4 bg-white/5 border border-white/10 text-white font-black text-[10px] uppercase tracking-widest rounded-2xl hover:bg-white/10"><FiArrowLeft /> Return to Main Page</Link>
+    <div className="min-h-screen bg-[#0c0c0c] text-slate-200 flex items-center justify-center p-6 text-center select-none">
+      <div className="bg-[#121214] border border-[#222225] p-12 text-center rounded-xl space-y-6 max-w-lg mx-auto">
+        <div className="w-12 h-12 bg-red-500/10 border border-red-500/20 rounded-full flex items-center justify-center mx-auto text-red-500 text-lg">
+          <FiZap />
+        </div>
+        <h1 className="text-xl font-[Cormorant_Garamond] font-semibold italic text-white">Access Denied</h1>
+        <p className="text-slate-400 text-xs font-mono max-w-xs mx-auto leading-relaxed">{error}</p>
+        <Link to="/" className="px-6 py-3 bg-[#e23e2d] hover:bg-[#cf2e2e] text-white font-mono text-xs font-semibold uppercase tracking-wider rounded transition-colors inline-flex items-center gap-1.5 cursor-pointer">
+          ← Return to Main Page
+        </Link>
       </div>
     </div>
   );
@@ -62,93 +90,119 @@ export default function PublicProfile() {
   };
 
   return (
-    <div className="min-h-screen bg-[#020202] text-gray-300 selection:bg-blue-600/30 font-inter pb-32 overflow-x-hidden">
-      {/* Dynamic Background */}
-      <div className="fixed inset-0 pointer-events-none z-0">
-        <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-blue-600/5 blur-[120px] rounded-full animate-pulse" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-indigo-600/5 blur-[120px] rounded-full animate-pulse delay-1000" />
-      </div>
-
-      <div className="relative z-10 max-w-7xl mx-auto px-6 pt-16">
+    <div className="min-h-screen bg-[#0c0c0c] text-slate-200 font-sans pb-32 overflow-x-hidden select-none">
+      <div className="max-w-7xl mx-auto px-6 pt-16 space-y-12">
+        
         {/* Profile Identity Card */}
-        <div className="glass-card-premium p-1 md:p-1.5 rounded-[3.5rem] mb-12 border-none ring-1 ring-white/5 group">
-          <div className="bg-[#050505]/80 backdrop-blur-3xl rounded-[3.4rem] p-10 md:p-16 relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-blue-600/10 to-transparent blur-3xl -mr-20 -mt-20" />
-            <div className="absolute top-10 right-10 z-20">
-              <button onClick={handleShare} className={`flex items-center gap-3 px-6 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all active:scale-95 shadow-2xl ${copied ? "bg-green-600 text-white" : "bg-white/5 hover:bg-white/10 text-white border border-white/10 backdrop-blur-xl"}`}>
-                {copied ? <FiCheckCircle className="text-lg" /> : <FiShare2 className="text-lg" />} {copied ? "Copied" : "Share"}
-              </button>
+        <div className="bg-[#121214] border border-[#222225] rounded-xl p-8 md:p-12 relative overflow-hidden flex flex-col md:flex-row items-center gap-8 md:gap-12">
+          <div className="absolute top-6 right-6">
+            <button
+              onClick={handleShare}
+              className={`px-4 py-2 text-[9px] font-mono font-semibold uppercase tracking-wider rounded border transition-colors cursor-pointer flex items-center gap-1.5 ${
+                copied
+                  ? "bg-green-600 border-green-600 text-white font-semibold"
+                  : "bg-[#0c0c0c] border-[#222225] hover:border-neutral-700 text-slate-300"
+              }`}
+            >
+              {copied ? <FiCheckCircle size={12} /> : <FiShare2 size={12} />}
+              {copied ? "Copied" : "Share Profile"}
+            </button>
+          </div>
+
+          <div className="w-32 h-32 md:w-40 md:h-40 rounded-full bg-[#0c0c0c] border border-[#222225] p-1 flex-shrink-0">
+            <div className="w-full h-full rounded-full overflow-hidden flex items-center justify-center">
+              {user.avatar ? (
+                <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+              ) : (
+                <span className="font-[Cormorant_Garamond] font-bold text-4xl text-slate-600 italic">
+                  {user.name?.[0] || 'U'}
+                </span>
+              )}
+            </div>
+          </div>
+
+          <div className="flex-1 text-center md:text-left space-y-4">
+            <div className="space-y-1.5">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#e23e2d]/10 border border-[#e23e2d]/20 text-[#e23e2d] font-mono text-[9px] font-semibold uppercase tracking-wider">
+                <span>@{user.username}</span>
+              </div>
+              <h1 className="text-4xl md:text-5xl font-[Cormorant_Garamond] font-light italic text-white tracking-tight leading-none">
+                {user.name}
+              </h1>
+              <p className="font-mono text-[9px] text-slate-500 flex items-center justify-center md:justify-start gap-1">
+                <FiCalendar /> Joined {new Date(user.memberSince).toLocaleDateString("en-US", { month: 'long', year: 'numeric' })}
+              </p>
             </div>
 
-            <div className="flex flex-col lg:flex-row gap-12 items-center relative z-10">
-              <div className="relative group/avatar">
-                <div className="w-48 h-48 md:w-56 md:h-56 rounded-[3.5rem] bg-gradient-to-br from-blue-600 via-indigo-500 to-purple-600 p-[3px] shadow-[0_20px_50px_rgba(59,130,246,0.2)] group-hover/avatar:scale-[1.02] transition-transform duration-700">
-                  <div className="w-full h-full rounded-[3.4rem] bg-[#0A0A0A] flex items-center justify-center overflow-hidden">
-                    {user.avatar ? <img src={user.avatar} alt={user.name} className="w-full h-full object-cover grayscale-[20%] group-hover/avatar:grayscale-0 transition-all duration-700" /> : <span className="text-8xl font-black text-white/10 italic">{user.name?.[0] || 'U'}</span>}
-                  </div>
-                </div>
-                <div className="absolute -bottom-2 -right-2 w-16 h-16 bg-[#0A0A0A] rounded-3xl flex items-center justify-center shadow-2xl border-[6px] border-[#0A0A0A] group-hover/avatar:rotate-12 transition-all"><div className="w-full h-full rounded-2xl bg-blue-600 flex items-center justify-center text-white text-2xl"><FiAward /></div></div>
-              </div>
+            {user.bio && (
+              <p className="text-slate-400 text-xs italic max-w-xl border-l-2 border-[#e23e2d]/50 pl-4 py-1 text-left">
+                "{user.bio}"
+              </p>
+            )}
 
-              <div className="flex-1 text-center lg:text-left">
-                <div className="flex flex-col lg:flex-row items-center gap-6 mb-6">
-                  <h1 className="text-5xl md:text-8xl font-black text-white italic tracking-tighter leading-none">{user.name}</h1>
-                </div>
-                <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 mb-8">
-                  <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-500/5 border border-blue-500/10 text-blue-400 text-[11px] font-black uppercase tracking-[0.2em] rounded-2xl"><FiTarget className="text-sm" /> @{user.username}</div>
-                  <div className="text-gray-500 font-bold text-xs flex items-center gap-2 px-2"><FiCalendar className="text-blue-500/50" /> Joined {new Date(user.memberSince).toLocaleDateString("en-US", { month: 'long', year: 'numeric' })}</div>
-                </div>
-                {user.bio && <p className="text-gray-400 text-xl font-medium max-w-2xl mb-10 leading-relaxed italic border-l-4 border-blue-600/30 pl-6 py-2">"{user.bio}"</p>}
-                <div className="flex flex-wrap justify-center lg:justify-start gap-8">
-                  {user.location && <StatInfo icon={<FiMapPin />} text={user.location} />}
-                  {user.website && <StatInfo icon={<FiGlobe />} text={new URL(user.website).hostname.replace('www.', '')} link={user.website} />}
-                  {user.socials?.map((s, i) => <StatInfo key={i} icon={<FiLink />} text={s.platform} link={s.username?.startsWith('http') ? s.username : `https://${s.username}`} />)}
-                </div>
-              </div>
+            <div className="flex flex-wrap justify-center md:justify-start gap-4 pt-1">
+              {user.location && <StatInfo icon={<FiMapPin />} text={user.location} />}
+              {user.website && <StatInfo icon={<FiGlobe />} text={new URL(user.website).hostname.replace('www.', '')} link={user.website} />}
+              {user.socials?.map((s, i) => (
+                <StatInfo key={i} icon={<FiLink />} text={s.platform} link={s.username?.startsWith('http') ? s.username : `https://${s.username}`} />
+              ))}
             </div>
           </div>
         </div>
 
         {/* Neural Metrics Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
-          <MetricBox label="Memberships" value={stats.platforms} icon={<FiCode />} color="blue" />
-          <MetricBox label="Accomplishments" value={stats.totalProblemsSolved} icon={<FiCheckCircle />} color="green" />
-          <MetricBox label="Participation" value={stats.totalContests} icon={<FiActivity />} color="red" />
-          <MetricBox label="Main Focus" value={topLang} icon={<FiTrendingUp />} color="purple" />
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <MetricBox label="Memberships" value={stats.platforms} icon={<FiCode />} />
+          <MetricBox label="Problems Solved" value={stats.totalProblemsSolved} icon={<FiCheckCircle />} />
+          <MetricBox label="Participation" value={stats.totalContests} icon={<FiActivity />} />
+          <MetricBox label="Main Focus" value={topLang} icon={<FiTrendingUp />} />
         </div>
 
         {/* Linked Ecosystems */}
-        <div className="mb-20">
-          <div className="flex items-center gap-6 mb-12">
-            <h2 className="text-[10px] font-black uppercase tracking-[0.5em] text-gray-500 whitespace-nowrap">Linked Services</h2>
-            <div className="h-px bg-gradient-to-r from-white/5 to-transparent flex-1" />
+        <div className="space-y-6">
+          <div className="flex items-center gap-4">
+            <h2 className="text-xs font-mono font-semibold uppercase tracking-wider text-[#e23e2d] whitespace-nowrap">Linked Services</h2>
+            <div className="h-px bg-[#222225] flex-1" />
           </div>
-          <div className="grid md:grid-cols-2 gap-8">
-            {platforms.map((p, idx) => {
-              const cfg = platformConfig[p.platform] || { icon: FiActivity, color: "#fff", label: p.platform, gradient: "from-gray-700 to-gray-500", url: () => "#" };
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {platforms.map((p) => {
+              const cfg = platformConfig[p.platform] || { icon: FiActivity, colorClass: "text-slate-400", label: p.platform, url: () => "#" };
               const Icon = cfg.icon;
               return (
-                <div key={p.platform} className="glass-card-premium p-10 group relative overflow-hidden transition-all hover:-translate-y-2 border-none ring-1 ring-white/5">
-                  <div className={`absolute top-0 right-0 w-48 h-48 bg-gradient-to-br ${cfg.gradient} blur-[100px] opacity-0 group-hover:opacity-10 transition-opacity duration-700`} />
-                  <div className="flex items-center justify-between mb-12 relative z-10">
-                    <div className="flex items-center gap-6">
-                      <div className="w-16 h-16 rounded-[1.5rem] flex items-center justify-center shadow-2xl border border-white/5 bg-white/5 transition-all group-hover:scale-110 group-hover:rotate-3">
-                        <Icon style={{ color: cfg.color }} className="text-3xl" />
-                      </div>
-                      <div>
-                        <h3 className="text-3xl font-black text-white italic tracking-tighter uppercase">{cfg.label}</h3>
-                        <div className="flex items-center gap-3">
-                          <p className="text-white/40 font-black text-[10px] uppercase tracking-[0.3em]">@{p.username}</p>
-                          <a href={cfg.url(p.username)} target="_blank" rel="noopener noreferrer" className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white transition-all"><FiExternalLink className="text-[10px]" /></a>
+                <div key={p.platform} className="bg-[#121214] border border-[#222225] hover:border-neutral-700 p-6 rounded-xl transition-all space-y-6 flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded bg-[#0c0c0c] border border-[#222225] flex items-center justify-center text-lg">
+                          {cfg.isTextIcon ? <Icon /> : <Icon className={cfg.colorClass} />}
+                        </div>
+                        <div>
+                          <h3 className="font-[Cormorant_Garamond] font-semibold italic text-slate-100 text-lg leading-tight">{cfg.label}</h3>
+                          <p className="font-mono text-[9px] text-slate-500 uppercase tracking-wider">@{p.username}</p>
                         </div>
                       </div>
+                      <a
+                        href={cfg.url(p.username)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="p-2 bg-[#0c0c0c] border border-[#222225] rounded text-slate-400 hover:text-white transition-colors cursor-pointer"
+                        title={`Visit ${cfg.label} Profile`}
+                      >
+                        <FiExternalLink size={12} />
+                      </a>
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 relative z-10">
+
+                  <div className="grid grid-cols-2 gap-3 pt-4 border-t border-[#222225]/40">
                     {getDisplayStats(p).map((stat, si) => (
-                      <div key={si} className="bg-white/[0.02] border border-white/5 rounded-2xl p-4 transition-all hover:bg-white/[0.05]">
-                        <div className="text-[8px] font-black uppercase tracking-[0.1em] text-gray-500 mb-2 truncate">{stat.k.replace(/([A-Z])/g, " $1")}</div>
-                        <div className="text-lg font-black text-white italic tracking-tighter">{typeof stat.v === 'number' ? Math.round(stat.v).toLocaleString() : (stat.v || "—")}</div>
+                      <div key={si} className="bg-[#0c0c0c] border border-[#222225] rounded p-3 space-y-1">
+                        <div className="text-[8px] font-mono font-semibold uppercase tracking-wider text-slate-500 truncate">
+                          {stat.k}
+                        </div>
+                        <div className="text-sm font-mono font-bold text-slate-200 truncate">
+                          {typeof stat.v === 'number' ? Math.round(stat.v).toLocaleString() : (stat.v || "—")}
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -158,22 +212,22 @@ export default function PublicProfile() {
           </div>
         </div>
 
-        {/* Medals */}
+        {/* Recognitions Section */}
         {stats.badges.length > 0 && (
-          <div className="mb-20">
-            <div className="flex items-center gap-6 mb-12">
-              <h2 className="text-[10px] font-black uppercase tracking-[0.5em] text-gray-500 whitespace-nowrap">Recognitions</h2>
-              <div className="h-px bg-gradient-to-r from-white/5 to-transparent flex-1" />
+          <div className="space-y-6">
+            <div className="flex items-center gap-4">
+              <h2 className="text-xs font-mono font-semibold uppercase tracking-wider text-[#e23e2d] whitespace-nowrap">Recognitions</h2>
+              <div className="h-px bg-[#222225] flex-1" />
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {stats.badges.map((b, i) => (
-                <div key={i} className="glass-card-premium p-6 flex items-center gap-6 group hover:bg-white/[0.03] transition-all border-none ring-1 ring-white/5">
-                  <div className="w-14 h-14 rounded-2xl bg-white/5 border border-white/5 flex items-center justify-center text-3xl group-hover:scale-110 group-hover:rotate-12 transition-all shadow-inner">
-                    <span className="filter grayscale group-hover:grayscale-0 transition-all duration-500">{b.icon || "🎖️"}</span>
+                <div key={i} className="bg-[#121214] border border-[#222225] p-5 rounded-xl flex items-center gap-4">
+                  <div className="w-10 h-10 rounded bg-[#0c0c0c] border border-[#222225] flex items-center justify-center text-xl flex-shrink-0">
+                    <span>{b.icon || "🎖️"}</span>
                   </div>
-                  <div>
-                    <h4 className="text-white font-black text-[11px] uppercase tracking-[0.2em] mb-1">{b.label}</h4>
-                    <p className="text-[9px] text-blue-500 font-bold uppercase tracking-widest opacity-60">{b.platform}</p>
+                  <div className="min-w-0">
+                    <h4 className="font-mono text-[9px] font-semibold text-slate-200 uppercase tracking-wider truncate">{b.label}</h4>
+                    <p className="font-mono text-[8px] text-slate-500 uppercase tracking-wider mt-0.5">{b.platform}</p>
                   </div>
                 </div>
               ))}
@@ -181,33 +235,41 @@ export default function PublicProfile() {
           </div>
         )}
 
-        <footer className="mt-40 text-center relative border-t border-white/5 pt-20">
-          <Link to="/" className="inline-block group mb-12 text-5xl md:text-7xl font-black text-white italic tracking-tighter hover:text-blue-500 transition-all duration-500">DEVLOG<span className="text-blue-600">_</span></Link>
-          <div className="flex justify-center flex-wrap gap-8 text-gray-600 text-[9px] font-black uppercase tracking-[0.4em]">
-            <span>© 2026 MANAGEMENT CENTER</span><span>MEMBER PORTAL</span><span>ALL RIGHTS RESERVED</span>
+        <footer className="pt-24 pb-8 text-center space-y-6 border-t border-[#222225]">
+          <Link to="/" className="inline-flex items-center gap-1.5 font-[Cormorant_Garamond] font-semibold italic text-white text-xl hover:text-slate-300 transition-colors">
+            <FiZap className="text-[#e23e2d] text-base" /> DevLog
+          </Link>
+          <div className="flex justify-center gap-6 font-mono text-[8px] text-slate-600 uppercase tracking-wider">
+            <span>© {new Date().getFullYear()} devlog tracker</span>
+            <span>member portal</span>
+            <span>all rights reserved</span>
           </div>
         </footer>
+
       </div>
     </div>
   );
 }
 
-function MetricBox({ label, value, icon, color }) {
-  const cls = { blue: "text-blue-500 bg-blue-500/10 border-blue-500/20", green: "text-green-500 bg-green-500/10 border-green-500/20", red: "text-red-500 bg-red-500/10 border-red-500/20", purple: "text-purple-500 bg-purple-500/10 border-purple-500/20" };
+function MetricBox({ label, value, icon }) {
   return (
-    <div className="glass-card-premium p-10 group relative transition-all border-none ring-1 ring-white/5 overflow-hidden">
-      <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-2xl transition-all duration-500 group-hover:rotate-12 border ${cls[color]} mb-8`}>{icon}</div>
-      <div className="text-4xl md:text-5xl font-black text-white mb-2 italic tracking-tighter group-hover:translate-x-1 transition-transform">{value || "0"}</div>
-      <div className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] opacity-60 group-hover:opacity-100 transition-opacity">{label}</div>
+    <div className="bg-[#121214] border border-[#222225] p-6 rounded-xl flex justify-between items-center transition-all hover:border-neutral-700">
+      <div className="space-y-1">
+        <div className="text-[9px] font-mono font-semibold uppercase tracking-wider text-slate-500">{label}</div>
+        <div className="text-3xl font-mono font-bold text-white">{value || "0"}</div>
+      </div>
+      <div className="w-10 h-10 rounded bg-[#0c0c0c] border border-[#222225] flex items-center justify-center text-[#e23e2d] text-lg">
+        {icon}
+      </div>
     </div>
   );
 }
 
 function StatInfo({ icon, text, link }) {
   const content = (
-    <div className="flex items-center gap-3 text-gray-400 group/item hover:text-blue-400 transition-all">
-      <div className="w-10 h-10 rounded-2xl bg-white/[0.03] border border-white/5 flex items-center justify-center group-hover/item:border-blue-400/30 group-hover/item:bg-blue-500/5">{icon}</div>
-      <span className="text-sm font-black tracking-tight uppercase opacity-60 group-hover/item:opacity-100">{text}</span>
+    <div className="flex items-center gap-1.5 text-slate-400 hover:text-white transition-colors text-xs font-mono cursor-pointer">
+      <span className="text-slate-500">{icon}</span>
+      <span>{text}</span>
     </div>
   );
   return link ? <a href={link} target="_blank" rel="noopener noreferrer">{content}</a> : content;
