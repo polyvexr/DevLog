@@ -109,10 +109,8 @@ function calculateAggregateStats(platformStats) {
 
 
 export const updatePublicProfile = catchAsync(async (req, res) => {
-  const { enabled, username, showLeetCode, showCodeforces, showGitHub, showCodeChef, showAtCoder } = req.body;
+  const { username, showLeetCode, showCodeforces, showGitHub, showCodeChef, showAtCoder } = req.body;
   const updates = {};
-
-  if (typeof enabled === "boolean") updates["publicProfile.enabled"] = enabled;
 
   if (username !== undefined) {
     if (username && !/^[a-zA-Z0-9_-]{3,30}$/.test(username)) {

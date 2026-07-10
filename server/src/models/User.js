@@ -17,7 +17,6 @@ const userSchema = new mongoose.Schema({
 
   // Public profile settings for /u/:username route
   publicProfile: {
-    enabled: { type: Boolean, default: true },
     username: { type: String, unique: true, sparse: true },
     showLeetCode: { type: Boolean, default: true },
     showCodeforces: { type: Boolean, default: true },
@@ -83,6 +82,6 @@ userSchema.methods.matchPassword = async function (entered) {
 
 
 // Compound index for public profile lookups
-userSchema.index({ "publicProfile.username": 1, "publicProfile.enabled": 1 });
+userSchema.index({ "publicProfile.username": 1 });
 
 export default mongoose.model("User", userSchema);
