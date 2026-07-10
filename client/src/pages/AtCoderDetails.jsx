@@ -20,7 +20,6 @@ export default function AtCoderDetails() {
   const { data, loading, error, stats } = usePlatformStats("atcoder");
 
   const handleUnlink = async () => {
-    if (!window.confirm("Are you sure you want to disconnect AtCoder?")) return;
     try {
       await unlinkPlatform("atcoder");
       navigate("/");

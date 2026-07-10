@@ -6,7 +6,7 @@ import FullPageLoader from "../components/FullPageLoader";
 import {
   PlatformDetailsHeader,
   StatBox,
-  DifficultyGrid,
+  SectionHeader,
   ContestHistoryList
 } from "../components/PlatformDetails";
 
@@ -15,7 +15,6 @@ export default function CodeChefDetails() {
   const { data, loading, error, stats } = usePlatformStats("codechef");
 
   const handleUnlink = async () => {
-    if (!window.confirm("Are you sure you want to disconnect CodeChef?")) return;
     try {
       await unlinkPlatform("codechef");
       navigate("/");
@@ -63,12 +62,11 @@ export default function CodeChefDetails() {
         />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <StatBox
           label="Current Rating"
           value={stats.rating || 0}
           subValue={`/ ${stats.highestRating || 0} Peak`}
-          colSpan={2}
         />
         <div className="bg-[#121214] border border-[#222225] p-5 rounded-xl space-y-2">
           <div className="text-[8px] font-mono font-semibold uppercase tracking-wider text-slate-500">Star Rating</div>
@@ -76,25 +74,8 @@ export default function CodeChefDetails() {
             {"★".repeat(stats.stars || 1)}
           </div>
         </div>
-        <StatBox label="Division" value={stats.division || "—"} />
+        <StatBox label="Total Solved" value={stats.totalSolved || 0} />
       </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <StatBox label="Global Rank" value={`#${stats.globalRank?.toLocaleString() || "—"}`} />
-        <StatBox label="Country Rank" value={`#${stats.countryRank?.toLocaleString() || "—"}`} subValue={stats.countryName} />
-      </div>
-
-      <DifficultyGrid
-        title="Solved Problems"
-        dotColor="bg-[#e23e2d]"
-        difficulties={{
-          total: stats.totalSolved || 0,
-          easy: stats.problemsSolved?.easy || 0,
-          medium: stats.problemsSolved?.medium || 0,
-          hard: stats.problemsSolved?.hard || 0,
-          challenge: stats.problemsSolved?.challenge || 0
-        }}
-      />
 
       <ContestHistoryList
         contests={stats.ratingHistory?.slice().map(c => ({

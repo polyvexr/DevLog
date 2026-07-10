@@ -16,7 +16,6 @@ export default function CodeforcesDetails() {
   const { data, loading, error, stats } = usePlatformStats("codeforces");
 
   const handleUnlink = async () => {
-    if (!window.confirm("Are you sure you want to disconnect Codeforces?")) return;
     try {
       await unlinkPlatform("codeforces");
       navigate("/");

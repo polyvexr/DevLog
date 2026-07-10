@@ -7,26 +7,7 @@ import catchAsync from "../utils/catchAsync.js";
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
 
-const TWO_DAYS_MS = 2 * 24 * 60 * 60 * 1000;
 
-// Internal helper for rate limiting platform changes
-async function checkMonthlyLimit(userId, platform) {
-  const last = await PlatformAction.findOne({ userId, platform })
-    .sort({ createdAt: -1 })
-    .lean();
-
-  if (!last) return null;
-
-  const elapsed = Date.now() - new Date(last.createdAt).getTime();
-  if (elapsed < TWO_DAYS_MS) {
-    return {
-      blocked: true,
-      retryAfter: new Date(new Date(last.createdAt).getTime() + TWO_DAYS_MS),
-      lastAction: last.action,
-    };
-  }
-  return null;
-}
 
 export const linkPlatform = catchAsync(async (req, res) => {
   const { platform, username } = req.body;
@@ -34,23 +15,6 @@ export const linkPlatform = catchAsync(async (req, res) => {
 
   if (!fetchFunction) {
     throw new ApiError(400, `Unsupported platform: ${platform}`);
-  }
-
-  // Rate limit check
-  const blocked = await checkMonthlyLimit(req.user._id, platform);
-  if (blocked) {
-    // Dynamic Re-add Policy: If last action was unlink, allow ONE free re-add
-    const readdUsed = req.user.oneTimeReaddUsed?.get?.(platform) || req.user.oneTimeReaddUsed?.[platform];
-
-    if (blocked.lastAction === "unlink" && !readdUsed) {
-      // req.user is lean — use atomic update instead of .save()
-      await User.updateOne(
-        { _id: req.user._id },
-        { $set: { [`oneTimeReaddUsed.${platform}`]: true } }
-      );
-    } else {
-      throw new ApiError(429, "You can add or remove this platform at most once every 2 days.");
-    }
   }
 
   // Check if already linked
@@ -99,11 +63,6 @@ export const getPlatforms = catchAsync(async (req, res) => {
 
 export const unlinkPlatform = catchAsync(async (req, res) => {
   const { platform } = req.params;
-
-  const blocked = await checkMonthlyLimit(req.user._id, platform);
-  if (blocked) {
-    throw new ApiError(429, "You can add or remove this platform at most once every 2 days.");
-  }
 
   const existing = await PlatformStat.findOne({ userId: req.user._id, platform }).lean();
   if (!existing) {
