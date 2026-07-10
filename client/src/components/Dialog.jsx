@@ -4,35 +4,31 @@ import { FiAlertTriangle, FiX, FiCheckCircle, FiInfo, FiAlertCircle } from "reac
 const typeConfig = {
   success: {
     icon: FiCheckCircle,
-    colorClass: "text-green-500",
-    bgClass: "bg-green-500",
-    borderClass: "border-green-500/20",
-    bgLightClass: "bg-green-500/10",
-    shadowClass: "shadow-green-500/20"
+    colorClass: "text-[#e23e2d]",
+    bgClass: "bg-[#e23e2d] hover:bg-[#cf2e2e]",
+    borderClass: "border-[#e23e2d]/20",
+    bgLightClass: "bg-[#e23e2d]/10",
   },
   error: {
     icon: FiAlertTriangle,
     colorClass: "text-red-500",
-    bgClass: "bg-red-500",
+    bgClass: "bg-red-950/20 hover:bg-red-950/40 border border-red-500/20 text-red-200",
     borderClass: "border-red-500/20",
     bgLightClass: "bg-red-500/10",
-    shadowClass: "shadow-red-500/20"
   },
   warning: {
     icon: FiAlertCircle,
-    colorClass: "text-yellow-500",
-    bgClass: "bg-yellow-500",
-    borderClass: "border-yellow-500/20",
-    bgLightClass: "bg-yellow-500/10",
-    shadowClass: "shadow-yellow-500/20"
+    colorClass: "text-[#e23e2d]",
+    bgClass: "bg-[#e23e2d] hover:bg-[#cf2e2e]",
+    borderClass: "border-[#e23e2d]/20",
+    bgLightClass: "bg-[#e23e2d]/10",
   },
   info: {
     icon: FiInfo,
-    colorClass: "text-blue-500",
-    bgClass: "bg-blue-500",
-    borderClass: "border-blue-500/20",
-    bgLightClass: "bg-blue-500/10",
-    shadowClass: "shadow-blue-500/20"
+    colorClass: "text-slate-200",
+    bgClass: "bg-[#e23e2d] hover:bg-[#cf2e2e]",
+    borderClass: "border-[#222225]",
+    bgLightClass: "bg-[#0c0c0c]",
   }
 };
 
@@ -61,41 +57,45 @@ export default function Dialog({
   const Icon = config.icon;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 sm:p-4">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 select-none">
       <div
-        className="absolute inset-0 bg-black/40 backdrop-blur-md animate-fade-in"
+        className="absolute inset-0 bg-[#0c0c0c]/80 backdrop-blur-md transition-opacity"
         onClick={onCancel}
       />
       
-      <div className="relative glass-card-premium p-10 max-w-sm w-full border-none ring-1 ring-white/10 shadow-[0_32px_128px_rgba(0,0,0,0.5)] animate-fade-in-scale">
+      <div className="relative bg-[#121214] border border-[#222225] p-10 max-w-sm w-full rounded-xl shadow-[0_32px_128px_rgba(0,0,0,0.8)] z-10 space-y-6">
         <button 
           onClick={onCancel}
-          className="absolute top-6 right-6 text-gray-500 hover:text-white transition-colors"
+          className="absolute top-6 right-6 text-slate-500 hover:text-slate-200 transition-colors cursor-pointer"
         >
-          <FiX size={20} />
+          <FiX size={18} />
         </button>
 
-        <div className="flex flex-col items-center text-center">
-          <div className={`w-16 h-16 ${config.bgLightClass} rounded-2xl flex items-center justify-center mb-8 border ${config.borderClass}`}>
-            <Icon className={`text-3xl ${config.colorClass}`} />
+        <div className="flex flex-col items-center text-center space-y-5">
+          <div className={`w-12 h-12 ${config.bgLightClass} rounded-full flex items-center justify-center border ${config.borderClass}`}>
+            <Icon className={`text-xl ${config.colorClass}`} />
           </div>
           
-          <h3 className="text-2xl font-black text-white italic mb-4 tracking-tight">{title}</h3>
-          <p className="text-gray-400 text-sm font-medium leading-relaxed mb-10">
-            {message}
-          </p>
+          <div className="space-y-2">
+            <h3 className="text-xl font-[Cormorant_Garamond] font-semibold italic text-white leading-tight">
+              {title}
+            </h3>
+            <p className="text-slate-400 text-xs font-mono max-w-xs mx-auto leading-relaxed">
+              {message}
+            </p>
+          </div>
 
-          <div className="w-full space-y-3">
-             <button
+          <div className="w-full space-y-2.5 pt-2">
+            <button
               onClick={onConfirm}
-              className={`w-full py-4 ${config.bgClass} hover:opacity-90 text-white font-black text-xs uppercase tracking-[0.2em] rounded-2xl transition-all shadow-xl ${config.shadowClass} active:scale-95`}
+              className={`w-full py-2.5 ${config.bgClass} text-white font-mono text-xs font-semibold uppercase tracking-wider rounded transition-colors cursor-pointer flex items-center justify-center`}
             >
               {confirmText}
             </button>
-            {cancelText && (
+            {cancelText && onCancel && (
               <button
                 onClick={onCancel}
-                className="w-full py-4 bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white font-black text-[10px] uppercase tracking-[0.2em] rounded-2xl border border-white/5 transition-all"
+                className="w-full py-2.5 bg-[#121214] border border-[#222225] hover:bg-[#1c1c1f] text-slate-400 hover:text-slate-200 font-mono text-xs font-semibold uppercase tracking-wider rounded transition-colors cursor-pointer flex items-center justify-center"
               >
                 {cancelText}
               </button>

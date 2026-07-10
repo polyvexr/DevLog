@@ -1,8 +1,10 @@
+import React, { useState } from "react";
 import { SiCodechef } from "react-icons/si";
 import { useNavigate, Link } from "react-router-dom";
 import { usePlatformStats } from "../hooks/useApi";
 import { unlinkPlatform } from "../api/axios";
 import FullPageLoader from "../components/FullPageLoader";
+import DisconnectDialog from "../components/DisconnectDialog";
 import {
   PlatformDetailsHeader,
   StatBox,
@@ -13,8 +15,14 @@ import {
 export default function CodeChefDetails() {
   const navigate = useNavigate();
   const { data, loading, error, stats } = usePlatformStats("codechef");
+  const [unlinkDialogOpen, setUnlinkDialogOpen] = useState(false);
 
   const handleUnlink = async () => {
+    setUnlinkDialogOpen(true);
+  };
+
+  const confirmUnlink = async () => {
+    setUnlinkDialogOpen(false);
     try {
       await unlinkPlatform("codechef");
       navigate("/");
@@ -85,6 +93,13 @@ export default function CodeChefDetails() {
           date: c.date
         }))}
         platform="codechef"
+      />
+
+      <DisconnectDialog
+        open={unlinkDialogOpen}
+        platform="codechef"
+        onConfirm={confirmUnlink}
+        onCancel={() => setUnlinkDialogOpen(false)}
       />
     </div>
   );

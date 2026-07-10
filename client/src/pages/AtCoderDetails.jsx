@@ -1,7 +1,9 @@
+import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { usePlatformStats } from "../hooks/useApi";
 import { unlinkPlatform } from "../api/axios";
 import FullPageLoader from "../components/FullPageLoader";
+import DisconnectDialog from "../components/DisconnectDialog";
 import {
   PlatformDetailsHeader,
   StatBox,
@@ -18,8 +20,14 @@ const AtCoderIcon = () => (
 export default function AtCoderDetails() {
   const navigate = useNavigate();
   const { data, loading, error, stats } = usePlatformStats("atcoder");
+  const [unlinkDialogOpen, setUnlinkDialogOpen] = useState(false);
 
   const handleUnlink = async () => {
+    setUnlinkDialogOpen(true);
+  };
+
+  const confirmUnlink = async () => {
+    setUnlinkDialogOpen(false);
     try {
       await unlinkPlatform("atcoder");
       navigate("/");
@@ -45,10 +53,15 @@ export default function AtCoderDetails() {
   );
 
   const rankColors = {
-    gray: "#808080", brown: "#804000", green: "#008000", cyan: "#00C0C0",
-    blue: "#0000FF", yellow: "#C0C000", orange: "#FF8000", red: "#FF0000",
+    Grey: "#808080",
+    Brown: "#804000",
+    Green: "#008000",
+    Cyan: "#00C0C0",
+    Blue: "#0000FF",
+    Yellow: "#C0C000",
+    Orange: "#FF8000",
+    Red: "#FF0000"
   };
-  const rankColor = rankColors[stats.rankColor] || rankColors.gray;
 
   return (
     <div className="max-w-7xl mx-auto py-8 px-4 space-y-12">
@@ -63,32 +76,23 @@ export default function AtCoderDetails() {
           platform="atcoder"
           username={data.username}
           icon={AtCoderIcon}
-          isTextIcon={true}
           title="AtCoder"
           onUnlink={handleUnlink}
         />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <StatBox
           label="Current Rating"
           value={stats.rating || 0}
           subValue={`/ ${stats.highestRating || 0} Peak`}
-          colSpan={2}
-          className="relative"
-        >
-          <div className="absolute top-0 right-0 p-5 h-full flex items-center">
-            <div className="w-2.5 h-1/2 rounded" style={{ backgroundColor: rankColor }}></div>
+        />
+        <div className="bg-[#121214] border border-[#222225] p-5 rounded-xl space-y-2">
+          <div className="text-[8px] font-mono font-semibold uppercase tracking-wider text-slate-500">Rank</div>
+          <div className="text-3xl font-[Cormorant_Garamond] font-bold italic" style={{ color: rankColors[stats.rank || "Grey"] }}>
+            {stats.rank || "Unranked"}
           </div>
-        </StatBox>
-        <StatBox label="Rank Color" value={(stats.rankColor || "Unrated").toUpperCase()} valueColor="" style={{ color: rankColor }} />
-        <StatBox label="AC Rank" value={`#${stats.acRank?.toLocaleString() || "—"}`} />
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <StatBox label="Competitions Joined" value={stats.contestsParticipated || 0} />
-        <StatBox label="Avg Performance" value={stats.averagePerformance || 0} />
-        <StatBox label="Best Performance" value={stats.bestPerformance || 0} />
+        </div>
       </div>
 
       <div>
@@ -107,6 +111,13 @@ export default function AtCoderDetails() {
       <ContestHistoryList
         contests={stats.ratingHistory?.slice().reverse()}
         platform="atcoder"
+      />
+
+      <DisconnectDialog
+        open={unlinkDialogOpen}
+        platform="atcoder"
+        onConfirm={confirmUnlink}
+        onCancel={() => setUnlinkDialogOpen(false)}
       />
     </div>
   );

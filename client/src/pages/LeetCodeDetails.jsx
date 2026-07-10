@@ -1,8 +1,10 @@
+import React, { useState } from "react";
 import { SiLeetcode } from "react-icons/si";
 import { useNavigate, Link } from "react-router-dom";
 import { usePlatformStats } from "../hooks/useApi";
 import { unlinkPlatform } from "../api/axios";
 import FullPageLoader from "../components/FullPageLoader";
+import DisconnectDialog from "../components/DisconnectDialog";
 import {
   PlatformDetailsHeader,
   StatBox,
@@ -14,8 +16,14 @@ import {
 export default function LeetCodeDetails() {
   const navigate = useNavigate();
   const { data, loading, error, stats } = usePlatformStats("leetcode");
+  const [unlinkDialogOpen, setUnlinkDialogOpen] = useState(false);
 
   const handleUnlink = async () => {
+    setUnlinkDialogOpen(true);
+  };
+
+  const confirmUnlink = async () => {
+    setUnlinkDialogOpen(false);
     try {
       await unlinkPlatform("leetcode");
       navigate("/");
@@ -29,7 +37,7 @@ export default function LeetCodeDetails() {
     <div className="bg-[#121214] border border-[#222225] p-12 text-center rounded-xl space-y-6 max-w-lg mx-auto mt-12">
       <h2 className="text-xl font-[Cormorant_Garamond] font-semibold italic text-white">Service Not Linked</h2>
       <p className="text-slate-400 text-xs font-mono max-w-xs mx-auto leading-relaxed">
-        This account is not yet connected. Connect your LeetCode account to monitor statistics.
+        This account is not yet connected. Connect your LeetCode profile to monitor statistics.
       </p>
       <button
         onClick={() => window.location.href = '/settings'}
@@ -70,17 +78,6 @@ export default function LeetCodeDetails() {
         <StatBox label="Profile Name" value={stats.realName || "Anonymous"} />
       </div>
 
-      <DifficultyGrid
-        title="Solved Problems"
-        dotColor="bg-[#e23e2d]"
-        difficulties={{
-          easy: easy,
-          medium: medium,
-          hard: hard,
-          total: total
-        }}
-      />
-
       {stats.contestRanking && (
         <div className="space-y-4">
           <SectionHeader title="Contest Performance" dotColor="bg-[#e23e2d]" />
@@ -109,24 +106,36 @@ export default function LeetCodeDetails() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="space-y-6">
-          <SectionHeader title="Skills and Topics" dotColor="bg-[#e23e2d]" />
-          <div className="bg-[#121214] border border-[#222225] p-6 rounded-xl space-y-6">
-            {stats.tagStats?.advanced && (
-              <div className="space-y-3">
-                <h3 className="text-[9px] font-mono font-semibold uppercase tracking-wider text-[#e23e2d]">Advanced Topics</h3>
-                <div className="flex flex-wrap gap-2">
-                  {stats.tagStats.advanced.slice(0, 8).map(tag => (
-                    <div key={tag.tagSlug} className="px-3 py-1.5 bg-[#0c0c0c] border border-[#222225] rounded text-[9px] font-mono text-slate-300">
-                      {tag.tagName} <span className="text-[#e23e2d] ml-1">{tag.problemsSolved}</span>
-                    </div>
-                  ))}
+          <DifficultyGrid
+            title="Solved Problems"
+            dotColor="bg-[#e23e2d]"
+            difficulties={{
+              easy: easy,
+              medium: medium,
+              hard: hard,
+              total: total
+            }}
+          />
+          <div className="space-y-6">
+            <SectionHeader title="Skills and Topics" dotColor="bg-[#e23e2d]" />
+            <div className="bg-[#121214] border border-[#222225] p-6 rounded-xl space-y-6">
+              {stats.tagStats?.advanced && (
+                <div className="space-y-3">
+                  <h3 className="text-[9px] font-mono font-semibold uppercase tracking-wider text-[#e23e2d]">Advanced Topics</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {stats.tagStats.advanced.slice(0, 8).map(tag => (
+                      <div key={tag.tagSlug} className="px-3 py-1.5 bg-[#0c0c0c] border border-[#222225] rounded text-[9px] font-mono text-slate-300">
+                        {tag.tagName} <span className="text-[#e23e2d] ml-1">{tag.problemsSolved}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )}
-            <LanguageStats
-              languages={stats.languageStats?.reduce((acc, curr) => ({ ...acc, [curr.languageName]: curr.problemsSolved }), {})}
-              title="Languages Used"
-            />
+              )}
+              <LanguageStats
+                languages={stats.languageStats?.reduce((acc, curr) => ({ ...acc, [curr.languageName]: curr.problemsSolved }), {})}
+                title="Languages Used"
+              />
+            </div>
           </div>
         </div>
 
@@ -147,6 +156,13 @@ export default function LeetCodeDetails() {
           </div>
         </div>
       </div>
+
+      <DisconnectDialog
+        open={unlinkDialogOpen}
+        platform="leetcode"
+        onConfirm={confirmUnlink}
+        onCancel={() => setUnlinkDialogOpen(false)}
+      />
     </div>
   );
 }

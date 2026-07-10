@@ -60,7 +60,7 @@ export const platformService = {
       if (!allowed) {
         return {
           queued: false,
-          message: `Dynamic cooldown active. Available in ${Math.ceil(remainingMs / 60000)} minutes.`,
+          message: "Data already synced and you should wait for hour before next sync",
           cooldownActive: true,
           remainingMs
         };
