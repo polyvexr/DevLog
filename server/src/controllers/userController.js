@@ -67,10 +67,9 @@ export const updateProfile = catchAsync(async (req, res) => {
 
 
 export const updateSettings = catchAsync(async (req, res) => {
-  const { theme, timezone } = req.body;
+  const { timezone } = req.body;
   const updates = {};
 
-  if (theme !== undefined) updates["settings.theme"] = theme;
   if (timezone !== undefined) updates["settings.timezone"] = timezone;
 
   const user = await User.findByIdAndUpdate(

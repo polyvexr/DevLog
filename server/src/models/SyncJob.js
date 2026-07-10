@@ -1,9 +1,6 @@
 import mongoose from "mongoose";
 
-/**
- * SyncJob Model - Database-driven job queue for serverless architecture
- * Replaces BullMQ/Redis with MongoDB-based job state management
- */
+
 const syncJobSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,

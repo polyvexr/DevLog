@@ -1,18 +1,19 @@
-/**
- * Validation Middleware for DevLog API
- */
-
 // Email validation regex - exported for reuse
 export const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 // Valid platforms list - exported for reuse
-export const validPlatforms = ["leetcode", "codeforces", "github", "codechef", "atcoder"];
+export const validPlatforms = [
+  "leetcode",
+  "codeforces",
+  "github",
+  "codechef",
+  "atcoder",
+];
 
 import ApiError from "../utils/ApiError.js";
 
-/**
- * Validate registration input
- */
+// Validate registration input
+
 export const validateRegister = (req, res, next) => {
   const { name, email, password } = req.body;
   const errors = [];
@@ -22,7 +23,8 @@ export const validateRegister = (req, res, next) => {
   else if (!emailRegex.test(email)) errors.push("Invalid email format");
 
   if (!password) errors.push("Password is required");
-  else if (password.length < 6) errors.push("Password must be at least 6 characters");
+  else if (password.length < 6)
+    errors.push("Password must be at least 6 characters");
 
   if (errors.length > 0) {
     throw new ApiError(400, "Validation failed", errors);
@@ -31,9 +33,7 @@ export const validateRegister = (req, res, next) => {
   next();
 };
 
-/**
- * Validate login input
- */
+// Validate login input
 export const validateLogin = (req, res, next) => {
   const { email, password } = req.body;
 
@@ -48,14 +48,16 @@ export const validateLogin = (req, res, next) => {
   next();
 };
 
-/**
- * Validate platform link input
- */
+// Validate platform link input
+
 export const validatePlatformLink = (req, res, next) => {
   const { platform, username } = req.body;
 
   if (!platform || !validPlatforms.includes(platform.toLowerCase())) {
-    throw new ApiError(400, `Platform must be one of: ${validPlatforms.join(", ")}`);
+    throw new ApiError(
+      400,
+      `Platform must be one of: ${validPlatforms.join(", ")}`,
+    );
   }
 
   if (!username || !username.trim()) {
@@ -65,7 +67,10 @@ export const validatePlatformLink = (req, res, next) => {
   // Sanitize: alphanumeric, underscores, hyphens, dots only; max 39 chars (GitHub limit)
   const sanitized = username.trim();
   if (sanitized.length > 39 || !/^[a-zA-Z0-9._-]+$/.test(sanitized)) {
-    throw new ApiError(400, "Username must be 1-39 characters (letters, numbers, dots, hyphens, underscores)");
+    throw new ApiError(
+      400,
+      "Username must be 1-39 characters (letters, numbers, dots, hyphens, underscores)",
+    );
   }
 
   // Normalize platform to lowercase
@@ -75,9 +80,8 @@ export const validatePlatformLink = (req, res, next) => {
   next();
 };
 
-/**
- * Sanitize user object for response (remove sensitive fields)
- */
+// Sanitize user object for response (remove sensitive fields)
+
 export const sanitizeUser = (user) => {
   if (!user) return null;
 
