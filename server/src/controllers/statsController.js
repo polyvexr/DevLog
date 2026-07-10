@@ -56,9 +56,7 @@ export const getStatsSummary = catchAsync(async (req, res) => {
   res.status(200).json(new ApiResponse(200, { summary }));
 });
 
-/**
- * Refresh stats for a specific platform
- */
+
 export const refreshPlatformStats = catchAsync(async (req, res) => {
   const { platform } = req.params;
   
@@ -98,9 +96,7 @@ export const refreshPlatformStats = catchAsync(async (req, res) => {
   }, "Platform stats refreshed successfully"));
 });
 
-/**
- * Get refresh job status
- */
+
 export const getRefreshStatus = catchAsync(async (req, res) => {
   const { jobId } = req.params;
   const job = await SyncJob.findOne({ _id: jobId, userId: req.user._id }).lean();

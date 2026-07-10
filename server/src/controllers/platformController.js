@@ -28,10 +28,6 @@ async function checkMonthlyLimit(userId, platform) {
   return null;
 }
 
-/**
- * Link a new platform to user account
- * POST /api/platforms/link
- */
 export const linkPlatform = catchAsync(async (req, res) => {
   const { platform, username } = req.body;
   const fetchFunction = platformFetchers[platform];
@@ -94,19 +90,13 @@ export const linkPlatform = catchAsync(async (req, res) => {
   res.status(201).json(new ApiResponse(201, { entry }, "Platform linked successfully"));
 });
 
-/**
- * Get all linked platforms for current user
- * GET /api/platforms
- */
+
 export const getPlatforms = catchAsync(async (req, res) => {
   const platforms = await PlatformStat.find({ userId: req.user._id }).lean();
   res.status(200).json(new ApiResponse(200, { platforms }));
 });
 
-/**
- * Unlink a platform
- * DELETE /api/platforms/:platform
- */
+
 export const unlinkPlatform = catchAsync(async (req, res) => {
   const { platform } = req.params;
 

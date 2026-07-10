@@ -1,16 +1,9 @@
 import PlatformStat from "../models/PlatformStat.js";
 import Contest from "../models/Contest.js";
-import User from "../models/User.js";
 import catchAsync from "../utils/catchAsync.js";
 import ApiResponse from "../utils/ApiResponse.js";
-import ApiError from "../utils/ApiError.js";
 
-/**
- * Dashboard Controller - Combined endpoint for dashboard data
- * Reduces multiple API calls to a single request
- */
 
-// Simple in-memory cache for global upcoming contests
 let contestCache = {
   data: null,
   expiry: 0
@@ -96,9 +89,9 @@ export const getDashboardData = catchAsync(async (req, res) => {
   res.status(200).json(new ApiResponse(200, dashboardData, "Dashboard data fetched successfully"));
 });
 
-/**
- * Calculate summary statistics from platform stats
- */
+
+ // Calculate summary statistics from platform stats
+
 function calculateSummary(platformStats) {
   const summary = {
     totalPlatforms: platformStats.length,

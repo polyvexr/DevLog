@@ -8,10 +8,7 @@ import catchAsync from "../utils/catchAsync.js";
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
 
-/**
- * Get current user profile
- * GET /api/user/profile
- */
+
 export const getProfile = catchAsync(async (req, res) => {
   const user = await User.findById(req.user._id)
     .select("-password -resetPasswordToken -resetPasswordExpires")
@@ -24,10 +21,7 @@ export const getProfile = catchAsync(async (req, res) => {
   res.status(200).json(new ApiResponse(200, { user }, "User profile fetched"));
 });
 
-/**
- * Update user profile
- * PUT /api/user/profile
- */
+
 export const updateProfile = catchAsync(async (req, res) => {
   const { name, avatar, bio, location, website, socials, publicProfile: ppUpdate } = req.body;
   const updates = {};
@@ -71,10 +65,7 @@ export const updateProfile = catchAsync(async (req, res) => {
 });
 
 
-/**
- * Update user settings
- * PUT /api/user/settings
- */
+
 export const updateSettings = catchAsync(async (req, res) => {
   const { theme, timezone } = req.body;
   const updates = {};
@@ -98,10 +89,7 @@ export const updateSettings = catchAsync(async (req, res) => {
 });
 
 
-/**
- * Update user avatar
- * POST /api/user/avatar
- */
+
 export const updateAvatar = catchAsync(async (req, res) => {
   logger.info("Avatar upload request received", { userId: req.user._id });
 
@@ -131,10 +119,7 @@ export const updateAvatar = catchAsync(async (req, res) => {
   );
 });
 
-/**
- * Update password from profile
- * PUT /api/user/password
- */
+
 export const updatePassword = catchAsync(async (req, res) => {
   const { currentPassword, newPassword } = req.body;
 
@@ -162,10 +147,7 @@ export const updatePassword = catchAsync(async (req, res) => {
   res.status(200).json(new ApiResponse(200, null, "Password updated successfully"));
 });
 
-/**
- * Delete account and all associated data (cascade delete)
- * DELETE /api/user/account
- */
+
 export const deleteAccount = catchAsync(async (req, res) => {
   const userId = req.user._id;
 

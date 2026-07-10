@@ -6,10 +6,7 @@ import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import { sanitizeUser } from "../middleware/validation.js";
 
-/**
- * Register a new user
- * POST /api/auth/register
- */
+
 export const register = catchAsync(async (req, res) => {
   const { name, email, password } = req.body;
 
@@ -41,10 +38,8 @@ export const register = catchAsync(async (req, res) => {
   );
 });
 
-/**
- * Login user
- * POST /api/auth/login
- */
+
+
 export const login = catchAsync(async (req, res) => {
   const { email, password } = req.body;
 
@@ -76,10 +71,7 @@ export const login = catchAsync(async (req, res) => {
   );
 });
 
-/**
- * Get current user
- * GET /api/auth/me
- */
+
 export const getMe = catchAsync(async (req, res) => {
   const user = await User.findById(req.user._id)
     .select("-password -resetPasswordToken -resetPasswordExpires")

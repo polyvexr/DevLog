@@ -5,10 +5,7 @@ import catchAsync from "../utils/catchAsync.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import ApiError from "../utils/ApiError.js";
 
-/**
- * Request password reset
- * POST /api/auth/forgot-password
- */
+
 export const forgotPassword = catchAsync(async (req, res) => {
   const { email } = req.body;
 
@@ -44,10 +41,7 @@ export const forgotPassword = catchAsync(async (req, res) => {
   res.status(200).json(new ApiResponse(200, null, "If an account exists, a reset link will be sent"));
 });
 
-/**
- * Reset password with token
- * POST /api/auth/reset-password/:token
- */
+
 export const resetPassword = catchAsync(async (req, res) => {
   const { token } = req.params;
   const { password } = req.body;
@@ -75,10 +69,7 @@ export const resetPassword = catchAsync(async (req, res) => {
   res.status(200).json(new ApiResponse(200, null, "Password reset successful. You can now login."));
 });
 
-/**
- * Verify reset token is valid
- * GET /api/auth/verify-reset-token/:token
- */
+
 export const verifyResetToken = catchAsync(async (req, res) => {
   const { token } = req.params;
   const hashedToken = crypto.createHash("sha256").update(token).digest("hex");

@@ -9,13 +9,7 @@ import catchAsync from "../utils/catchAsync.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import ApiError from "../utils/ApiError.js";
 
-/**
- * Cron Controller - Endpoints for Lambda/serverless cron triggers
- */
 
-/**
- * Common authorization helper for cron jobs
- */
 const authorizeCron = (req) => {
   const cronSecret = req.headers["x-cron-secret"] || req.query["x-cron-secret"];
   const authHeader = req.headers["authorization"];
@@ -29,9 +23,7 @@ const authorizeCron = (req) => {
   return cronSecret === process.env.CRON_SECRET || bearerToken === process.env.CRON_SECRET;
 };
 
-/**
- * Process pending sync jobs
- */
+
 export const handleSyncCron = catchAsync(async (req, res) => {
   if (!authorizeCron(req)) {
     throw new ApiError(401, "Unauthorized");
@@ -42,9 +34,7 @@ export const handleSyncCron = catchAsync(async (req, res) => {
   res.status(200).json(new ApiResponse(200, result, "Sync cron completed"));
 });
 
-/**
- * Fetch contests from all platforms
- */
+
 export const handleContestsCron = catchAsync(async (req, res) => {
   if (!authorizeCron(req)) {
     throw new ApiError(401, "Unauthorized");
@@ -55,9 +45,7 @@ export const handleContestsCron = catchAsync(async (req, res) => {
   res.status(200).json(new ApiResponse(200, result, "Contests cron completed"));
 });
 
-/**
- * Unified endpoint for Hobby plan - runs both sync and contests
- */
+
 export const handleUnifiedCron = catchAsync(async (req, res) => {
   if (!authorizeCron(req)) {
     throw new ApiError(401, "Unauthorized");

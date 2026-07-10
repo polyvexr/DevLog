@@ -4,14 +4,7 @@ import catchAsync from "../utils/catchAsync.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import ApiError from "../utils/ApiError.js";
 
-/**
- * Public Profile Controller - Unauthenticated public developer profiles
- */
 
-/**
- * Get public profile by username
- * GET /u/:username
- */
 export const getPublicProfile = catchAsync(async (req, res) => {
   const { username } = req.params;
 
@@ -64,9 +57,9 @@ export const getPublicProfile = catchAsync(async (req, res) => {
   }));
 });
 
-/**
- * Calculate aggregate stats from all platforms
- */
+
+ //Calculate aggregate stats from all platforms
+
 function calculateAggregateStats(platformStats) {
   const stats = {
     totalProblemsSolved: 0,
@@ -115,10 +108,7 @@ function calculateAggregateStats(platformStats) {
   return stats;
 }
 
-/**
- * Update public profile settings
- * PATCH /api/user/public-profile
- */
+
 export const updatePublicProfile = catchAsync(async (req, res) => {
   const { enabled, username, showLeetCode, showCodeforces, showGitHub, showCodeChef, showAtCoder } = req.body;
   const updates = {};
