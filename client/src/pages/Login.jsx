@@ -102,7 +102,8 @@ export default function Login() {
                 </label>
                   to="/forgot-password"
                   className="text-xs font-bold text-blue-400 hover:text-blue-300 transition-colors uppercase tracking-wider"
-                >
+                
+                <Link>
                   Forgot?
                 </Link>
               </div>

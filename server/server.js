@@ -79,7 +79,7 @@ app.use((req, res, next) => {
 });
 
 // Paths that allow no-origin requests (for cron jobs)
-const noOriginAllowedPaths = ["/api/cron", "/api/health", "/", "/favicon.ico", "/robots.txt"];
+const noOriginAllowedPaths = ["/api/cron", "/api/health", "/", "/robots.txt"];
 
 // Custom CORS middleware to restrict no-origin requests
 app.use((req, res, next) => {
