@@ -9,7 +9,6 @@ import connectDB from "./src/config/db.js";
 import authRoutes from "./src/routes/auth.js";
 import platformRoutes from "./src/routes/platforms.js";
 import statsRoutes from "./src/routes/stats.js";
-import adminRoutes from "./src/routes/admin.js";
 import passwordRoutes from "./src/routes/password.js";
 import userRoutes from "./src/routes/user.js";
 // New V2 routes
@@ -147,7 +146,6 @@ app.use("/api/auth", authRoutes);
 app.use("/api/auth", passwordRoutes);
 app.use("/api/platforms", platformRoutes);
 app.use("/api/stats", statsRoutes);
-app.use("/api/admin", adminRoutes);
 app.use("/api/user", userRoutes);
 
 // V2 API Routes

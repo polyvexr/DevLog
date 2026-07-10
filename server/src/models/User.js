@@ -8,14 +8,6 @@ const userSchema = new mongoose.Schema({
   password: String,
   oneTimeReaddUsed: { type: Map, of: Boolean, default: {} },
 
-  // RBAC - Role-based access control
-  role: {
-    type: String,
-    enum: ["user", "admin"],
-    default: "user"
-  },
-  permissions: [String],
-
   // Profile subdocument
   profile: {
     avatar: { type: String, default: "" },

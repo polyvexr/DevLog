@@ -45,7 +45,7 @@ const syncJobSchema = new mongoose.Schema({
   // Metadata
   triggeredBy: {
     type: String,
-    enum: ["user", "admin", "cron"],
+    enum: ["user", "cron"],
     default: "user"
   },
   executionDurationMs: { type: Number, default: null }

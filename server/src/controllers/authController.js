@@ -71,7 +71,6 @@ export const login = catchAsync(async (req, res) => {
   res.status(200).json(
     new ApiResponse(200, {
       token,
-      isAdmin: user.role === "admin",
       user: sanitizeUser(user)
     }, "Login successful")
   );

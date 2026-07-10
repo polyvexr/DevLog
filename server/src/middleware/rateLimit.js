@@ -28,16 +28,3 @@ export const authLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-/**
- * Admin Action Rate Limiter
- * Limits destructive or heavy admin sync actions
- */
-export const adminLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000, // 1 hour
-  max: 20, // Limit each IP to 20 admin actions per hour
-  message: {
-    message: "Too many admin actions, please try again after an hour",
-  },
-  standardHeaders: true,
-  legacyHeaders: false,
-});

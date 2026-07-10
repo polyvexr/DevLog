@@ -46,9 +46,7 @@ export const handleSyncCron = catchAsync(async (req, res) => {
  * Fetch contests from all platforms
  */
 export const handleContestsCron = catchAsync(async (req, res) => {
-  const isAdmin = req.user?.role === "admin";
-
-  if (!authorizeCron(req) && !isAdmin) {
+  if (!authorizeCron(req)) {
     throw new ApiError(401, "Unauthorized");
   }
 
