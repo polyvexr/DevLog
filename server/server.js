@@ -9,7 +9,6 @@ import connectDB from "./src/config/db.js";
 import authRoutes from "./src/routes/auth.js";
 import platformRoutes from "./src/routes/platforms.js";
 import statsRoutes from "./src/routes/stats.js";
-import passwordRoutes from "./src/routes/password.js";
 import userRoutes from "./src/routes/user.js";
 // New V2 routes
 import contestRoutes from "./src/routes/contests.js";
@@ -143,7 +142,6 @@ app.get("/api/health", (req, res) => {
 
 // Core API Routes
 app.use("/api/auth", authRoutes);
-app.use("/api/auth", passwordRoutes);
 app.use("/api/platforms", platformRoutes);
 app.use("/api/stats", statsRoutes);
 app.use("/api/user", userRoutes);

@@ -74,7 +74,7 @@ export const login = catchAsync(async (req, res) => {
 
 export const getMe = catchAsync(async (req, res) => {
   const user = await User.findById(req.user._id)
-    .select("-password -resetPasswordToken -resetPasswordExpires")
+    .select("-password")
     .lean();
 
   if (!user) {

@@ -84,7 +84,5 @@ export const sanitizeUser = (user) => {
   const obj = user.toObject ? user.toObject() : { ...user };
   delete obj.password;
   delete obj.__v;
-  delete obj.resetPasswordToken;
-  delete obj.resetPasswordExpires;
   return obj;
 };
