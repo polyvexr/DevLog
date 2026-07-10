@@ -122,31 +122,13 @@ const PlatformCard = ({
   platform,
   stats,
   username,
-  canRefresh = true,
-  nextRefreshAvailable,
-  onRefresh,
   onClick,
 }) => {
-  const [isRefreshing, setIsRefreshing] = useState(false);
-
   const config = platformConfig[platform];
   if (!config) return null;
 
   const Icon = config.icon;
   const statsDisplay = getStatsDisplay(platform, stats);
-  const timeRemaining = formatTimeRemaining(nextRefreshAvailable);
-
-  const handleRefresh = async (e) => {
-    e.stopPropagation();
-    if (!canRefresh || isRefreshing) return;
-
-    setIsRefreshing(true);
-    try {
-      await onRefresh(platform);
-    } finally {
-      setIsRefreshing(false);
-    }
-  };
 
   const handleVisit = (e) => {
     e.stopPropagation();
@@ -196,26 +178,12 @@ const PlatformCard = ({
       {/* Actions */}
       <div className="flex gap-3">
         <button
-          className="flex-1 py-2.5 bg-[#121214] border border-[#222225] hover:bg-[#1c1c1f] text-slate-300 font-mono text-[9px] font-semibold uppercase tracking-wider rounded transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+          className="flex-grow py-2.5 bg-[#121214] border border-[#222225] hover:bg-[#1c1c1f] text-slate-300 font-mono text-[9px] font-semibold uppercase tracking-wider rounded transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
           onClick={handleVisit}
         >
           <FiExternalLink size={12} />
           Profile
         </button>
-        <div className="flex-1 relative">
-          <button
-            className="w-full py-2.5 bg-[#e23e2d] hover:bg-[#cf2e2e] disabled:bg-red-950/50 disabled:text-slate-600 disabled:cursor-not-allowed text-white font-mono text-[9px] font-semibold uppercase tracking-wider rounded transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
-            onClick={handleRefresh}
-            disabled={isRefreshing}
-          >
-            {isRefreshing ? (
-              <FiRefreshCw size={12} className="animate-spin" />
-            ) : (
-              <FiZap size={12} />
-            )}
-            {isRefreshing ? "Syncing" : "Sync Stats"}
-          </button>
-        </div>
       </div>
     </div>
   );

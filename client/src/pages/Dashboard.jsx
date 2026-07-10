@@ -5,12 +5,41 @@ import FullPageLoader from "../components/FullPageLoader";
 import Dialog from "../components/Dialog";
 import PlatformCard from "../components/PlatformCard";
 import SummarySection from "../components/SummarySection";
-import { FiBarChart2 } from "react-icons/fi";
+import { FiBarChart2, FiZap, FiRefreshCw } from "react-icons/fi";
+import { useEffect } from "react";
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const { data, loading, error, refresh } = useDashboard();
   const { refresh: triggerRefresh } = usePlatformRefresh();
+  const [syncingAll, setSyncingAll] = useState(false);
+  const [cooldownMinutes, setCooldownMinutes] = useState(0);
+
+  useEffect(() => {
+    const platforms = data?.platforms || [];
+    if (platforms.length === 0) return;
+
+    const checkCooldown = () => {
+      const latest = platforms.reduce((latestDate, item) => {
+        if (!item.nextRefreshAvailable) return latestDate;
+        const nextDate = new Date(item.nextRefreshAvailable);
+        return !latestDate || nextDate > latestDate ? nextDate : latestDate;
+      }, null);
+
+      if (latest) {
+        const diffMs = new Date(latest) - new Date();
+        if (diffMs > 0) {
+          setCooldownMinutes(Math.ceil(diffMs / (60 * 1000)));
+          return;
+        }
+      }
+      setCooldownMinutes(0);
+    };
+
+    checkCooldown();
+    const interval = setInterval(checkCooldown, 20000);
+    return () => clearInterval(interval);
+  }, [data?.platforms]);
 
   const [messageDialog, setMessageDialog] = useState({
     open: false,
@@ -19,24 +48,32 @@ export default function Dashboard() {
     type: "info"
   });
 
-  const handleRefresh = async (platform) => {
-    const success = await triggerRefresh(platform, () => {
-      refresh(); // Reload all data
+  const handleSyncAll = async () => {
+    if (syncingAll || !stats.length) return;
+    setSyncingAll(true);
+    try {
+      // Refresh all linked platforms in parallel
+      const promises = stats.map(item => triggerRefresh(item.platform));
+      await Promise.all(promises);
+      
+      // Reload dashboard state
+      await refresh();
+
       setMessageDialog({
         open: true,
-        title: "Information Updated",
-        message: `${platform} information has been updated successfully.`,
+        title: "All Services Synced",
+        message: "All connected platforms have been updated successfully.",
         type: "success",
       });
-    });
-
-    if (!success) {
+    } catch (err) {
       setMessageDialog({
         open: true,
-        title: "Update Not Available",
-        message: "The system is currently in a waiting period. Please try again later.",
+        title: "Sync Warning",
+        message: "Failed to sync some platforms. Please try again later.",
         type: "warning"
       });
+    } finally {
+      setSyncingAll(false);
     }
   };
 
@@ -62,15 +99,38 @@ export default function Dashboard() {
           </p>
         </div>
 
-        {data?.user?.publicProfile?.username && (
-          <button
-            onClick={() => window.open(`/u/${data.user.publicProfile.username}`, "_blank")}
-            className="px-5 py-3 bg-[#121214] border border-[#222225] hover:bg-[#1c1c1f] text-slate-200 font-mono text-[9px] font-semibold uppercase tracking-wider rounded transition-colors flex items-center justify-center gap-2 cursor-pointer"
-          >
-            <span>View Public Profile</span>
-            <span className="text-slate-500">↗</span>
-          </button>
-        )}
+        <div className="flex flex-wrap items-center gap-3">
+          {stats.length > 0 && (
+            <button
+              onClick={handleSyncAll}
+              disabled={syncingAll || cooldownMinutes > 0}
+              className="px-5 py-3 bg-[#e23e2d] hover:bg-[#cf2e2e] disabled:bg-red-950/50 disabled:text-slate-600 disabled:cursor-not-allowed text-white font-mono text-[9px] font-semibold uppercase tracking-wider rounded transition-colors flex items-center justify-center gap-2 cursor-pointer"
+            >
+              {syncingAll ? (
+                <FiRefreshCw size={12} className="animate-spin" />
+              ) : (
+                <FiZap size={12} />
+              )}
+              <span>
+                {syncingAll 
+                  ? "Syncing All..." 
+                  : cooldownMinutes > 0 
+                    ? `Cooldown: ${cooldownMinutes} min` 
+                    : "Sync All Stats"}
+              </span>
+            </button>
+          )}
+
+          {data?.user?.publicProfile?.username && (
+            <button
+              onClick={() => window.open(`/u/${data.user.publicProfile.username}`, "_blank")}
+              className="px-5 py-3 bg-[#121214] border border-[#222225] hover:bg-[#1c1c1f] text-slate-200 font-mono text-[9px] font-semibold uppercase tracking-wider rounded transition-colors flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <span>View Public Profile</span>
+              <span className="text-slate-500">↗</span>
+            </button>
+          )}
+        </div>
       </div>
 
       <SummarySection summary={summary} loading={false} />
@@ -99,9 +159,6 @@ export default function Dashboard() {
               platform={item.platform}
               stats={item.stats}
               username={item.username}
-              canRefresh={item.canRefresh}
-              nextRefreshAvailable={item.nextRefreshAvailable}
-              onRefresh={handleRefresh}
               onClick={() => navigate(`/${item.platform}`)}
             />
           ))}
