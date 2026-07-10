@@ -15,14 +15,10 @@ import contestRoutes from "./src/routes/contests.js";
 import publicRoutes from "./src/routes/public.js";
 import cronRoutes from "./src/routes/cron.js";
 import dashboardRoutes from "./src/routes/dashboard.js";
-import { apiLimiter } from "./src/middleware/rateLimit.js";
 import logger from "./src/utils/logger.js";
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-
-// Trust Vercel's proxy for express-rate-limit
-app.set("trust proxy", 1);
 
 // CORS configuration
 const allowedOrigins = [
@@ -70,9 +66,6 @@ app.use(helmet({
 
 // Compression middleware for faster responses
 app.use(compression());
-
-// Rate limiting
-app.use("/api", apiLimiter);
 
 // Request logging for error responses (production observability)
 app.use((req, res, next) => {

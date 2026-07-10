@@ -28,11 +28,7 @@ export const protect = catchAsync(async (req, res, next) => {
   }
 });
 
-/**
- * Optional Auth Middleware
- * Attempts to authenticate but allows request to proceed without token
- * Useful for endpoints that can be accessed by both authenticated and unauthenticated users
- */
+
 export const optionalAuth = catchAsync(async (req, res, next) => {
   const token = req.headers.authorization?.split(" ")[1];
   if (!token) {

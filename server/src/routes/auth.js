@@ -4,7 +4,6 @@ import {
   getMe,
 } from "../controllers/authController.js";
 import { validateRegister, validateLogin } from "../middleware/validation.js";
-import { authLimiter } from "../middleware/rateLimit.js";
 import { protect } from "../middleware/auth.js";
 import express from "express";
 
@@ -15,14 +14,14 @@ const router = express.Router();
  * @desc    Register a new user
  * @access  Public
  */
-router.post("/register", authLimiter, validateRegister, register);
+router.post("/register", validateRegister, register);
 
 /**
  * @route   POST /api/auth/login
  * @desc    Login user
  * @access  Public
  */
-router.post("/login", authLimiter, validateLogin, login);
+router.post("/login", validateLogin, login);
 
 /**
  * @route   GET /api/auth/me

@@ -6,14 +6,11 @@ const RATE_LIMITS = {
   leetcode: { maxPerMinute: 30, delayMs: 2000 },
   codeforces: { maxPerMinute: 30, delayMs: 2000 },
   github: { maxPerMinute: 60, delayMs: 1000 },
-  codechef: { maxPerMinute: 15, delayMs: 4000 }, // Slower due to scraping fallback
+  codechef: { maxPerMinute: 15, delayMs: 4000 },
   atcoder: { maxPerMinute: 20, delayMs: 3000 }
 };
 
-/**
- * Process pending sync jobs (runs every 1 minute)
- * Batch processes jobs with rate limiting
- */
+
 export async function processSyncJobs(options = {}) {
   const { batchSize = 10 } = options;
   const startTime = Date.now();
@@ -29,7 +26,7 @@ export async function processSyncJobs(options = {}) {
   try {
     const now = new Date();
 
-    // 0. Cleanup "Zombie" jobs (stuck in processing for > 5 mins)
+    
     const fiveMinsAgo = new Date(now.getTime() - 5 * 60 * 1000);
     const zombies = await SyncJob.updateMany(
       { status: "processing", updatedAt: { $lt: fiveMinsAgo } },
@@ -132,9 +129,7 @@ export async function processSyncJobs(options = {}) {
   }
 }
 
-/**
- * Delay helper
- */
+
 function delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
