@@ -9,10 +9,9 @@ export function useSettings() {
     const [loading, setLoading] = useState(true);
     const [status, setStatus] = useState({ type: "", message: "" });
     const [isEditing, setIsEditing] = useState(false);
-    const [uploading, setUploading] = useState(false);
 
     const [formData, setFormData] = useState({
-        name: "", bio: "", location: "", website: "", avatar: "", socials: [],
+        name: "", bio: "", location: "", website: "", socials: [],
         publicProfile: {
             enabled: true,
             showLeetCode: true,
@@ -46,7 +45,6 @@ export function useSettings() {
                 bio: u.profile?.bio || "",
                 location: u.profile?.location || "",
                 website: u.profile?.website || "",
-                avatar: u.profile?.avatar || "",
                 socials: u.profile?.socials || [],
                 publicProfile: { ...prev.publicProfile, ...u.publicProfile }
             }));
@@ -69,8 +67,7 @@ export function useSettings() {
                 bio: formData.bio,
                 location: formData.location,
                 website: formData.website,
-                socials: formData.socials,
-                avatar: formData.avatar
+                socials: formData.socials
             });
             showStatus("success", "Identity updated");
             setIsEditing(false);
@@ -80,34 +77,7 @@ export function useSettings() {
         }
     };
 
-    const handleAvatarUpload = async (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
 
-        const upData = new FormData();
-        upData.append("avatar", file);
-
-        try {
-            setUploading(true);
-            showStatus("success", "Uploading to Cloudinary...");
-            const res = await api.post("/user/avatar", upData);
-            if (res.data.success) {
-                // Backend returns: { success: true, data: { url: "..." } }
-                const url = res.data.data?.url;
-                if (url) {
-                    setFormData(prev => ({ ...prev, avatar: url }));
-                    showStatus("success", "Asset synchronized successfully");
-                    refreshUser();
-                }
-            }
-        } catch (err) {
-            console.error("Upload failure:", err);
-            const msg = err.response?.data?.message || "Upload sequence failed";
-            showStatus("error", msg);
-        } finally {
-            setUploading(false);
-        }
-    };
 
     const handlePublicVisibilityToggle = async (toggle) => {
         const nextValue = !formData.publicProfile[toggle];
@@ -166,9 +136,7 @@ export function useSettings() {
         setIsEditing,
         formData,
         setFormData,
-        uploading,
         handleUpdate,
-        handleAvatarUpload,
         handlePublicVisibilityToggle,
         linkPlatform,
         unlinkPlatform,

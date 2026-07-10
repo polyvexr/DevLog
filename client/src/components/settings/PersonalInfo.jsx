@@ -1,13 +1,11 @@
-import { FiUser, FiMapPin, FiLink, FiCamera, FiRefreshCw, FiPlus, FiTrash2, FiEdit3 } from "react-icons/fi";
+import { FiUser, FiMapPin, FiLink, FiPlus, FiTrash2, FiEdit3 } from "react-icons/fi";
 
 export default function PersonalInfo({
   isEditing,
   setIsEditing,
   formData,
   setFormData,
-  handleUpdate,
-  handleAvatarUpload,
-  uploading
+  handleUpdate
 }) {
   return (
     <section className="bg-[#121214] border border-[#222225] p-6 rounded-xl space-y-6">
@@ -31,43 +29,6 @@ export default function PersonalInfo({
       </div>
 
       <form onSubmit={handleUpdate} className="space-y-6">
-        {/* Avatar Upload */}
-        <div className="flex flex-col items-center gap-4 pb-4 border-b border-[#222225]/40">
-          <div className="relative group/avatar">
-            <div className={`w-28 h-28 rounded-full bg-[#0c0c0c] border border-[#222225] p-1 transition-colors ${
-              isEditing ? "cursor-pointer hover:border-[#e23e2d]" : "opacity-60"
-            }`}>
-              <div className="w-full h-full rounded-full overflow-hidden flex items-center justify-center relative">
-                {formData.avatar ? (
-                  <img src={formData.avatar} className={`w-full h-full object-cover transition-opacity ${uploading ? "opacity-20 blur-sm" : ""}`} alt="Avatar" />
-                ) : (
-                  <FiUser className="text-3xl text-slate-600" />
-                )}
-                {uploading && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-black/50">
-                    <FiRefreshCw className="text-white animate-spin text-xl" />
-                  </div>
-                )}
-                {isEditing && !uploading && (
-                  <div className="absolute inset-0 bg-[#e23e2d]/40 opacity-0 group-hover/avatar:opacity-100 flex items-center justify-center transition-opacity">
-                    <FiCamera className="text-white text-xl" />
-                  </div>
-                )}
-              </div>
-            </div>
-            {isEditing && (
-              <input
-                type="file"
-                className="absolute inset-0 opacity-0 cursor-pointer z-10"
-                onChange={handleAvatarUpload}
-                accept="image/*"
-              />
-            )}
-          </div>
-          <div className="text-center">
-            <h3 className="text-[8px] font-mono font-semibold uppercase tracking-wider text-slate-500">Profile Photo</h3>
-          </div>
-        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {[

@@ -109,17 +109,7 @@ export default function PublicProfile() {
             </button>
           </div>
 
-          <div className="w-32 h-32 md:w-40 md:h-40 rounded-full bg-[#0c0c0c] border border-[#222225] p-1 flex-shrink-0">
-            <div className="w-full h-full rounded-full overflow-hidden flex items-center justify-center">
-              {user.avatar ? (
-                <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
-              ) : (
-                <span className="font-[Cormorant_Garamond] font-bold text-4xl text-slate-600 italic">
-                  {user.name?.[0] || 'U'}
-                </span>
-              )}
-            </div>
-          </div>
+
 
           <div className="flex-1 text-center md:text-left space-y-4">
             <div className="space-y-1.5">

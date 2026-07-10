@@ -30,9 +30,7 @@ export default function Settings() {
     setIsEditing,
     formData,
     setFormData,
-    uploading,
     handleUpdate,
-    handleAvatarUpload,
     handlePublicVisibilityToggle,
     linkPlatform,
     unlinkPlatform
@@ -74,8 +72,6 @@ export default function Settings() {
         formData={formData}
         setFormData={setFormData}
         handleUpdate={handleUpdate}
-        handleAvatarUpload={handleAvatarUpload}
-        uploading={uploading}
       />
 
       <EcosystemSync
