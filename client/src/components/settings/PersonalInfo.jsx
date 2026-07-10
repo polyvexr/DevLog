@@ -68,9 +68,10 @@ export default function PersonalInfo({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {formData.socials.map((s, i) => (
               <div key={i} className={`flex items-center justify-between bg-[#0c0c0c] border border-[#222225] p-3 rounded transition-opacity ${!isEditing ? "opacity-35" : ""}`}>
-                <div className="flex-1 flex flex-col min-w-0">
-                  <span className="text-[7px] font-mono font-semibold text-[#e23e2d] uppercase tracking-wider">{s.platform}</span>
-                  <span className="text-xs font-mono font-bold text-slate-200 truncate">{s.username}</span>
+                <div className="flex-1 flex items-center justify-between min-w-0 pr-4">
+                  <span className="text-[9px] font-mono font-semibold text-[#e23e2d] uppercase tracking-wider flex-shrink-0">{s.platform}</span>
+                  <div className="h-px bg-[#222225]/60 flex-1 mx-3" />
+                  <span className="text-xs font-mono font-bold text-slate-200 truncate max-w-[65%] text-right">{s.username}</span>
                 </div>
                 {isEditing && (
                   <button
@@ -91,6 +92,7 @@ export default function PersonalInfo({
                   className="w-1/3 bg-transparent p-1 text-[10px] font-mono text-slate-200 outline-none uppercase placeholder-slate-700"
                   id="social-tag"
                 />
+                <div className="w-px h-4 bg-[#222225] self-center"></div>
                 <input
                   type="text"
                   placeholder="URL Profile"

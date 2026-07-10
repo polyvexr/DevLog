@@ -1,39 +1,44 @@
 import { Link } from "react-router-dom";
-import { FiHome, FiAlertCircle } from "react-icons/fi";
+import { FiAlertCircle } from "react-icons/fi";
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen relative flex items-center justify-center px-4 py-8 overflow-hidden">
-      {/* Background blobs for depth */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-600/10 rounded-full blur-[120px] animate-blob"></div>
-      <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-purple-600/10 rounded-full blur-[150px] animate-blob animation-delay-2000"></div>
-
-      <div className="w-full max-w-2xl relative z-10 text-center">
-        <div className="relative mb-4 group">
-          <div className="text-[15vw] md:text-[180px] font-black leading-none text-white opacity-5 select-none transition-all group-hover:opacity-10">404</div>
+    <div className="min-h-screen bg-[#0c0c0c] text-slate-200 flex flex-col items-center justify-center px-4 select-none">
+      <div className="w-full max-w-md text-center space-y-6">
+        
+        {/* Giant 404 Watermark */}
+        <div className="relative">
+          <div className="text-[22vw] md:text-[180px] font-bold font-mono leading-none text-[#e23e2d]/10">
+            404
+          </div>
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-32 h-32 bg-white/5 rounded-3xl flex items-center justify-center border border-white/10 shadow-2xl backdrop-blur-3xl group-hover:scale-110 transition-transform duration-500">
-              <FiAlertCircle className="text-6xl text-blue-500 opacity-50" />
+            <div className="w-12 h-12 bg-red-500/10 border border-red-500/20 rounded-full flex items-center justify-center text-red-500 text-lg">
+              <FiAlertCircle />
             </div>
           </div>
         </div>
 
-        <div className="fade-in-up">
-          <h1 className="text-5xl md:text-7xl font-black text-white mb-6 italic tracking-tight italic">
-            Page Not <span className="animate-text-shine">Found</span>
+        {/* Messaging & Action */}
+        <div className="space-y-4">
+          <h1 className="text-3xl md:text-4xl font-[Cormorant_Garamond] font-light italic text-white tracking-tight leading-none">
+            Lost in the <br />
+            <span className="text-[#e23e2d]">Workspace.</span>
           </h1>
-          <p className="text-gray-500 mb-12 text-xl font-medium max-w-md mx-auto leading-relaxed">
-            The page you are looking for doesn't exist or has been moved.
+          
+          <p className="text-slate-500 text-xs font-mono max-w-xs mx-auto leading-relaxed">
+            The page you are looking for doesn't exist, has been archived, or was relocated.
           </p>
+        </div>
 
+        <div className="pt-4">
           <Link
             to="/"
-            className="inline-flex items-center gap-4 px-10 py-5 bg-blue-600 hover:bg-blue-500 text-white font-black text-lg rounded-2xl shadow-xl shadow-blue-500/20 transition-all active:scale-[0.98] group"
+            className="px-6 py-3 bg-[#e23e2d] hover:bg-[#cf2e2e] text-white font-mono text-xs font-semibold uppercase tracking-wider rounded transition-colors inline-flex items-center gap-1.5 cursor-pointer"
           >
-            <FiHome className="text-2xl group-hover:-translate-y-1 transition-transform" />
-            Reconnect Dashboard
+            ← Return to Dashboard
           </Link>
         </div>
+
       </div>
     </div>
   );
