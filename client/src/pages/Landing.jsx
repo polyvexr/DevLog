@@ -1,159 +1,169 @@
 import { Link } from "react-router-dom";
-import { FiZap, FiBarChart2, FiAward, FiLink, FiTarget, FiGlobe, FiStar, FiChevronDown, FiActivity, FiSearch, FiShield, FiCpu } from "react-icons/fi";
+import { FiZap, FiChevronDown, FiSearch, FiShield, FiCpu, FiGlobe } from "react-icons/fi";
 import { SiLeetcode, SiCodeforces, SiGithub, SiCodechef } from "react-icons/si";
 
 const NavLink = ({ to, label, primary }) => (
-  <Link to={to} className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all hover:scale-105 active:scale-95 ${primary ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg shadow-blue-500/20" : "text-gray-400 hover:text-white"}`}>
+  <Link
+    to={to}
+    className={`px-4 py-2 rounded-lg text-xs font-mono tracking-wider uppercase transition-all duration-200 ${
+      primary
+        ? "bg-[#e23e2d] hover:bg-[#cf2e2e] text-white shadow-lg shadow-red-600/10"
+        : "text-slate-400 hover:text-slate-100"
+    }`}
+  >
     {label}
   </Link>
 );
 
-// AtCoder component
-const AtCoderIcon = () => <span className="font-black text-sm">AT</span>;
-
 export default function Landing() {
   const platforms = [
-    { name: "LeetCode", icon: SiLeetcode, color: "from-orange-500 to-yellow-500", stats: [{ l: "Simple", v: "400+", c: "text-green-400" }, { l: "Moderate", v: "500+", c: "text-yellow-400" }, { l: "Advanced", v: "150+", c: "text-red-400" }] },
-    { name: "Codeforces", icon: SiCodeforces, color: "from-blue-600 to-cyan-500", custom: <div className="p-4 bg-blue-500/10 rounded-xl border border-blue-500/20"><div className="text-xl font-black text-blue-400 italic">SKILLED PRACTITIONER</div><div className="text-[10px] text-gray-500 uppercase font-black">1984 Score</div></div> },
-    { name: "GitHub", icon: SiGithub, color: "from-purple-600 to-pink-500", stats: [{ l: "Projects", v: 72 }, { l: "Stars", v: "8.1K" }], github: true },
-    { name: "CodeChef", icon: SiCodechef, color: "from-amber-800 to-amber-600", stats: [{ l: "Score", v: "2140" }, { l: "Stars", v: "5★" }, { l: "Rank", v: "#142" }] },
-    { name: "AtCoder", icon: AtCoderIcon, color: "from-gray-700 to-gray-900", stats: [{ l: "Score", v: "1420" }, { l: "Color", v: "Cyan" }, { l: "Events", v: 24 }] },
+    {
+      name: "LeetCode",
+      icon: SiLeetcode,
+      color: "text-orange-500",
+      stats: [{ l: "Simple", v: "400+" }, { l: "Moderate", v: "500+" }, { l: "Advanced", v: "150+" }]
+    },
+    {
+      name: "Codeforces",
+      icon: SiCodeforces,
+      color: "text-blue-500",
+      stats: [{ l: "Score", v: "1984" }, { l: "Rank", v: "Skilled" }]
+    },
+    {
+      name: "GitHub",
+      icon: SiGithub,
+      color: "text-slate-200",
+      stats: [{ l: "Repositories", v: "72" }, { l: "Stars Earned", v: "8.1K" }]
+    },
+    {
+      name: "CodeChef",
+      icon: SiCodechef,
+      color: "text-amber-600",
+      stats: [{ l: "Score", v: "2140" }, { l: "Stars", v: "5★" }, { l: "Rank", v: "#142" }]
+    },
+    {
+      name: "AtCoder",
+      icon: () => <span className="font-bold text-[9px] text-indigo-400 bg-indigo-500/10 px-1.5 py-0.5 rounded border border-indigo-500/20">AT</span>,
+      color: "",
+      stats: [{ l: "Score", v: "1420" }, { l: "Color", v: "Cyan" }]
+    }
   ];
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white selection:bg-blue-500/30">
-      {/* Visual Effects */}
-      <div className="fixed inset-0 pointer-events-none opacity-40">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-600/20 blur-[120px] animate-pulse" />
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-600/20 blur-[120px] animate-pulse delay-700" />
-      </div>
-
-      <div className="max-w-7xl mx-auto px-6 relative z-10">
-        <nav className="flex justify-between items-center py-10 fade-in-up">
-          <div className="text-2xl font-black italic flex items-center gap-2 group cursor-pointer text-white">
-            <FiZap className="text-blue-500 group-hover:animate-bounce" /> <span>DEVLOG</span>
+    <div className="min-h-screen bg-[#0c0c0c] text-slate-200 selection:bg-red-500/20 overflow-x-hidden">
+      <div className="w-full max-w-[1440px] mx-auto px-6 md:px-12 xl:px-16">
+        <nav className="flex justify-between items-center py-6 border-b border-[#222225]">
+          <div className="text-lg font-[Cormorant_Garamond] font-semibold italic tracking-tight flex items-center gap-2 text-white">
+            <FiZap className="text-[#e23e2d] text-base" />
+            <span>DevLog™</span>
           </div>
-          <div className="flex gap-2">
+          <div className="flex items-center gap-2">
             <NavLink to="/login" label="Sign In" />
             <NavLink to="/register" label="Join Now" primary />
           </div>
         </nav>
 
-        {/* Hero */}
-        <section className="py-20 md:py-32 text-center space-y-10">
-          <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] font-black uppercase tracking-widest animate-fade-in shadow-[0_0_20px_rgba(59,130,246,0.1)]">
-            <FiStar className="animate-spin-slow" /> Centralize • Analyze • Elevate
+        {/* Simplified Centered Hero */}
+        <section className="py-24 md:py-32 text-center max-w-2xl mx-auto space-y-8">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#e23e2d]/10 border border-[#e23e2d]/20 text-[#e23e2d] font-mono text-[9px] font-semibold uppercase tracking-wider">
+            <span>Centralize • Analyze • Elevate</span>
           </div>
-          <h1 className="text-6xl md:text-9xl font-black tracking-tighter italic leading-none fade-in-up">
-            Your Coding <br /> <span className="animate-text-shine">Journey.</span>
+          <h1 className="text-4xl md:text-5xl xl:text-6xl font-[Cormorant_Garamond] font-light italic text-white leading-tight tracking-tight">
+            Your coding stats. <br />
+            <span className="text-[#e23e2d]">All in one place.</span>
           </h1>
-          <p className="text-gray-400 text-xl md:text-2xl max-w-3xl mx-auto font-medium leading-relaxed fade-in-up delay-100">
-            The all-in-one tracker for your professional progress. Link your services from <span className="text-white">LeetCode</span>, <span className="text-white">Codeforces</span>, <span className="text-white">GitHub</span>, <span className="text-white">AtCoder</span>, and <span className="text-white">CodeChef</span>.
+          <p className="text-slate-400 text-sm md:text-base leading-relaxed">
+            Track progress, monitor ratings, and analyze pattern updates across LeetCode, Codeforces, GitHub, AtCoder, and CodeChef in one unified workspace.
           </p>
-          <div className="flex flex-col sm:flex-row gap-6 justify-center fade-in-up delay-200">
-            <Link to="/register" className="px-12 py-5 bg-white text-black font-black italic rounded-2xl hover:bg-blue-600 hover:text-white transition-all shadow-xl active:scale-95 group">
-              GET STARTED NOW <span className="inline-block group-hover:translate-x-1 transition-transform ml-1">→</span>
-            </Link>
-            <a href="#more" className="px-12 py-5 bg-white/5 border border-white/10 font-bold rounded-2xl hover:bg-white/10 transition-all flex items-center justify-center gap-3">
-              LEARN MORE <FiChevronDown />
-            </a>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
+            <Link to="/register" className="px-6 py-3 bg-[#e23e2d] hover:bg-[#cf2e2e] text-white font-mono text-xs tracking-wider uppercase rounded transition-colors text-center font-semibold">Get Started Now</Link>
+            <a href="#services" className="px-6 py-3 bg-[#121214] border border-[#222225] hover:bg-[#1c1c1f] text-slate-200 font-mono text-xs tracking-wider uppercase rounded transition-colors text-center flex items-center justify-center gap-2">Explore Services <FiChevronDown className="text-slate-500" /></a>
           </div>
         </section>
 
-        {/* Platform Display */}
-        <section id="more" className="py-32">
-          <div className="flex flex-col items-center mb-16 text-center">
-            <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-blue-500 mb-4">Supported Services</h2>
-            <div className="text-4xl font-black italic tracking-tight">One System. Multiple Information Sources.</div>
+        <section id="services" className="py-24 border-t border-[#222225]">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-6">
+            <div>
+              <h2 className="text-xs font-mono font-semibold uppercase tracking-widest text-[#e23e2d] mb-2">Supported Services</h2>
+              <p className="text-2xl md:text-3xl font-[Cormorant_Garamond] italic text-slate-200">Consolidated platform integrations.</p>
+            </div>
+            <p className="text-slate-400 text-sm max-w-md leading-relaxed">Automated syncing fetches your profiles, scores, and contributions directly from official platform APIs.</p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
             {platforms.map((p, i) => (
-              <div key={i} className="glass-card-premium p-8 group hover:-translate-y-2 transition-all duration-500 border-none ring-1 ring-white/5">
-                <div className="flex items-center gap-4 mb-8">
-                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${p.color} flex items-center justify-center text-xl shadow-xl shadow-white/5`}><p.icon /></div>
-                  <div className="text-lg font-black italic uppercase tracking-tighter">{p.name}</div>
-                </div>
-                {p.stats && (
-                  <div className="flex flex-col gap-3">
-                    {p.stats.map((s, si) => (
-                      <div key={si} className="flex justify-between items-center py-2 border-b border-white/5">
-                        <span className="text-[8px] font-black uppercase text-gray-500">{s.l}</span>
-                        <span className={`text-sm font-black ${s.c || "text-white"}`}>{s.v}</span>
+              <div
+                key={i}
+                className="bg-[#121214] border border-[#222225] hover:border-neutral-700 rounded-xl p-5 flex flex-col justify-between min-h-[180px] transition-all"
+              >
+                <div>
+                  <div className="flex items-center gap-3 mb-5">
+                    <div className="w-9 h-9 rounded bg-[#0c0c0c] border border-[#222225] flex items-center justify-center text-lg">
+                      <p.icon className={p.color} />
+                    </div>
+                    <h3 className="text-sm font-[Cormorant_Garamond] font-semibold italic text-slate-100">{p.name}</h3>
+                  </div>
+                  <div className="space-y-2 font-mono">
+                    {p.stats.map((s, idx) => (
+                      <div key={idx} className="flex justify-between text-[10px]">
+                        <span className="text-slate-500">{s.l}</span>
+                        <span className="font-bold text-slate-200">{s.v}</span>
                       </div>
                     ))}
                   </div>
-                )}
-                {p.custom}
-                {p.github && (
-                  <div className="flex items-end gap-1.5 h-16 mt-6">
-                    {[0.3, 0.6, 0.4, 0.9, 0.5, 0.8, 0.4].map((h, hi) => (
-                      <div key={hi} className="flex-1 bg-purple-500/50 rounded-sm" style={{ height: `${h * 100}%` }} />
-                    ))}
-                  </div>
-                )}
+                </div>
               </div>
             ))}
           </div>
         </section>
 
-        {/* Features */}
-        <section className="py-24 border-t border-white/5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+        <section className="py-20 border-t border-[#222225] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {[
-            { i: FiCpu, t: "Regular Information Matching", d: "Your progress information is automatically updated to show your latest activity." },
-            { i: FiSearch, t: "Shared Profile Pages", d: "Beautiful shareable pages that showcase your professional journey milestones to the world." },
-            { i: FiShield, t: "Trusted Information", d: "All statistics are fetched directly from the authorized services for accuracy." },
-            { i: FiGlobe, t: "Consolidated Summary", d: "Get a clear picture of where you stand with consolidated measurements from all information points." }
+            { i: FiCpu, t: "Regular Syncing", d: "Your progress metrics are automatically matched to show your latest active coding logs." },
+            { i: FiSearch, t: "Shared Profiles", d: "Beautiful shareable pages that showcase your professional journey milestones to the world." },
+            { i: FiShield, t: "Trusted Statistics", d: "All statistics are fetched directly from the authorized services for complete transparency." },
+            { i: FiGlobe, t: "Consolidated Summary", d: "Get a clear picture of where you stand with consolidated measurements from all accounts." }
           ].map((f, i) => (
-            <div key={i} className="space-y-4 group">
-              <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center group-hover:bg-blue-600/10 transition-colors">
-                <f.i className="text-2xl text-blue-500" />
-              </div>
-              <h3 className="text-lg font-black italic uppercase tracking-tighter">{f.t}</h3>
-              <p className="text-gray-500 text-sm leading-relaxed">{f.d}</p>
+            <div key={i} className="space-y-3">
+              <div className="w-10 h-10 rounded bg-[#121214] border border-[#222225] flex items-center justify-center"><f.i className="text-xl text-slate-400" /></div>
+              <h3 className="text-sm font-[Cormorant_Garamond] font-semibold italic text-slate-200 tracking-tight">{f.t}</h3>
+              <p className="text-slate-400 text-xs leading-relaxed">{f.d}</p>
             </div>
           ))}
         </section>
 
-        {/* Footer */}
-        <footer className="py-20 border-t border-white/5">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-12">
-            <div className="space-y-4 text-center md:text-left">
-              <div className="text-2xl font-black italic flex items-center gap-2 justify-center md:justify-start">
-                <FiZap className="text-blue-500" /> DEVLOG
+        <footer className="py-16 border-t border-[#222225]">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
+            <div className="space-y-3">
+              <div className="text-lg font-[Cormorant_Garamond] font-semibold italic tracking-tight flex items-center gap-2 text-white">
+                <FiZap className="text-[#e23e2d] text-base" /> DevLog™
               </div>
-              <p className="text-gray-500 text-sm max-w-xs">Connecting the dots of your coding journey across every platform.</p>
+              <p className="text-slate-500 text-xs max-w-xs leading-relaxed">Connecting the dots of your coding journey across every platform.</p>
             </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-16 text-center md:text-left">
-              <div className="space-y-4">
-                <div className="text-[10px] font-black uppercase tracking-widest text-white">Platform</div>
-                <div className="flex flex-col gap-2 text-gray-500 text-xs font-bold">
-                  <a href="#" className="hover:text-blue-500 transition-colors">Dashboard</a>
-                  <a href="#" className="hover:text-blue-500 transition-colors">Explorer</a>
-                  <a href="#" className="hover:text-blue-500 transition-colors">API</a>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-12 sm:gap-16 font-mono text-xs">
+              {[
+                { title: "Platform", links: ["Dashboard", "Explorer", "API"] },
+                { title: "Community", links: ["Twitter", "Discord", "GitHub"] }
+              ].map((g, i) => (
+                <div key={i} className="space-y-3">
+                  <div className="text-[9px] font-semibold uppercase tracking-wider text-slate-500">{g.title}</div>
+                  <div className="flex flex-col gap-2 text-slate-400">
+                    {g.links.map((l, li) => <a key={li} href="#" className="hover:text-slate-200 transition-colors">{l}</a>)}
+                  </div>
                 </div>
-              </div>
-              <div className="space-y-4">
-                <div className="text-[10px] font-black uppercase tracking-widest text-white">Community</div>
-                <div className="flex flex-col gap-2 text-gray-500 text-xs font-bold">
-                  <a href="#" className="hover:text-blue-500 transition-colors">Twitter</a>
-                  <a href="#" className="hover:text-blue-500 transition-colors">Discord</a>
-                  <a href="#" className="hover:text-blue-500 transition-colors">GitHub</a>
-                </div>
-              </div>
-              <div className="space-y-4 col-span-2 sm:col-span-1 border-t border-white/5 sm:border-none pt-8 sm:pt-0">
-                <div className="text-[10px] font-black uppercase tracking-widest text-white">Access</div>
-                <div className="flex gap-4 justify-center md:justify-start">
-                  <Link to="/login" className="px-6 py-3 bg-white/5 border border-white/10 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all">Login</Link>
-                  <Link to="/register" className="px-6 py-3 bg-blue-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-500 transition-all shadow-lg shadow-blue-600/20">Join</Link>
+              ))}
+              <div className="space-y-3 col-span-2 sm:col-span-1">
+                <div className="text-[9px] font-semibold uppercase tracking-wider text-slate-500">Access</div>
+                <div className="flex gap-2">
+                  <Link to="/login" className="px-3 py-1.5 bg-[#121214] border border-[#222225] rounded text-[9px] font-medium hover:bg-[#1c1c1f] text-slate-300 transition-all uppercase tracking-wider">Login</Link>
+                  <Link to="/register" className="px-3 py-1.5 bg-[#e23e2d] text-white rounded text-[9px] font-semibold hover:bg-[#cf2e2e] transition-all uppercase tracking-wider">Join</Link>
                 </div>
               </div>
             </div>
           </div>
-
-          <div className="mt-20 pt-10 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6 opacity-30">
-            <div className="text-[8px] font-black uppercase tracking-[0.4em]">© 2026 DevLog Tracker</div>
-            <div className="text-[8px] font-black uppercase tracking-[0.4em]">Built for Developers</div>
+          <div className="mt-16 pt-8 border-t border-[#222225] flex flex-col sm:flex-row justify-between items-center gap-4 font-mono text-[9px] text-slate-600 font-medium">
+            <div>© {new Date().getFullYear()} DevLog Tracker. All rights reserved.</div>
+            <div>Built for Developers</div>
           </div>
         </footer>
       </div>
