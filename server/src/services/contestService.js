@@ -186,7 +186,6 @@ export const contestService = {
       } catch (scrapeErr) {
         throw new Error(`AtCoder fetch failed: ${scrapeErr.message}`);
       }
-    }
   },
 
   extractCFDiv(name) {
