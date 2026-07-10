@@ -1,54 +1,39 @@
+import React from "react";
 import { FiClock, FiExternalLink, FiZap, FiCalendar } from "react-icons/fi";
 import { FaCode } from "react-icons/fa";
 import { SiLeetcode, SiCodeforces, SiCodechef } from "react-icons/si";
 
-/**
- * ContestCard - Premium contest display with platform-specific styling
- */
-export default function ContestCard({ contest }) {
-  const platformConfig = {
-    leetcode: {
-      name: "LeetCode",
-      icon: SiLeetcode,
-      color: "#ffa116",
-      textColor: "text-orange-400",
-      bgGradient: "from-orange-500/10 via-orange-500/5 to-transparent",
-      borderColor: "border-orange-500/20",
-      ringColor: "ring-orange-500/30",
-      glowColor: "shadow-orange-500/10",
-    },
-    codeforces: {
-      name: "Codeforces",
-      icon: SiCodeforces,
-      color: "#1f8acb",
-      textColor: "text-blue-400",
-      bgGradient: "from-blue-500/10 via-blue-500/5 to-transparent",
-      borderColor: "border-blue-500/20",
-      ringColor: "ring-blue-500/30",
-      glowColor: "shadow-blue-500/10",
-    },
-    codechef: {
-      name: "CodeChef",
-      icon: SiCodechef,
-      color: "#8b6914",
-      textColor: "text-amber-400",
-      bgGradient: "from-amber-500/10 via-amber-500/5 to-transparent",
-      borderColor: "border-amber-500/20",
-      ringColor: "ring-amber-500/30",
-      glowColor: "shadow-amber-500/10",
-    },
-    atcoder: {
-      name: "AtCoder",
-      icon: FaCode,
-      color: "#00a0e9",
-      textColor: "text-cyan-400",
-      bgGradient: "from-cyan-500/10 via-cyan-500/5 to-transparent",
-      borderColor: "border-cyan-500/20",
-      ringColor: "ring-cyan-500/30",
-      glowColor: "shadow-cyan-500/10",
-    },
-  };
+const AtCoderIcon = () => (
+  <span className="font-bold text-[8px] text-[#e23e2d] bg-[#e23e2d]/10 px-1.5 py-0.5 rounded border border-[#e23e2d]/20 font-sans">
+    AT
+  </span>
+);
 
+const platformConfig = {
+  leetcode: {
+    name: "LeetCode",
+    icon: SiLeetcode,
+    colorClass: "text-orange-500",
+  },
+  codeforces: {
+    name: "Codeforces",
+    icon: SiCodeforces,
+    colorClass: "text-blue-500",
+  },
+  codechef: {
+    name: "CodeChef",
+    icon: SiCodechef,
+    colorClass: "text-amber-600",
+  },
+  atcoder: {
+    name: "AtCoder",
+    icon: AtCoderIcon,
+    colorClass: "",
+    isTextIcon: true,
+  },
+};
+
+export default function ContestCard({ contest }) {
   const config = platformConfig[contest.platform] || platformConfig.leetcode;
   const Icon = config.icon;
 
@@ -60,27 +45,20 @@ export default function ContestCard({ contest }) {
   const diffDays = Math.floor(diffMs / 86400000);
 
   let timeUntil;
-  let timeUntilClass = "text-gray-400";
-  let statusBg = "bg-gray-500/10";
-  let isUrgent = false;
+  let statusClass = "text-slate-400 border-slate-500/10";
 
   if (diffMs < 0) {
     timeUntil = "Live Now";
-    timeUntilClass = "text-green-400";
-    statusBg = "bg-green-500/20 border-green-500/30";
-    isUrgent = true;
+    statusClass = "text-green-500 border-green-500/20";
   } else if (diffHours < 1) {
     timeUntil = "Starting Soon";
-    timeUntilClass = "text-red-400";
-    statusBg = "bg-red-500/20 border-red-500/30";
-    isUrgent = true;
+    statusClass = "text-red-500 border-red-500/20";
   } else if (diffHours < 24) {
     timeUntil = `In ${diffHours}h`;
-    timeUntilClass = "text-yellow-400";
-    statusBg = "bg-yellow-500/20 border-yellow-500/30";
+    statusClass = "text-amber-500 border-amber-500/20";
   } else {
     timeUntil = `In ${diffDays}d`;
-    statusBg = "bg-gray-500/10 border-gray-500/20";
+    statusClass = "text-slate-400 border-slate-500/10";
   }
 
   // Format duration
@@ -93,9 +71,8 @@ export default function ContestCard({ contest }) {
   // Create Google Calendar URL
   const getGoogleCalendarUrl = () => {
     const start = new Date(contest.startTime);
-    const duration = contest.duration || 120; // Default to 2 hours if missing
+    const duration = contest.duration || 120;
     const end = new Date(start.getTime() + (duration * 60000));
-
     const formatDate = (date) => date.toISOString().replace(/-|:|\.\d\d\d/g, "");
 
     const title = encodeURIComponent(`${config.name}: ${contest.name}`);
@@ -106,88 +83,82 @@ export default function ContestCard({ contest }) {
   };
 
   return (
-    <div
-      className={`glass-card-premium relative overflow-hidden p-6 border-none ring-1 ring-white/5 hover:ring-2 ${config.ringColor} transition-all duration-300 group hover:scale-[1.02] ${isUrgent ? 'animate-pulse-slow' : ''}`}
-    >
-      {/* Background gradient */}
-      <div className={`absolute inset-0 bg-gradient-to-br ${config.bgGradient} opacity-50 group-hover:opacity-100 transition-opacity`} />
-
-      {/* Content */}
-      <div className="relative z-10">
+    <div className="bg-[#121214] border border-[#222225] hover:border-neutral-700 p-6 rounded-xl transition-all relative overflow-hidden group flex flex-col justify-between min-h-[190px]">
+      <div>
         {/* Header */}
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${config.borderColor} border bg-black/20`}>
-              <Icon style={{ color: config.color }} size={18} />
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded bg-[#0c0c0c] border border-[#222225] flex items-center justify-center text-sm">
+              {config.isTextIcon ? <Icon /> : <Icon className={config.colorClass} />}
             </div>
             <div>
-              <span className={`text-[10px] font-black uppercase tracking-widest ${config.textColor}`}>
+              <span className="font-mono text-[9px] uppercase tracking-wider text-slate-400">
                 {config.name}
               </span>
               {contest.division && (
-                <span className="ml-2 text-[10px] font-bold text-gray-500">
+                <span className="ml-1.5 font-mono text-[9px] text-slate-600">
                   • {contest.division}
                 </span>
               )}
             </div>
           </div>
-          <span className={`px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border ${statusBg} ${timeUntilClass}`}>
+          <span className={`px-2 py-0.5 rounded text-[8px] font-mono uppercase tracking-wider border bg-[#0c0c0c] ${statusClass}`}>
             {timeUntil}
           </span>
         </div>
 
-        {/* Contest name */}
-        <h3 className="text-lg font-black text-white mb-4 line-clamp-2 group-hover:text-white/90 transition-colors italic">
+        {/* Contest Name */}
+        <h3 className="font-[Cormorant_Garamond] font-semibold italic text-slate-100 text-base leading-tight mt-4 mb-4 line-clamp-2">
           {contest.name}
         </h3>
-
-        {/* Time and duration */}
-        <div className="flex items-center justify-between text-xs">
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 text-gray-400">
-              <FiZap size={14} className={config.textColor} />
-              <span className="font-bold">
-                {startTime.toLocaleDateString("en-US", {
-                  weekday: "short",
-                  month: "short",
-                  day: "numeric",
-                })}
-              </span>
-            </div>
-            <div className="flex items-center gap-2 text-gray-400">
-              <FiClock size={14} />
-              <span className="font-bold">
-                {startTime.toLocaleTimeString("en-US", {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
-              </span>
-            </div>
-          </div>
-          <span className="px-3 py-1.5 rounded-full bg-white/5 text-gray-300 font-bold text-[10px] uppercase tracking-wider">
-            {durationStr}
-          </span>
-        </div>
       </div>
 
-      {/* Hover overlay - Actions */}
-      <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 opacity-0 group-hover:opacity-100 bg-black/80 backdrop-blur-sm transition-all duration-300 z-20 p-6">
+      {/* Footer Info */}
+      <div className="flex items-center justify-between text-[9px] font-mono pt-3 border-t border-[#222225]/40 mt-auto">
+        <div className="flex items-center gap-3 text-slate-500">
+          <div className="flex items-center gap-1">
+            <FiCalendar className="text-[#e23e2d]" />
+            <span>
+              {startTime.toLocaleDateString("en-US", {
+                weekday: "short",
+                month: "short",
+                day: "numeric",
+              })}
+            </span>
+          </div>
+          <div className="flex items-center gap-1">
+            <FiClock />
+            <span>
+              {startTime.toLocaleTimeString("en-US", {
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+            </span>
+          </div>
+        </div>
+        <span className="px-2 py-0.5 bg-[#0c0c0c] border border-[#222225] rounded text-slate-400">
+          {durationStr}
+        </span>
+      </div>
+
+      {/* Actions (Hover Overlay) */}
+      <div className="absolute inset-0 bg-[#121214]/95 border border-[#222225] flex flex-col justify-center gap-2.5 p-5 opacity-0 group-hover:opacity-100 transition-opacity z-20">
         <a
           href={contest.url}
           target="_blank"
           rel="noopener noreferrer"
-          className="w-full flex items-center justify-center gap-3 text-white font-black text-sm px-6 py-4 bg-white/10 rounded-2xl border border-white/10 hover:bg-white/20 transition-all active:scale-95"
+          className="w-full py-2.5 bg-[#e23e2d] hover:bg-[#cf2e2e] text-white font-mono text-[9px] font-semibold uppercase tracking-wider rounded transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
         >
-          <FiExternalLink className="text-lg" />
+          <FiExternalLink size={12} />
           Open Contest
         </a>
         <a
           href={getGoogleCalendarUrl()}
           target="_blank"
           rel="noopener noreferrer"
-          className="w-full flex items-center justify-center gap-3 text-white font-black text-sm px-6 py-4 bg-blue-600/20 rounded-2xl border border-blue-500/30 hover:bg-blue-600 hover:scale-105 transition-all active:scale-95 text-blue-400 hover:text-white shadow-lg shadow-blue-500/10"
+          className="w-full py-2.5 bg-[#0c0c0c] border border-[#222225] hover:bg-[#121214] text-slate-300 font-mono text-[9px] font-semibold uppercase tracking-wider rounded transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
         >
-          <FiCalendar className="text-lg" />
+          <FiCalendar size={12} />
           Add to Calendar
         </a>
       </div>
