@@ -47,30 +47,28 @@ export default function Dashboard() {
   const displayName = data?.user?.name || "Developer";
 
   return (
-    <>
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-12 fade-in-scale">
-        <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] font-black uppercase tracking-widest mb-6">
-            Welcome back, {displayName}
+    <div className="space-y-12">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-[#222225]">
+        <div className="space-y-4">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#e23e2d]/10 border border-[#e23e2d]/20 text-[#e23e2d] font-mono text-[9px] font-semibold uppercase tracking-wider">
+            <span>Welcome back, {displayName}</span>
           </div>
-          <h1 className="text-5xl md:text-8xl font-black mb-4 tracking-tight">
-            <span className="text-white opacity-90 italic">Your Coding</span>
-            <br />
-            <span className="animate-text-shine inline-block italic">Dashboard</span>
+          <h1 className="text-4xl md:text-5xl font-[Cormorant_Garamond] font-light italic text-white tracking-tight leading-tight">
+            Your coding <br />
+            <span className="text-[#e23e2d]">workspace.</span>
           </h1>
-          <p className="text-gray-400 text-xl md:text-2xl font-medium max-w-2xl leading-relaxed">
-            Track your coding progress and performance stats across all your connected platforms in one place.
+          <p className="text-slate-400 text-xs md:text-sm max-w-xl leading-relaxed">
+            Track progress and monitor live synced developer logs across LeetCode, Codeforces, GitHub, AtCoder, and CodeChef in one place.
           </p>
         </div>
 
         {data?.user?.publicProfile?.username && (
           <button
             onClick={() => window.open(`/u/${data.user.publicProfile.username}`, "_blank")}
-            className="flex items-center gap-3 px-8 py-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl text-white font-black text-[10px] uppercase tracking-widest transition-all active:scale-95 group shadow-2xl backdrop-blur-xl"
+            className="px-5 py-3 bg-[#121214] border border-[#222225] hover:bg-[#1c1c1f] text-slate-200 font-mono text-[9px] font-semibold uppercase tracking-wider rounded transition-colors flex items-center justify-center gap-2 cursor-pointer"
           >
-            <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse ring-4 ring-blue-500/20"></span>
-            View Public Profile
-            <span className="opacity-40 group-hover:translate-x-1 transition-transform">↗</span>
+            <span>View Public Profile</span>
+            <span className="text-slate-500">↗</span>
           </button>
         )}
       </div>
@@ -78,30 +76,29 @@ export default function Dashboard() {
       <SummarySection summary={summary} loading={false} />
 
       {stats.length === 0 ? (
-        <div className="glass-card-premium p-16 md:p-24 text-center fade-in-up">
-          <div className="w-24 h-24 bg-blue-600/10 border border-blue-500/20 rounded-3xl flex items-center justify-center mx-auto mb-10 shadow-2xl pulse-ring">
-            <FiBarChart2 className="text-5xl text-blue-500" />
+        <div className="bg-[#121214] border border-[#222225] p-12 text-center rounded-xl space-y-6 max-w-lg mx-auto">
+          <div className="w-12 h-12 bg-[#e23e2d]/10 border border-[#e23e2d]/20 rounded-full flex items-center justify-center mx-auto text-[#e23e2d] text-lg">
+            <FiBarChart2 />
           </div>
-          <h3 className="text-4xl font-black mb-4 text-white italic lowercase">No Accounts Linked</h3>
-          <p className="text-gray-500 text-xl max-w-md mx-auto mb-12 font-medium leading-relaxed">
-            You haven't connected any platforms yet. Connect your accounts to see your combined stats here.
+          <h3 className="text-xl font-[Cormorant_Garamond] font-semibold italic text-white">No accounts linked</h3>
+          <p className="text-slate-400 text-xs font-mono max-w-xs mx-auto leading-relaxed">
+            You haven't connected any platform stats yet. Link your coding profiles to view synced logs.
           </p>
           <button
-            onClick={() => navigate('/link')}
-            className="px-10 py-5 bg-blue-600 hover:bg-blue-500 text-white font-black text-lg rounded-2xl transition-all shadow-2xl shadow-blue-500/30 active:scale-95 group uppercase tracking-widest"
+            onClick={() => navigate('/settings')}
+            className="px-6 py-3 bg-[#e23e2d] hover:bg-[#cf2e2e] text-white font-mono text-xs font-semibold uppercase tracking-wider rounded transition-colors inline-flex items-center gap-1.5 cursor-pointer"
           >
-            Link Service <span className="inline-block group-hover:translate-x-2 transition-transform ml-2">→</span>
+            Link Accounts →
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {stats.map((item) => (
             <PlatformCard
               key={item.platform}
               platform={item.platform}
               stats={item.stats}
               username={item.username}
-
               canRefresh={item.canRefresh}
               nextRefreshAvailable={item.nextRefreshAvailable}
               onRefresh={handleRefresh}
@@ -119,6 +116,6 @@ export default function Dashboard() {
         confirmText="Got it"
         onConfirm={() => setMessageDialog(prev => ({ ...prev, open: false }))}
       />
-    </>
+    </div>
   );
 }

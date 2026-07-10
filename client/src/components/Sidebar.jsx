@@ -5,21 +5,24 @@ import { useSidebar } from "../hooks/useSidebar";
 import {
   FiZap,
   FiBarChart2,
-  FiLink,
   FiTarget,
   FiSettings,
   FiLogOut,
-  FiUser,
   FiChevronRight,
   FiX,
   FiLayers,
-  FiGlobe,
   FiExternalLink,
 } from "react-icons/fi";
 import { SiLeetcode, SiCodeforces, SiGithub, SiCodechef } from "react-icons/si";
 
+const AtCoderIcon = ({ isCollapsed }) => (
+  <span className={`font-bold text-[8px] text-[#e23e2d] bg-[#e23e2d]/10 px-1.5 py-0.5 rounded border border-[#e23e2d]/20 font-sans ${isCollapsed ? "mx-auto" : ""}`}>
+    AT
+  </span>
+);
+
 export default function Sidebar() {
-  const { logout, isAdmin, user } = useContext(AuthContext);
+  const { logout, isAdmin } = useContext(AuthContext);
   const {
     isCollapsed,
     isMobileOpen,
@@ -51,49 +54,12 @@ export default function Sidebar() {
     { path: "/settings", icon: FiSettings, label: "Settings" },
   ];
 
-
-
   const platformItems = [
-    {
-      path: "/leetcode",
-      icon: SiLeetcode,
-      label: "LeetCode",
-      color: "text-orange-400",
-      bg: "bg-orange-500/10",
-      border: "border-orange-500/20",
-    },
-    {
-      path: "/codeforces",
-      icon: SiCodeforces,
-      label: "Codeforces",
-      color: "text-blue-400",
-      bg: "bg-blue-500/10",
-      border: "border-blue-500/20",
-    },
-    {
-      path: "/github",
-      icon: SiGithub,
-      label: "GitHub",
-      color: "text-purple-400",
-      bg: "bg-purple-500/10",
-      border: "border-purple-500/20",
-    },
-    {
-      path: "/codechef",
-      icon: SiCodechef,
-      label: "CodeChef",
-      color: "text-amber-400",
-      bg: "bg-amber-500/10",
-      border: "border-amber-500/20",
-    },
-    {
-      path: "/atcoder",
-      icon: null, // Text fallback
-      label: "AtCoder",
-      color: "text-cyan-400",
-      bg: "bg-cyan-500/10",
-      border: "border-cyan-500/20",
-    },
+    { path: "/leetcode", icon: SiLeetcode, label: "LeetCode" },
+    { path: "/codeforces", icon: SiCodeforces, label: "Codeforces" },
+    { path: "/github", icon: SiGithub, label: "GitHub" },
+    { path: "/codechef", icon: SiCodechef, label: "CodeChef" },
+    { path: "/atcoder", icon: AtCoderIcon, label: "AtCoder" },
   ];
 
   return (
@@ -101,7 +67,7 @@ export default function Sidebar() {
       {/* Mobile Overlay */}
       {isMobileOpen && (
         <div
-          className="fixed inset-0 bg-black/60 backdrop-blur-md z-[60] lg:hidden animate-fade-in"
+          className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[60] lg:hidden"
           onClick={closeMobile}
         />
       )}
@@ -109,16 +75,16 @@ export default function Sidebar() {
       {/* Sidebar */}
       <aside
         className={`
-          fixed top-0 left-0 h-full z-[70] flex flex-col
-          bg-[#0a0f18]/60 backdrop-blur-2xl border-r border-white/5
-          transition-all duration-500 cubic-bezier(0.23, 1, 0.32, 1)
-          ${isCollapsed ? "lg:w-24" : "lg:w-72"} w-72
+          fixed top-0 left-0 h-full z-[70] flex flex-col select-none
+          bg-[#121214] border-r border-[#222225]
+          transition-all duration-300
+          ${isCollapsed ? "lg:w-20" : "lg:w-64"} w-64
           ${isMobileOpen ? "translate-x-0" : "-translate-x-full"}
           lg:translate-x-0
         `}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-6 mb-4">
+        <div className={`flex items-center p-5 border-b border-[#222225] ${isCollapsed ? "justify-center" : "justify-between"}`}>
           <NavLink
             to="/"
             onClick={(e) => {
@@ -129,13 +95,11 @@ export default function Sidebar() {
                 handleNavClick();
               }
             }}
-            className="flex items-center gap-3 group"
+            className={`flex items-center gap-2 group cursor-pointer ${isCollapsed ? "mx-auto justify-center" : ""}`}
           >
-            <div className={`w-12 h-12 rounded-2xl bg-blue-600/10 border border-blue-500/20 flex items-center justify-center transition-all duration-300 ${isCollapsed ? "mx-auto" : ""}`}>
-              <FiZap className="text-2xl text-blue-500 animate-pulse" />
-            </div>
+            <FiZap className="text-[#e23e2d] text-lg transition-transform duration-200 group-hover:scale-110" />
             {!isCollapsed && (
-              <span className="text-2xl font-black text-white italic tracking-tight animate-fade-in">
+              <span className="font-[Cormorant_Garamond] font-semibold italic text-lg text-white tracking-tight leading-none">
                 DevLog
               </span>
             )}
@@ -144,20 +108,20 @@ export default function Sidebar() {
           {isMobileOpen && (
             <button
               onClick={closeMobile}
-              className="lg:hidden w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-gray-400 hover:text-white"
+              className="lg:hidden w-8 h-8 rounded border border-[#222225] flex items-center justify-center text-slate-500 hover:text-white transition-colors cursor-pointer"
             >
-              <FiX />
+              <FiX className="text-sm" />
             </button>
           )}
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 px-4 space-y-8 overflow-y-auto custom-scrollbar">
+        <nav className="flex-1 px-3 py-6 space-y-6 overflow-y-auto custom-scrollbar">
           {/* Main Nav Sub-section */}
-          <div className="space-y-2">
+          <div className="space-y-1">
             {!isCollapsed && (
-              <div className="px-4 mb-4">
-                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-600">Navigation</span>
+              <div className="px-3 mb-3">
+                <span className="text-[9px] font-mono font-semibold uppercase tracking-wider text-slate-600">Navigation</span>
               </div>
             )}
             {navItems.map((item) => {
@@ -172,19 +136,17 @@ export default function Sidebar() {
                   {...navProps}
                   onClick={handleNavClick}
                   className={({ isActive }) => `
-                    flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all relative group
+                    flex items-center gap-3.5 px-3 py-2.5 rounded font-mono text-[10px] uppercase tracking-wider transition-all cursor-pointer group relative
                     ${!item.external && isActive
-                      ? "bg-blue-600 text-white shadow-lg shadow-blue-500/25 scale-[1.02]"
-                      : "text-gray-500 hover:text-gray-300 hover:bg-white/5"
+                      ? "bg-[#0c0c0c] border-l-2 border-[#e23e2d] text-white font-semibold"
+                      : "text-slate-500 hover:text-slate-200 hover:bg-[#0c0c0c]/40"
                     }
                   `}
                 >
-                  <item.icon className={`text-xl ${isCollapsed ? "mx-auto" : ""}`} />
+                  <item.icon className={`text-base ${isCollapsed ? "mx-auto" : ""}`} />
                   {!isCollapsed && (
                     <div className="flex-1 flex items-center justify-between overflow-hidden">
-                      <span className="font-black text-xs uppercase tracking-widest animate-fade-in line-clamp-1">
-                        {item.label}
-                      </span>
+                      <span className="line-clamp-1">{item.label}</span>
                       {item.external && (
                         <FiExternalLink className="ml-2 text-[10px] opacity-40 group-hover:opacity-100 transition-opacity" />
                       )}
@@ -196,92 +158,89 @@ export default function Sidebar() {
           </div>
 
           {/* Platforms Sub-section */}
-          <div className="space-y-2">
+          <div className="space-y-1">
             <button
               onClick={togglePlatforms}
               className={`
-                   w-full flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all group
-                   ${isPlatformRoute ? "text-white bg-white/5 border border-white/10" : "text-gray-500 hover:text-gray-300 hover:bg-white/5"}
-                `}
+                w-full flex items-center gap-3.5 px-3 py-2.5 rounded font-mono text-[10px] uppercase tracking-wider transition-all cursor-pointer text-left
+                ${isPlatformRoute ? "text-slate-200 bg-[#0c0c0c] border-l-2 border-[#e23e2d]" : "text-slate-500 hover:text-slate-200 hover:bg-[#0c0c0c]/40"}
+              `}
             >
-              <FiLayers className={`text-xl ${isCollapsed ? "mx-auto" : ""}`} />
+              <FiLayers className={`text-base ${isCollapsed ? "mx-auto" : ""}`} />
               {!isCollapsed && (
                 <>
-                  <span className="font-black text-xs uppercase tracking-widest flex-1 text-left">Your Platforms</span>
-                  <FiChevronRight className={`transition-transform duration-300 ${isPlatformsExpanded ? "rotate-90" : ""}`} />
+                  <span className="flex-1">Platforms</span>
+                  <FiChevronRight className={`text-xs transition-transform duration-200 ${isPlatformsExpanded ? "rotate-90" : ""}`} />
                 </>
               )}
             </button>
 
             {(isPlatformsExpanded || isCollapsed) && (
-              <div className={`space-y-1 ${isCollapsed ? "mt-2" : "mt-2 ml-4 border-l border-white/5 pl-4"} animate-fade-in`}>
-                {platformItems.map((item) => (
-                  <NavLink
-                    key={item.path}
-                    to={item.path}
-                    onClick={handleNavClick}
-                    className={({ isActive }) => `
-                            flex items-center gap-4 px-4 py-3 rounded-xl transition-all relative group
-                            ${isActive
-                        ? `${item.bg} ${item.color} ${item.border} border`
-                        : "text-gray-600 hover:text-gray-400 hover:bg-white/5"
-                      }
-                         `}
-                  >
-                    {item.icon ? (
-                      <item.icon className="text-lg" />
-                    ) : (
-                      <span className="text-xs font-black w-5 h-5 flex items-center justify-center bg-gray-700 rounded text-white">
-                        AT
-                      </span>
-                    )}
-                    {!isCollapsed && (
-                      <span className="font-bold text-[11px] uppercase tracking-wider">{item.label}</span>
-                    )}
-                  </NavLink>
-                ))}
+              <div className={`space-y-1 ${isCollapsed ? "mt-2" : "mt-1.5 ml-3 border-l border-[#222225] pl-3"}`}>
+                {platformItems.map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <NavLink
+                      key={item.path}
+                      to={item.path}
+                      onClick={handleNavClick}
+                      className={({ isActive }) => `
+                        flex items-center gap-3 px-3 py-2 rounded font-mono text-[9px] uppercase tracking-wider transition-all cursor-pointer
+                        ${isActive
+                          ? "bg-[#0c0c0c] text-[#e23e2d] font-semibold border-l border-[#e23e2d]/50"
+                          : "text-slate-600 hover:text-slate-300 hover:bg-[#0c0c0c]/40"
+                        }
+                      `}
+                    >
+                      {Icon ? (
+                        Icon === AtCoderIcon ? (
+                          <Icon isCollapsed={isCollapsed} />
+                        ) : (
+                          <Icon className={`text-base ${isCollapsed ? "mx-auto" : ""}`} />
+                        )
+                      ) : null}
+                      {!isCollapsed && <span>{item.label}</span>}
+                    </NavLink>
+                  );
+                })}
               </div>
             )}
           </div>
 
           {/* Admin Sub-section */}
           {isAdmin && (
-            <div className="space-y-2 pt-4 border-t border-white/5">
+            <div className="space-y-1 pt-4 border-t border-[#222225]">
               {!isCollapsed && (
-                <div className="px-4 mb-4">
-                  <span className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-600">System Admin</span>
+                <div className="px-3 mb-3">
+                  <span className="text-[9px] font-mono font-semibold uppercase tracking-wider text-slate-600">Admin</span>
                 </div>
               )}
               <NavLink
                 to="/admin"
                 onClick={handleNavClick}
                 className={({ isActive }) => `
-                  flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all group
+                  flex items-center gap-3.5 px-3 py-2.5 rounded font-mono text-[10px] uppercase tracking-wider transition-all cursor-pointer
                   ${isActive
-                    ? "bg-amber-500 text-white shadow-lg shadow-amber-500/25 scale-[1.02]"
-                    : "text-gray-500 hover:text-gray-300 hover:bg-white/5"
+                    ? "bg-[#0c0c0c] border-l-2 border-[#e23e2d] text-white font-semibold"
+                    : "text-slate-500 hover:text-slate-200 hover:bg-[#0c0c0c]/40"
                   }
                 `}
               >
-                <FiSettings className={`text-xl ${isCollapsed ? "mx-auto" : ""}`} />
-                {!isCollapsed && (
-                  <span className="font-black text-xs uppercase tracking-widest animate-fade-in">Admin Dashboard</span>
-                )}
+                <FiSettings className={`text-base ${isCollapsed ? "mx-auto" : ""}`} />
+                {!isCollapsed && <span>System Config</span>}
               </NavLink>
             </div>
           )}
         </nav>
 
         {/* Footer - Logout */}
-        <div className="p-6 border-t border-white/5">
+        <div className="p-4 border-t border-[#222225]">
           <button
             onClick={handleLogout}
-            className="w-full flex items-center gap-4 px-4 py-4 rounded-2xl text-gray-500 hover:text-red-400 hover:bg-red-500/5 transition-all group relative"
+            className="w-full flex items-center gap-3.5 px-3 py-2.5 rounded font-mono text-[10px] uppercase tracking-wider text-slate-500 hover:text-[#e23e2d] hover:bg-[#e23e2d]/5 transition-colors cursor-pointer"
           >
-            <FiLogOut className={`text-xl ${isCollapsed ? "mx-auto" : ""}`} />
-            {!isCollapsed && (
-              <span className="font-black text-xs uppercase tracking-widest">Sign Out</span>
-            )}
+            <FiLogOut className={`text-base ${isCollapsed ? "mx-auto" : ""}`} />
+            {!isCollapsed && <span>Sign Out</span>}
           </button>
         </div>
       </aside>
