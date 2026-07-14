@@ -10,10 +10,10 @@ const filters = [
 
 const FilterButtons = ({ activeFilter, onFilterChange }) => {
   return (
-    <div className="flex flex-wrap items-center gap-4 bg-white/[0.02] border border-white/5 p-2 rounded-[24px] backdrop-blur-3xl">
-      <div className="px-4 flex items-center gap-2 border-r border-white/10 hidden md:flex">
-        <FiFilter className="text-gray-500" size={14} />
-        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">Filter</span>
+    <div className="flex flex-wrap items-center gap-4 bg-slate-100 border border-slate-200 p-2 rounded-[24px]">
+      <div className="px-4 flex items-center gap-2 border-r border-slate-200 hidden md:flex">
+        <FiFilter className="text-slate-400" size={14} />
+        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Filter</span>
       </div>
       <div className="flex flex-wrap items-center gap-1.5">
         {filters.map((filter) => {
@@ -27,7 +27,7 @@ const FilterButtons = ({ activeFilter, onFilterChange }) => {
                 flex items-center gap-2 px-5 py-2.5 rounded-[18px] text-[11px] font-black uppercase tracking-widest transition-all
                 ${isActive 
                   ? "bg-blue-600 text-white shadow-lg shadow-blue-500/25 scale-105 active:scale-95 translate-y-[-1px]" 
-                  : "bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white"
+                  : "bg-white text-slate-500 hover:bg-slate-50 hover:text-slate-900"
                 }
               `}
             >

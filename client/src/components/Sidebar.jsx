@@ -67,7 +67,7 @@ export default function Sidebar() {
       {/* Mobile Overlay */}
       {isMobileOpen && (
         <div
-          className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[60] lg:hidden"
+          className="fixed inset-0 bg-black/30 backdrop-blur-sm z-[60] lg:hidden"
           onClick={closeMobile}
         />
       )}
@@ -76,7 +76,7 @@ export default function Sidebar() {
       <aside
         className={`
           fixed top-0 left-0 h-full z-[70] flex flex-col select-none
-          bg-[#121214] border-r border-[#222225]
+          bg-white border-r border-slate-200
           transition-all duration-300
           ${isCollapsed ? "lg:w-20" : "lg:w-64"} w-64
           ${isMobileOpen ? "translate-x-0" : "-translate-x-full"}
@@ -84,7 +84,7 @@ export default function Sidebar() {
         `}
       >
         {/* Header */}
-        <div className={`flex items-center p-5 border-b border-[#222225] ${isCollapsed ? "justify-center" : "justify-between"}`}>
+        <div className={`flex items-center p-5 border-b border-slate-200 ${isCollapsed ? "justify-center" : "justify-between"}`}>
           <NavLink
             to="/"
             onClick={(e) => {
@@ -99,7 +99,7 @@ export default function Sidebar() {
           >
             <FiZap className="text-[#e23e2d] text-lg transition-transform duration-200 group-hover:scale-110" />
             {!isCollapsed && (
-              <span className="font-[Cormorant_Garamond] font-semibold italic text-lg text-white tracking-tight leading-none">
+              <span className="font-[Cormorant_Garamond] font-semibold italic text-lg text-slate-900 tracking-tight leading-none">
                 DevLog
               </span>
             )}
@@ -108,7 +108,7 @@ export default function Sidebar() {
           {isMobileOpen && (
             <button
               onClick={closeMobile}
-              className="lg:hidden w-8 h-8 rounded border border-[#222225] flex items-center justify-center text-slate-500 hover:text-white transition-colors cursor-pointer"
+              className="lg:hidden w-8 h-8 rounded border border-slate-200 flex items-center justify-center text-slate-400 hover:text-slate-900 transition-colors cursor-pointer"
             >
               <FiX className="text-sm" />
             </button>
@@ -121,7 +121,7 @@ export default function Sidebar() {
           <div className="space-y-1">
             {!isCollapsed && (
               <div className="px-3 mb-3">
-                <span className="text-[9px] font-mono font-semibold uppercase tracking-wider text-slate-600">Navigation</span>
+                <span className="text-[9px] font-mono font-semibold uppercase tracking-wider text-slate-400">Navigation</span>
               </div>
             )}
             {navItems.map((item) => {
@@ -138,8 +138,8 @@ export default function Sidebar() {
                   className={({ isActive }) => `
                     flex items-center gap-3.5 px-3 py-2.5 rounded font-mono text-[10px] uppercase tracking-wider transition-all cursor-pointer group relative
                     ${!item.external && isActive
-                      ? "bg-[#0c0c0c] border-l-2 border-[#e23e2d] text-white font-semibold"
-                      : "text-slate-500 hover:text-slate-200 hover:bg-[#0c0c0c]/40"
+                      ? "bg-slate-100 border-l-2 border-[#e23e2d] text-slate-900 font-semibold"
+                      : "text-slate-500 hover:text-slate-900 hover:bg-slate-50"
                     }
                   `}
                 >
@@ -163,7 +163,7 @@ export default function Sidebar() {
               onClick={togglePlatforms}
               className={`
                 w-full flex items-center gap-3.5 px-3 py-2.5 rounded font-mono text-[10px] uppercase tracking-wider transition-all cursor-pointer text-left
-                ${isPlatformRoute ? "text-slate-200 bg-[#0c0c0c] border-l-2 border-[#e23e2d]" : "text-slate-500 hover:text-slate-200 hover:bg-[#0c0c0c]/40"}
+                ${isPlatformRoute ? "text-slate-700 bg-slate-100 border-l-2 border-[#e23e2d]" : "text-slate-500 hover:text-slate-900 hover:bg-slate-50"}
               `}
             >
               <FiLayers className={`text-base ${isCollapsed ? "mx-auto" : ""}`} />
@@ -176,7 +176,7 @@ export default function Sidebar() {
             </button>
 
             {(isPlatformsExpanded || isCollapsed) && (
-              <div className={`space-y-1 ${isCollapsed ? "mt-2" : "mt-1.5 ml-3 border-l border-[#222225] pl-3"}`}>
+              <div className={`space-y-1 ${isCollapsed ? "mt-2" : "mt-1.5 ml-3 border-l border-slate-200 pl-3"}`}>
                 {platformItems.map((item) => {
                   const Icon = item.icon;
                   return (
@@ -187,8 +187,8 @@ export default function Sidebar() {
                       className={({ isActive }) => `
                         flex items-center gap-3 px-3 py-2 rounded font-mono text-[9px] uppercase tracking-wider transition-all cursor-pointer
                         ${isActive
-                          ? "bg-[#0c0c0c] text-[#e23e2d] font-semibold border-l border-[#e23e2d]/50"
-                          : "text-slate-600 hover:text-slate-300 hover:bg-[#0c0c0c]/40"
+                          ? "bg-slate-100 text-[#e23e2d] font-semibold border-l border-[#e23e2d]/50"
+                          : "text-slate-400 hover:text-slate-700 hover:bg-slate-50"
                         }
                       `}
                     >
@@ -211,7 +211,7 @@ export default function Sidebar() {
         </nav>
 
         {/* Footer - Logout */}
-        <div className="p-4 border-t border-[#222225]">
+        <div className="p-4 border-t border-slate-200">
           <button
             onClick={handleLogout}
             className="w-full flex items-center gap-3.5 px-3 py-2.5 rounded font-mono text-[10px] uppercase tracking-wider text-slate-500 hover:text-[#e23e2d] hover:bg-[#e23e2d]/5 transition-colors cursor-pointer"

@@ -23,17 +23,17 @@ class ErrorBoundary extends Component {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen bg-[#0c0c0c] text-slate-200 flex items-center justify-center p-6 select-none">
-          <div className="bg-[#121214] border border-[#222225] p-12 text-center rounded-xl space-y-6 max-w-lg mx-auto">
+        <div className="min-h-screen bg-[#f8fafc] text-slate-700 flex items-center justify-center p-6 select-none">
+          <div className="bg-white border border-slate-200 p-12 text-center rounded-xl space-y-6 max-w-lg mx-auto">
             <div className="w-12 h-12 bg-red-500/10 border border-red-500/20 rounded-full flex items-center justify-center mx-auto text-red-500 text-lg">
               <FiAlertTriangle />
             </div>
             
             <div className="space-y-3">
-              <h1 className="text-xl font-[Cormorant_Garamond] font-semibold italic text-white leading-none">
+              <h1 className="text-xl font-[Cormorant_Garamond] font-semibold italic text-slate-900 leading-none">
                 Something went wrong
               </h1>
-              <p className="text-slate-500 text-xs font-mono max-w-xs mx-auto leading-relaxed">
+              <p className="text-slate-400 text-xs font-mono max-w-xs mx-auto leading-relaxed">
                 An unexpected error occurred in your current session. Let's restart the app context.
               </p>
             </div>

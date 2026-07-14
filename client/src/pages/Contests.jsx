@@ -93,20 +93,20 @@ export default function Contests() {
     const today = new Date();
     const diffDays = Math.ceil((date - today) / (1000 * 60 * 60 * 24));
 
-    if (diffDays <= 0) return { label: "Live Now", color: "bg-green-500/10 text-green-500 border-green-500/20" };
-    if (diffDays === 1) return { label: "Tomorrow", color: "bg-amber-500/10 text-amber-500 border-amber-500/20" };
-    if (diffDays <= 3) return { label: "This Week", color: "bg-blue-500/10 text-blue-500 border-blue-500/20" };
-    return { label: `In ${diffDays} days`, color: "bg-slate-500/10 text-slate-400 border-slate-500/20" };
+    if (diffDays <= 0) return { label: "Live Now", color: "bg-green-500/10 text-green-600 border-green-500/20" };
+    if (diffDays === 1) return { label: "Tomorrow", color: "bg-amber-500/10 text-amber-600 border-amber-500/20" };
+    if (diffDays <= 3) return { label: "This Week", color: "bg-blue-500/10 text-blue-600 border-blue-500/20" };
+    return { label: `In ${diffDays} days`, color: "bg-slate-100 text-slate-500 border-slate-200" };
   };
 
   if (loading && contests.length === 0) return <FullPageLoader />;
 
   return (
     <div className="space-y-12">
-      <div className="pb-6 border-b border-[#222225] space-y-6">
+      <div className="pb-6 border-b border-slate-200 space-y-6">
         <Link
           to="/"
-          className="inline-flex items-center gap-2 font-mono text-[9px] uppercase tracking-wider text-slate-500 hover:text-slate-200 transition-colors"
+          className="inline-flex items-center gap-2 font-mono text-[9px] uppercase tracking-wider text-slate-400 hover:text-slate-700 transition-colors"
           title="Back to Dashboard"
         >
           ← Back to Dashboard
@@ -116,25 +116,25 @@ export default function Contests() {
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#e23e2d]/10 border border-[#e23e2d]/20 text-[#e23e2d] font-mono text-[9px] font-semibold uppercase tracking-wider">
             <span>ecosystem schedule</span>
           </div>
-          <h1 className="text-4xl md:text-5xl font-[Cormorant_Garamond] font-light italic text-white tracking-tight leading-tight">
+          <h1 className="text-4xl md:text-5xl font-[Cormorant_Garamond] font-light italic text-slate-900 tracking-tight leading-tight">
             Contest <br />
             <span className="text-[#e23e2d]">Arena.</span>
           </h1>
-          <p className="text-slate-400 text-xs md:text-sm max-w-xl leading-relaxed">
+          <p className="text-slate-500 text-xs md:text-sm max-w-xl leading-relaxed">
             Track upcoming competitive programming battles and events scheduled across LeetCode, Codeforces, AtCoder, and CodeChef.
           </p>
         </div>
       </div>
 
       {/* Platform Filter Section */}
-      <div className="bg-[#121214] border border-[#222225] p-6 rounded-xl space-y-6">
+      <div className="bg-white border border-slate-200 p-6 rounded-xl space-y-6">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 bg-[#0c0c0c] border border-[#222225] rounded-full flex items-center justify-center text-[#e23e2d] text-base">
+          <div className="w-9 h-9 bg-slate-100 border border-slate-200 rounded-full flex items-center justify-center text-[#e23e2d] text-base">
             <FiFilter />
           </div>
           <div>
-            <h2 className="text-sm font-[Cormorant_Garamond] font-semibold italic text-slate-200">Information filters</h2>
-            <p className="text-[9px] font-mono uppercase tracking-wider text-slate-500">Toggle platforms to monitor</p>
+            <h2 className="text-sm font-[Cormorant_Garamond] font-semibold italic text-slate-700">Information filters</h2>
+            <p className="text-[9px] font-mono uppercase tracking-wider text-slate-400">Toggle platforms to monitor</p>
           </div>
         </div>
 
@@ -149,7 +149,7 @@ export default function Contests() {
                 className={`flex items-center gap-2.5 px-4 py-2 rounded text-[9px] font-mono uppercase tracking-wider border transition-colors cursor-pointer ${
                   isSelected
                     ? "bg-[#e23e2d] text-white border-[#e23e2d] font-semibold"
-                    : "bg-[#0c0c0c] text-slate-500 border-[#222225] hover:text-slate-300"
+                    : "bg-slate-100 text-slate-500 border-slate-200 hover:text-slate-700"
                 }`}
               >
                 {platform.id === "atcoder" ? (
@@ -165,12 +165,12 @@ export default function Contests() {
       </div>
 
       {error ? (
-        <div className="bg-[#121214] border border-[#222225] p-12 text-center rounded-xl space-y-6 max-w-lg mx-auto">
+        <div className="bg-white border border-slate-200 p-12 text-center rounded-xl space-y-6 max-w-lg mx-auto">
           <div className="w-12 h-12 bg-red-500/10 border border-red-500/20 rounded-full flex items-center justify-center mx-auto text-red-500 text-lg">
             <FiCalendar />
           </div>
-          <h3 className="text-xl font-[Cormorant_Garamond] font-semibold italic text-white">Connection failed</h3>
-          <p className="text-slate-400 text-xs font-mono max-w-xs mx-auto leading-relaxed">
+          <h3 className="text-xl font-[Cormorant_Garamond] font-semibold italic text-slate-900">Connection failed</h3>
+          <p className="text-slate-500 text-xs font-mono max-w-xs mx-auto leading-relaxed">
             {error}
           </p>
           <button
@@ -182,17 +182,17 @@ export default function Contests() {
           </button>
         </div>
       ) : contests.length === 0 ? (
-        <div className="bg-[#121214] border border-[#222225] p-12 text-center rounded-xl space-y-6 max-w-lg mx-auto">
+        <div className="bg-white border border-slate-200 p-12 text-center rounded-xl space-y-6 max-w-lg mx-auto">
           <div className="w-12 h-12 bg-[#e23e2d]/10 border border-[#e23e2d]/20 rounded-full flex items-center justify-center mx-auto text-[#e23e2d] text-lg">
             <FiCalendar />
           </div>
-          <h3 className="text-xl font-[Cormorant_Garamond] font-semibold italic text-white">Arena empty</h3>
-          <p className="text-slate-400 text-xs font-mono max-w-xs mx-auto leading-relaxed">
+          <h3 className="text-xl font-[Cormorant_Garamond] font-semibold italic text-slate-900">Arena empty</h3>
+          <p className="text-slate-500 text-xs font-mono max-w-xs mx-auto leading-relaxed">
             No upcoming competitions detected in the selected information sources. Try expanding your filter range.
           </p>
           <button
             onClick={() => setSelectedPlatforms(["leetcode", "codeforces", "codechef", "atcoder"])}
-            className="px-5 py-2.5 bg-[#0c0c0c] border border-[#222225] hover:bg-[#121214] text-slate-300 font-mono text-[9px] font-semibold uppercase tracking-wider rounded transition-colors cursor-pointer"
+            className="px-5 py-2.5 bg-slate-100 border border-slate-200 hover:bg-white text-slate-600 font-mono text-[9px] font-semibold uppercase tracking-wider rounded transition-colors cursor-pointer"
           >
             Reset Filters
           </button>
@@ -201,27 +201,27 @@ export default function Contests() {
         <div className="space-y-12">
           {/* Stats Bar */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="bg-[#121214] border border-[#222225] p-4 rounded-xl text-center space-y-1">
-              <div className="text-2xl font-mono font-bold text-white">{contests.length}</div>
-              <div className="text-[8px] font-mono font-semibold uppercase tracking-wider text-slate-500">Total Events</div>
+            <div className="bg-white border border-slate-200 p-4 rounded-xl text-center space-y-1">
+              <div className="text-2xl font-mono font-bold text-slate-900">{contests.length}</div>
+              <div className="text-[8px] font-mono font-semibold uppercase tracking-wider text-slate-400">Total Events</div>
             </div>
-            <div className="bg-[#121214] border border-[#222225] p-4 rounded-xl text-center space-y-1">
+            <div className="bg-white border border-slate-200 p-4 rounded-xl text-center space-y-1">
               <div className="text-2xl font-mono font-bold text-orange-500">
                 {contests.filter(c => c.platform === "leetcode").length}
               </div>
-              <div className="text-[8px] font-mono font-semibold uppercase tracking-wider text-slate-500">LeetCode</div>
+              <div className="text-[8px] font-mono font-semibold uppercase tracking-wider text-slate-400">LeetCode</div>
             </div>
-            <div className="bg-[#121214] border border-[#222225] p-4 rounded-xl text-center space-y-1">
+            <div className="bg-white border border-slate-200 p-4 rounded-xl text-center space-y-1">
               <div className="text-2xl font-mono font-bold text-blue-500">
                 {contests.filter(c => c.platform === "codeforces").length}
               </div>
-              <div className="text-[8px] font-mono font-semibold uppercase tracking-wider text-slate-500">Codeforces</div>
+              <div className="text-[8px] font-mono font-semibold uppercase tracking-wider text-slate-400">Codeforces</div>
             </div>
-            <div className="bg-[#121214] border border-[#222225] p-4 rounded-xl text-center space-y-1">
-              <div className="text-2xl font-mono font-bold text-slate-400">
+            <div className="bg-white border border-slate-200 p-4 rounded-xl text-center space-y-1">
+              <div className="text-2xl font-mono font-bold text-slate-500">
                 {contests.filter(c => ["codechef", "atcoder"].includes(c.platform)).length}
               </div>
-              <div className="text-[8px] font-mono font-semibold uppercase tracking-wider text-slate-500">Others</div>
+              <div className="text-[8px] font-mono font-semibold uppercase tracking-wider text-slate-400">Others</div>
             </div>
           </div>
 
@@ -231,19 +231,19 @@ export default function Contests() {
             return (
               <div key={date} className="space-y-6">
                 {/* Date header */}
-                <div className="flex items-center justify-between gap-4 mb-4 border-b border-[#222225] pb-4">
+                <div className="flex items-center justify-between gap-4 mb-4 border-b border-slate-200 pb-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-[#121214] border border-[#222225] rounded-full flex items-center justify-center text-slate-400 text-sm">
+                    <div className="w-8 h-8 bg-white border border-slate-200 rounded-full flex items-center justify-center text-slate-500 text-sm">
                       <FiCalendar />
                     </div>
                     <div>
-                      <h2 className="text-base font-[Cormorant_Garamond] font-semibold italic text-slate-100 leading-none">{formatDateHeader(date)}</h2>
-                      <p className="text-[8px] font-mono text-slate-500 uppercase tracking-wider mt-1">
+                      <h2 className="text-base font-[Cormorant_Garamond] font-semibold italic text-slate-800 leading-none">{formatDateHeader(date)}</h2>
+                      <p className="text-[8px] font-mono text-slate-400 uppercase tracking-wider mt-1">
                         {dateContests.length} Event{dateContests.length > 1 ? "s" : ""} Scheduled
                       </p>
                     </div>
                   </div>
-                  <span className={`px-2 py-0.5 rounded text-[8px] font-mono uppercase tracking-wider border bg-[#0c0c0c] ${badge.color}`}>
+                  <span className={`px-2 py-0.5 rounded text-[8px] font-mono uppercase tracking-wider border ${badge.color}`}>
                     {badge.label}
                   </span>
                 </div>
