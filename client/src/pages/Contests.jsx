@@ -39,7 +39,18 @@ export default function Contests() {
       setLoading(true);
       const response = await api.get(`/contests?platforms=${selectedPlatforms.join(",")}&days=60`);
       if (response.data.success) {
-        setContests(response.data.data?.contests || []);
+        const fetchedContests = response.data.data?.contests || [];
+        const uniqueContests = [];
+        const seenUrls = new Set();
+        
+        for (const contest of fetchedContests) {
+          if (!seenUrls.has(contest.url)) {
+            seenUrls.add(contest.url);
+            uniqueContests.push(contest);
+          }
+        }
+        
+        setContests(uniqueContests);
       }
       setError(null);
     } catch {
