@@ -16,7 +16,7 @@ const AtCoderIcon = () => (
 const PLATFORM_META = [
   { id: "leetcode", label: "LeetCode", icon: SiLeetcode, color: "text-orange-500", toggle: "showLeetCode" },
   { id: "codeforces", label: "Codeforces", icon: SiCodeforces, color: "text-blue-500", toggle: "showCodeforces" },
-  { id: "github", label: "GitHub", icon: SiGithub, color: "text-slate-200", toggle: "showGitHub" },
+  { id: "github", label: "GitHub", icon: SiGithub, color: "text-slate-700", toggle: "showGitHub" },
   { id: "codechef", label: "CodeChef", icon: SiCodechef, color: "text-amber-600", toggle: "showCodeChef" },
   { id: "atcoder", label: "AtCoder", icon: AtCoderIcon, color: "", toggle: "showAtCoder" },
 ];
@@ -44,23 +44,23 @@ export default function Settings() {
   return (
     <div className="max-w-7xl mx-auto py-12 px-4 space-y-12 pb-32">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-[#222225]">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-slate-200">
         <div className="space-y-4">
           <Link
             to="/"
-            className="inline-flex items-center gap-2 font-mono text-[9px] uppercase tracking-wider text-slate-500 hover:text-slate-200 transition-colors"
+            className="inline-flex items-center gap-2 font-mono text-[9px] uppercase tracking-wider text-slate-400 hover:text-slate-700 transition-colors"
             title="Back to Dashboard"
           >
             ← Back to Dashboard
           </Link>
-          <h1 className="text-4xl md:text-5xl font-[Cormorant_Garamond] font-light italic text-white tracking-tight leading-tight">
+          <h1 className="text-4xl md:text-5xl font-[Cormorant_Garamond] font-light italic text-slate-900 tracking-tight leading-tight">
             Workspace <br />
             <span className="text-[#e23e2d]">Settings.</span>
           </h1>
         </div>
         {status.message && (
           <div className={`px-4 py-2 border rounded font-mono text-[9px] uppercase tracking-wider ${
-            status.type === "error" ? "bg-red-500/10 border-red-500/20 text-red-500" : "bg-green-500/10 border-green-500/20 text-green-500"
+            status.type === "error" ? "bg-red-500/10 border-red-500/20 text-red-500" : "bg-green-500/10 border-green-500/20 text-green-600"
           }`}>
             {status.message}
           </div>

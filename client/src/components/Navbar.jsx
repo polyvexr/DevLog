@@ -13,13 +13,13 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="w-full bg-gradient-to-r from-slate-900/95 via-slate-800/95 to-slate-900/95 backdrop-blur-lg border-b border-blue-500/20 shadow-lg shadow-blue-500/10">
+    <nav className="w-full bg-white/90 backdrop-blur-lg border-b border-slate-200 shadow-sm">
       <div className="app-container flex items-center justify-between p-4">
         <NavLink
           to="/"
-          className="text-2xl font-black neon-text flex items-center gap-2"
+          className="text-2xl font-black text-slate-900 flex items-center gap-2"
         >
-          <FiZap className="text-blue-400" /> DevLog
+          <FiZap className="text-[#e23e2d]" /> DevLog
         </NavLink>
 
         <div className="flex gap-4 items-center">
@@ -29,8 +29,8 @@ export default function Navbar() {
             className={({ isActive }) =>
               `font-semibold px-4 py-2 rounded-lg transition-all duration-200 ${
                 isActive
-                  ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg shadow-blue-500/50"
-                  : "text-gray-300 hover:text-white hover:bg-white/5"
+                  ? "bg-[#e23e2d] text-white shadow-lg shadow-red-500/20"
+                  : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
               }`
             }
           >
@@ -40,7 +40,7 @@ export default function Navbar() {
           <button
             onClick={handleLogout}
             aria-label="Logout"
-            className="bg-gradient-to-r from-red-500 to-pink-600 text-white px-4 py-2 rounded-lg font-semibold hover:shadow-lg hover:shadow-red-500/50 transition-all duration-200"
+            className="bg-[#e23e2d] hover:bg-[#cf2e2e] text-white px-4 py-2 rounded-lg font-semibold hover:shadow-lg hover:shadow-red-500/20 transition-all duration-200"
           >
             Logout
           </button>

@@ -34,9 +34,9 @@ export default function LeetCodeDetails() {
 
   if (loading) return <FullPageLoader />;
   if (error || !data) return (
-    <div className="bg-[#121214] border border-[#222225] p-12 text-center rounded-xl space-y-6 max-w-lg mx-auto mt-12">
-      <h2 className="text-xl font-[Cormorant_Garamond] font-semibold italic text-white">Service Not Linked</h2>
-      <p className="text-slate-400 text-xs font-mono max-w-xs mx-auto leading-relaxed">
+    <div className="bg-white border border-slate-200 p-12 text-center rounded-xl space-y-6 max-w-lg mx-auto mt-12">
+      <h2 className="text-xl font-[Cormorant_Garamond] font-semibold italic text-slate-900">Service Not Linked</h2>
+      <p className="text-slate-500 text-xs font-mono max-w-xs mx-auto leading-relaxed">
         This account is not yet connected. Connect your LeetCode profile to monitor statistics.
       </p>
       <button
@@ -59,7 +59,7 @@ export default function LeetCodeDetails() {
       <div className="space-y-4">
         <Link
           to="/"
-          className="inline-flex items-center gap-2 font-mono text-[9px] uppercase tracking-wider text-slate-500 hover:text-slate-200 transition-colors"
+          className="inline-flex items-center gap-2 font-mono text-[9px] uppercase tracking-wider text-slate-400 hover:text-slate-700 transition-colors"
         >
           ← Back to Dashboard
         </Link>
@@ -81,23 +81,23 @@ export default function LeetCodeDetails() {
       {stats.contestRanking && (
         <div className="space-y-4">
           <SectionHeader title="Contest Performance" dotColor="bg-[#e23e2d]" />
-          <div className="bg-[#121214] border border-[#222225] p-6 rounded-xl">
+          <div className="bg-white border border-slate-200 p-6 rounded-xl">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 font-mono">
               <div className="space-y-1">
-                <div className="text-[8px] font-semibold text-slate-500 uppercase tracking-wider">Rating</div>
-                <div className="text-2xl font-bold text-slate-200">{stats.contestRanking.rating ? Math.round(stats.contestRanking.rating) : "N/A"}</div>
+                <div className="text-[8px] font-semibold text-slate-400 uppercase tracking-wider">Rating</div>
+                <div className="text-2xl font-bold text-slate-700">{stats.contestRanking.rating ? Math.round(stats.contestRanking.rating) : "N/A"}</div>
               </div>
               <div className="space-y-1">
-                <div className="text-[8px] font-semibold text-slate-500 uppercase tracking-wider">Percentile</div>
-                <div className="text-2xl font-bold text-slate-200">{stats.contestRanking.topPercentage ? `${stats.contestRanking.topPercentage}%` : "N/A"}</div>
+                <div className="text-[8px] font-semibold text-slate-400 uppercase tracking-wider">Percentile</div>
+                <div className="text-2xl font-bold text-slate-700">{stats.contestRanking.topPercentage ? `${stats.contestRanking.topPercentage}%` : "N/A"}</div>
               </div>
               <div className="space-y-1">
-                <div className="text-[8px] font-semibold text-slate-500 uppercase tracking-wider">Contests</div>
-                <div className="text-2xl font-bold text-slate-200">{stats.contestRanking.attendedContestsCount || 0}</div>
+                <div className="text-[8px] font-semibold text-slate-400 uppercase tracking-wider">Contests</div>
+                <div className="text-2xl font-bold text-slate-700">{stats.contestRanking.attendedContestsCount || 0}</div>
               </div>
               <div className="space-y-1">
-                <div className="text-[8px] font-semibold text-slate-500 uppercase tracking-wider">Rank</div>
-                <div className="text-2xl font-bold text-slate-200">#{stats.contestRanking.globalRanking?.toLocaleString() || "—"}</div>
+                <div className="text-[8px] font-semibold text-slate-400 uppercase tracking-wider">Rank</div>
+                <div className="text-2xl font-bold text-slate-700">#{stats.contestRanking.globalRanking?.toLocaleString() || "—"}</div>
               </div>
             </div>
           </div>
@@ -118,13 +118,13 @@ export default function LeetCodeDetails() {
           />
           <div className="space-y-6">
             <SectionHeader title="Skills and Topics" dotColor="bg-[#e23e2d]" />
-            <div className="bg-[#121214] border border-[#222225] p-6 rounded-xl space-y-6">
+            <div className="bg-white border border-slate-200 p-6 rounded-xl space-y-6">
               {stats.tagStats?.advanced && (
                 <div className="space-y-3">
                   <h3 className="text-[9px] font-mono font-semibold uppercase tracking-wider text-[#e23e2d]">Advanced Topics</h3>
                   <div className="flex flex-wrap gap-2">
                     {stats.tagStats.advanced.slice(0, 8).map(tag => (
-                      <div key={tag.tagSlug} className="px-3 py-1.5 bg-[#0c0c0c] border border-[#222225] rounded text-[9px] font-mono text-slate-300">
+                      <div key={tag.tagSlug} className="px-3 py-1.5 bg-slate-100 border border-slate-200 rounded text-[9px] font-mono text-slate-600">
                         {tag.tagName} <span className="text-[#e23e2d] ml-1">{tag.problemsSolved}</span>
                       </div>
                     ))}
@@ -141,14 +141,14 @@ export default function LeetCodeDetails() {
 
         <div className="space-y-6">
           <SectionHeader title="Recent Activity" dotColor="bg-[#e23e2d]" />
-          <div className="bg-[#121214] border border-[#222225] rounded-xl divide-y divide-[#222225]/40 overflow-hidden">
+          <div className="bg-white border border-slate-200 rounded-xl divide-y divide-slate-200 overflow-hidden">
             {stats.recentSubmissions?.slice(0, 8).map((sub, idx) => (
-              <div key={idx} className="flex items-center justify-between p-4 hover:bg-[#0c0c0c]/50 transition-colors group">
+              <div key={idx} className="flex items-center justify-between p-4 hover:bg-slate-50 transition-colors group">
                 <div className="flex items-center gap-3 min-w-0">
                   <div className="w-1.5 h-1.5 rounded-full bg-green-500 opacity-60"></div>
-                  <div className="font-mono text-xs text-slate-200 truncate pr-4">{sub.title}</div>
+                  <div className="font-mono text-xs text-slate-700 truncate pr-4">{sub.title}</div>
                 </div>
-                <div className="text-[8px] font-mono text-slate-500 uppercase tracking-wider flex-shrink-0">
+                <div className="text-[8px] font-mono text-slate-400 uppercase tracking-wider flex-shrink-0">
                   {new Date(parseInt(sub.timestamp) * 1000).toLocaleDateString()}
                 </div>
               </div>

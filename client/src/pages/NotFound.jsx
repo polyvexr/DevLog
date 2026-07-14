@@ -3,7 +3,7 @@ import { FiAlertCircle } from "react-icons/fi";
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen bg-[#0c0c0c] text-slate-200 flex flex-col items-center justify-center px-4 select-none">
+    <div className="min-h-screen bg-[#f8fafc] text-slate-700 flex flex-col items-center justify-center px-4 select-none">
       <div className="w-full max-w-md text-center space-y-6">
         
         {/* Giant 404 Watermark */}
@@ -20,12 +20,12 @@ export default function NotFound() {
 
         {/* Messaging & Action */}
         <div className="space-y-4">
-          <h1 className="text-3xl md:text-4xl font-[Cormorant_Garamond] font-light italic text-white tracking-tight leading-none">
+          <h1 className="text-3xl md:text-4xl font-[Cormorant_Garamond] font-light italic text-slate-900 tracking-tight leading-none">
             Lost in the <br />
             <span className="text-[#e23e2d]">Workspace.</span>
           </h1>
           
-          <p className="text-slate-500 text-xs font-mono max-w-xs mx-auto leading-relaxed">
+          <p className="text-slate-400 text-xs font-mono max-w-xs mx-auto leading-relaxed">
             The page you are looking for doesn't exist, has been archived, or was relocated.
           </p>
         </div>
